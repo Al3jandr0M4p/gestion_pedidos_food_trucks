@@ -1,0 +1,29 @@
+{% include 'layouts/base.html'   %}
+{% block head %}
+    
+{% endblock %}
+
+{% block body %}
+
+<div class="form-container">
+    <h2>Pago con Criptomonedas</h2>
+    <form enctype="multipart/form-data">
+        <label for="crypto">Selecciona una criptomoneda:</label>
+        <select id="crypto" name="crypto">
+            <option disabled selected>Seleciona una cripto</option>
+            <option value="bitcoin">Bitcoin (BTC)</option>
+            <option value="ethereum">Ethereum (ETH)</option>
+            <option value="usdt">Tether (USDT)</option>
+        </select>
+
+        <label for="wallet">Dirección de la billetera:</label>
+        <input type="text" id="wallet" name="wallet" required>
+
+        <label for="proof">Subir comprobante de pago:</label>
+        <input type="file" id="proof" name="proof" accept="image/*" required>
+
+        <button type="submit">Enviar Pago</button>
+    </form>
+</div>
+    
+{% endblock %}

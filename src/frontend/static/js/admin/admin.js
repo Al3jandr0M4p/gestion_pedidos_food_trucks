@@ -1,0 +1,1 @@
+document?.addEventListener('DOMContentLoaded', () => { document.body.appendChild(Object.assign(document.createElement('button'), { className: 'menu-toggle', textContent: '☰', onclick: () => document.querySelector('.container__admin__configuration')?.classList.toggle('show') })); });

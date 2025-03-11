@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client/carrito.css') }}">
+{% endblock %}
+
+{% block body %}
+    <header class="container__head">
+        <h1>Carrito de Compras</h1>
+        <a href="{{ url_for('menu_foodtruck', foodtruck_id=1) }}">
+            <i class="fa-solid fa-arrow-left"></i> Volver pedidos
+        </a>
+    </header>
+
+    <section class="container__carrito">
+        <div id="lista-carrito"></div>
+        
+        <div class="carrito__total">
+            <h3>Total: <span id="total-precio">$0.00</span></h3>
+            <button id="vaciar-carrito">Vaciar Carrito</button>
+            <button id="finalizar-compra">Finalizar Compra</button>
+        </div>
+    </section>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/client/carrito.js') }}"></script>
+
+{% endblock %}

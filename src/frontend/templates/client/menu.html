@@ -1,0 +1,93 @@
+{% include 'layouts/base.html' %}
+{% block head %}
+
+<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/menu.css') }}">
+
+{% endblock %}
+
+{% block body %}
+
+<section class="container__principal__section__menu">
+    <div class="container">
+        <header class="header">
+            <h1>Descubre Food Trucks Increíbles</h1>
+            <p>Explora una experiencia gastronómica única en las mejores cocinas sobre ruedas de la ciudad</p>
+        </header>
+
+        <div class="container__slider">
+            <nav class="slider__wrapper">
+                <ul class="slider__icons__categories">
+                    <li>
+                        <div>
+                            <img src="{{ url_for('static', filename='assets/icons/pizza.png') }}" alt="icon pizza">
+                            <p>Pizza</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <img src="{{ url_for('static', filename='assets/icons/hamburguesa.png') }}" alt="icon hamburguesa">
+                            <p>Hamburguesa</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <img src="{{ url_for('static', filename='assets/icons/sushi.png') }}" alt="icon sushi">
+                            <p>Sushi</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <img src="{{ url_for('static', filename='assets/icons/tacos.png') }}" alt="icon tacos">
+                            <p>Tacos</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <img src="{{ url_for('static', filename='assets/icons/aguacate.png') }}" alt="icon vegana">
+                            <p>Vegana</p>
+                        </div>
+                    </li>
+                    <li>
+                        <div>
+                            <img src="{{ url_for('static', filename='assets/icons/donas.png') }}" alt="icon donas">
+                            <p>Donas</p>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="cards-grid">
+
+            {% for foodtruck in session.get('foodtrucks') %}
+                <article class="food-card">
+                    <div class="card-image">
+                        <img src="{{ foodtruck['imagen_foodtruck'] }}" alt="{{ foodtruck['nombre_truck'] }}" loading="lazy">
+                    </div>
+                    <div class="card-content">
+                        <h3>{{ foodtruck['nombre_truck'] }}</h3>
+                        
+                        <div class="info-item">
+                            <i data-lucide="utensils"></i>
+                            <span>{{ foodtruck['info_foodtruck'] }}</span>
+                        </div>
+
+                        <div class="specialty">
+                            <p>{{ foodtruck['especialidad'] }}</p>
+                        </div>
+ 
+                        <a href="{{ url_for('menu_foodtruck', foodtruck_id=foodtruck['id']) }}">
+                            <button type="submit">Explorar Menu</button>
+                        </a>                        
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+
+        <p id="noResults" style="display: none; text-align: center; margin-top: 20px;">No hay coincidencias con tu búsqueda</p>
+    </div>
+</section>
+
+<script src="{{ url_for('static', filename='js/client/menu.js') }}"></script>
+    
+{% endblock %}

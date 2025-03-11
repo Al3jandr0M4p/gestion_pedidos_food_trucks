@@ -1,0 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    --font: 'Poppins', sans-serif;
+
+    /* Colors */
+    --gray: #ccc;
+    --blue: #007BFF;
+    --white: #fff;
+}
+
+/* 
+______________________________
+    Estilos Generales
+______________________________
+
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    appearance: none;
+}
+
+body {
+    font-family: var(--font);
+    line-height: 1.6;
+    overflow: hidden;
+}
+
+/* 
+______________________________
+    Estilos Formulario
+______________________________
+
+*/
+
+.container__form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    height: 100vh;
+}
+
+form {
+    display: flex;
+    gap: 15px;
+    flex-direction: column;
+    padding: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.container__logo {
+    text-align: center;
+}
+
+.container__input__password,
+.container__input__name,
+.container__input__email,
+.container__rol__employees {
+    display: flex;
+    flex-direction: column;
+}
+
+.roles {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--gray);
+    font-family: var(--font);
+}
+
+.roles:focus {
+    outline: 3px solid var(--blue);
+}
+
+label {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+input {
+    font-size: 14px;
+    border: 1px solid var(--gray);
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+input:focus {
+    outline: 3px solid var(--blue);
+}
+
+.btn__primary {
+    padding: 10px;
+    border: none;
+    background: var(--blue);
+    color: var(--white);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: var(--font);
+}
+
+/* 
+______________________________
+    Estilo Alertas
+______________________________
+
+*/
+
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #333;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.5s ease-in-out;
+}
+
+.notification.success {
+    background-color: #4CAF50;
+}
+
+.notification.error {
+    background-color: #f44336;
+}
+
+.icon {
+    font-size: 18px;
+}
+
+/* 
+______________________________
+    Media Querys
+______________________________
+
+*/
+
+@media (max-width: 468px) {
+    .container__form {
+        padding: 40px;
+    }
+
+    form {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .container__form {
+        padding: 60px;
+    }
+
+    form {
+        max-width: 600px;
+    }
+}
+
+/* 
+______________________________
+    End CSS
+______________________________
+
+*/

@@ -1,0 +1,23 @@
+{% extends 'layouts/base.html' %}
+{% block head %}
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/qr.css') }}">
+    <link type="image/x-icon" rel="shortcut icon" href="favicon.ico">
+
+{% endblock %}
+
+{% block body %}
+    <div class="container__qrcode">
+        <h1>Explora Nuestro Menu</h1>  
+        <p>Escanea el codigo QR y descubre una variedad de sabores unicos en Foodtrucks Friends. ¡Ordena facil y disfruta al maximo!</p>  
+
+        <div class="container__data">
+            <div class="container__img__qr">
+                <img src="{{ url_for('static', filename='assets/qr.svg') }}" alt="QR Logo">
+            </div>
+            <div class="container__img__code">
+                <img src="data:image/png;base64, {{ img_str }}" alt="QR Code">
+            </div>
+        </div>
+    </div>
+{% endblock %}

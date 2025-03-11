@@ -1,0 +1,53 @@
+{% extends 'layouts/base.html' %}
+{% block head %}
+
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/pedidosP.css') }}">
+
+{% endblock %}
+
+{% block body %}
+    <header class="container__head">
+        <h1>Menu del Food Truck</h1>
+
+        <div>
+            <a href="/ver-carrito">
+                <i class="fa-solid fa-cart-shopping" data-count="0"></i>
+            </a>
+        </div>
+    </header>
+
+    <section class="container__menu">
+        {% if productos %}
+            {% for producto in productos %}
+                <div class="container__producto">
+                    <img src="{{ producto['imagen_producto'] }}" alt="{{ producto['nombre_producto'] }}" loading="eager">
+                    <h2>{{ producto['nombre_producto'] }}</h2>
+                    <p>{{ producto['descripcion'] }}</p>
+                    <span class="precio">${{ producto['precio'] }}</span>
+                    <button class="agregar__carrito" data-id="{{ producto['id'] }}" data-nombre="{{ producto['nombre_producto'] }}" data-precio="{{ producto['precio'] }}">
+                        comprar
+                    </button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="container__empty" style="text-align: center;">
+                <i class="fa-solid fa-utensils fa-3x"></i>
+                <p>No hay productos disponibles en este food trucks.</p>
+                <p>¡Vuelve pronto para nuevas delicias!</p>
+            </div>
+        {% endif %}
+    </section>
+
+    <div class="container__volver">
+        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
+            <i class="fa-solid fa-arrow-left"></i> Ir al Menu
+        </a>
+    </div>
+
+    <!-- alerta cuando se agrega al carrito -->
+    <div class="add-to-cart-alert" id="cartAlert">
+        Producto agregado al carrito
+    </div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/client/pedidos.js') }}"></script>
+{% endblock %}

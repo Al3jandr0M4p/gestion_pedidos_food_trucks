@@ -1,0 +1,56 @@
+{% include 'layouts/base.html'   %}
+{% block head %}
+    
+{% endblock %}
+
+{% block body %}
+
+    <div class="container__efectivo">
+        <h2>Pago en Efectivo</h2>
+        <form id="form-efectivo">
+            <div class="cotainer__input">
+                <label for="nombre">
+                    Nombre:
+                </label>
+                <input type="text" name="nombre" id="monto" required min="1">
+            </div>
+
+            <div class="container__input">
+                <label for="monto">
+                    Monto a pagar:
+                </label>
+                <input type="number" name="monto" id="monto" required min="1">
+            </div>
+
+            <button type="submit">Pagar</button>
+        </form>
+        <div id="alerta-pendiente" style="display: none; padding: 10px; margin-top: 10px;">
+            <p>
+                Esperando confirmacion del pago...
+            </p>
+        </div>
+        <button id="confirmar-pago" style="display: none; margin-top: 10px;">Confirmar Pago</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const formEfectivo = document.getElementById("form-efectivo");
+            const alertaPendiente = document.getElementById("alerta-pendiente");
+            const btnConfirmar = document.getElementById("confirmar-pago");
+        
+            formEfectivo.addEventListener("submit", (e) => {
+                e.preventDefault();
+                alertaPendiente.style.display = "block";
+                btnConfirmar.style.display = "block";
+            });
+        
+            btnConfirmar.addEventListener("click", () => {
+                localStorage.setItem("pago_confirmado", "true");
+                localStorage.removeItem("carrito");
+                alert("Pago en efectivo confirmado. Procesando pedido...");
+                window.location.href = "/ver-carrito";
+            });
+        })
+    </script>
+
+{% endblock %}

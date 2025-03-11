@@ -1,0 +1,52 @@
+{% include 'layouts/base.html'   %}
+{% block head %}
+    
+{% endblock %}
+
+{% block body %}
+
+    <div class="container__tarjeta">
+        <h2>Pago con Tarjeta</h2>
+        <form>
+            <div class="container__input">
+                <label for="">
+                    Nombre:
+                </label>
+                <input type="text" autocomplete="off" name="nombreUsuario" id="nombre" required>
+            </div>
+
+            <div class="container__input">
+                <label for="">
+                    Numero Tarjeta:
+                </label>
+                <input type="text" id="numeroTarjeta" name="numeroTarjeta" autocomplete="off" placeholder="#### #### #### ####" maxlength="19" required>
+            </div>
+
+            <div class="container__card__input">
+                <div>
+                    <label for="">
+                        Fecha Expiracion:
+                    </label>
+                    <input type="text" name="fechaExp" id="fechaExp" placeholder="MM/AA" maxlength="5" autocomplete="off" required>
+                </div>
+                <div>
+                    <label for="">
+                        CVV:
+                    </label>
+                    <input type="password" id="cvv" name="cvv" placeholder="###" maxlength="3" autocomplete="new-password" required>
+                </div>
+            </div>
+
+            <div class="containerr__input">
+                <label for="">
+                    Monto a Pagar:
+                </label>
+                <input type="number" name="monto" id="monto" required min="1">
+            </div>
+
+            <button type="submit">Pagar</button>
+
+        </form>
+    </div>
+
+{% endblock %}

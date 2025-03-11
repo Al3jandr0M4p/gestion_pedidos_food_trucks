@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %}
+{% block head %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/register.css') }}">
+
+<style>
+    
+</style>
+
+{% endblock %}
+
+{% block body %}
+
+<div class="container__form">
+
+    <form action="/admin/register" method="post">
+
+        <div class="container__logo">
+            <img src="https://" alt="Logo">
+            <h1>Registra Usuarios..</h1>
+        </div>
+
+        <div class="container__input__name">
+            <label for="name">
+                Username:
+            </label>
+            <input type="text" name="name" id="name" autocomplete="off" required>
+        </div>
+
+        <div class="container__input__email">
+            <label for="email">
+                Email:
+            </label>
+            <input type="email" name="email" id="email" autocomplete="off" required>
+        </div>
+
+        <div class="container__input__password">
+            <label for="passwd">
+                Password:
+            </label>
+            <input type="password" name="passwd" id="passwd" autocomplete="new-password" required>
+        </div>
+
+        <div class="container__rol__employees">
+            <select name="rol" id="rol" class="roles">
+                <option selected disabled>seleciona un rol</option>
+                <option value="admin">admin</option>
+                <option value="empleado">empleado</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn__primary">Registrar</button>
+
+    </form>
+
+</div>
+
+<div class="container__notificacion">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul id="flash-messages">
+                {% for category, message in messages %}
+                    <li data-category="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+</div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/notificacion.js') }}"></script>
+
+{% endblock %}

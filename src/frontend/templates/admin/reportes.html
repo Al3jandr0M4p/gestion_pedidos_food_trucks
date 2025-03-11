@@ -1,0 +1,64 @@
+{% extends 'layouts/base.html' %}
+{% block head %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/reporte.css') }}">
+    
+{% endblock %}
+
+{% block body %}
+
+<section class="reports__container">
+
+    <h1>Generar reportes</h1>
+
+    <div class="container__btn__render__reports__pdf">
+        <div class="container__foodtruck">
+            <h5>
+                Food truck mas popular:
+            </h5>
+            <button type="button">
+                reporte
+            </button>
+        </div>
+
+        <div class="container__producto">
+            <h5>
+                Producto mas vendido:
+            </h5>
+            <button type="button">
+                reporte
+            </button>
+        </div>
+
+        <div class="container__ganancias__totales__foodtruck">
+            <h5>
+                Ganancias por foodtruck:
+            </h5>
+            <button type="button">
+                reporte
+            </button>
+        </div>
+
+        <div class="container__ganancias__totales">
+            <h5>
+                Ganancias totales:
+            </h5>
+            <button type="button">
+                reporte
+            </button>
+        </div>
+
+        <div class="container__meses__productivo">
+            <h5>
+                Meses mas vendido:
+            </h5>
+            <button type="button">
+                reporte
+            </button>
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

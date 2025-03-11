@@ -1,0 +1,241 @@
+{% extends 'layouts/base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client/pago.css') }}">
+
+    <style>
+
+        :root {
+            --primary: #f97316;
+            --primary-light: #fb923c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.2;
+            background: #fff;
+            color: var(--primary);
+        }
+
+        .container__head {
+            display: flex;
+            justify-content: space-between;
+            padding: 30px;
+        }
+
+        .container__head h1 {
+            color: var(--primary-light);
+            font-size: 1.2rem;
+        }
+
+        .container__head a {
+            text-decoration: none;
+            color: var(--primary-light);
+            font-size: 16px;
+        }
+
+        .container__pago {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+            justify-items: center;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s ease-in-out;
+            text-align: center;
+            width: 100%;
+        }
+        
+        input[type="radio"] {
+            display: none;
+        }
+        
+        input[type="radio"]:checked + .tab {
+            background: #fff;
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .tab:nth-child(3) {
+            grid-column: 1 / 3;
+            justify-self: center;
+            width: 50%;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgb(0, 0, 0, .6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal__content {
+            background: #fff;
+            color: #000;
+            padding: 20px;
+            border-radius: 8px;
+            width: 70%;
+            max-width: 550px;
+            position: relative;
+        }
+
+        .close {
+            float: right;
+            font-size: 22px;
+            cursor: pointer;
+        }
+
+        .container__img {
+            width: 100%;
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .container__img img {
+            object-fit: cover;
+            width: 400px;
+        }
+
+        .carrito__total h2 {
+            font-size: 24px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        i {
+            font-size: 20px;
+        }
+
+        .payment-message {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            padding: 8px;
+        }
+
+    </style>
+{% endblock %}
+
+{% block body %}
+    <header class="container__head">
+        <h1>Seleccionar Método de Pago</h1>
+        <a href="{{ url_for('ver_carrito') }}">
+            <i class="fa-solid fa-arrow-left"></i> Volver al carrito
+        </a>
+    </header>
+
+    <section class="container__pago">
+
+        <form method="POST" aria-label="Formulario de procesar metodo de pago">
+            <p class="payment-message">
+                Selecciona tu metodo de pago favorito y finaliza tu compra.
+            </p>
+            <div class="tabs">
+                <input type="radio" id="tabTransferencia" name="metodo_pago" value="transferencia" onclick="openModal('modalTransferencia')">
+                <label for="tabTransferencia" class="tab"><i class='fas fa-university'></i> Transferencia</label>
+    
+                <input type="radio" id="tabTarjeta" name="metodo_pago" value="tarjeta" onclick="openModal('modalTarjeta')">
+                <label for="tabTarjeta" class="tab"><i class="fas fa-credit-card"></i> Tarjeta</label>
+    
+                <input type="radio" id="tabEfectivo" name="metodo_pago" value="efectivo" onclick="openModal('modalEfectivo')">
+                <label for="tabEfectivo" class="tab"><i class="fas fa-money-bill-wave"></i> Efectivo</label>
+
+                <input type="radio" id="tabCripto" name="metodo_pago" value="criptos" onclick="openModal('modalCripto')">
+                <label for="tabCripto" class="tab"><i class="fab fa-bitcoin"></i> Cripto</label>
+            </div>
+        </form>
+
+        <div class="container__img">
+            <img src="{{ url_for('static', filename='assets/pago.svg') }}" alt="icono de pago">
+        </div>
+
+        <div class="carrito__total" style="text-align: center; color: #666;">
+            <h2><i class="fas fa-coins"></i> Total a pagar:</h2>
+            <h3>Total: <strong><span id="total-precio">$0.00</span></strong></h3>
+            <h4>ITBIS (18%): <strong><span id="total-itbis">$0.00</span></strong></h4>
+        </div>
+    </section>
+
+
+    <div id="modalTransferencia" class="modal">
+        <div class="modal__content">
+            <span class="close" onclick="closeModal('modalTransferencia')">&times;</span>
+            {% include 'client/payments/transferencia.html' %}
+        </div>
+    </div>
+
+    <div id="modalTarjeta" class="modal">
+        <div class="modal__content">
+            <span class="close" onclick="closeModal('modalTarjeta')">&times;</span>
+            {% include 'client/payments/tarjeta.html' %}
+        </div>
+    </div>
+
+    <div id="modalEfectivo" class="modal">
+        <div class="modal__content">
+            <span class="close" onclick="closeModal('modalEfectivo')">&times;</span>
+            {% include 'client/payments/efectivo.html' %}
+        </div>
+    </div>
+
+    <div id="modalCripto" class="modal">
+        <div class="modal__content">
+            <span class="close" onclick="closeModal('modalCripto')">&times;</span>
+            {% include 'client/payments/cripto.html' %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const totalPrecio = document.getElementById("total-precio");
+            const totalItbis = document.getElementById("total-itbis");
+
+            // Cargar el total y el ITBIS desde localStorage
+            const total = localStorage.getItem("total");
+            const itbis = localStorage.getItem("itbis");
+
+            if (total) {
+                totalPrecio.textContent = `$${total}`;
+            }
+
+            if (itbis) {
+                totalItbis.textContent = `$${itbis}`;
+            }
+
+        });
+
+        let openModal = (id) => document.getElementById(id).style.display = 'flex';
+        
+        let closeModal = (id) => document.getElementById(id).style.display = 'none';
+    </script>
+
+{% endblock %}

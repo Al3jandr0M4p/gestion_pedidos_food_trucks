@@ -1,0 +1,38 @@
+{% extends 'layouts/base.html' %}
+{% block head %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    
+{% endblock %}
+
+{% block body %}
+
+<div class="container__form">
+
+    <form action="/login" method="post">
+
+        <div class="container__logo">
+            <h1>Inicia sesion en tu cuenta..</h1>
+        </div>
+
+        <div class="container__input__name">
+            <label for="name">
+                Username:
+            </label>
+            <input type="text" name="name" id="name" autocomplete="off" required>
+        </div>
+
+        <div class="container__input__password">
+            <label for="password">
+                Password:
+            </label>
+            <input type="password" name="passwd" id="passwd" autocomplete="new-password" required>
+        </div>
+
+        <button type="submit" class="btn__primary">Entrar</button>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,160 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root {
+    --font: 'Poppins', sans-serif;
+
+    /* Neutral Colors */
+    --white: #fff;
+    --black: #000;
+}
+
+/*
+
+________________________________
+    CSS-GENERAL
+________________________________
+
+*/
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    appearance: none;
+    text-decoration: none;
+    list-style: none;
+}
+
+body {
+    font-family: var(--font);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    overflow-y: hidden;
+}
+
+/*
+
+__________________________________
+    SECTION: DASHBOARD
+__________________________________
+
+*/
+
+.container__admin__dashboard {
+    display: flex;
+    height: 100vh;
+}
+
+.container__admin__configuration {
+    width: 250px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--black);
+    transition: transform 0.3s ease-in-out;
+}
+
+.navbar__admin {
+    width: 100%;
+}
+
+.links__admin {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 15px;
+}
+
+.links__admin li {
+    width: 100%;
+}
+
+.links__admin li a {
+    display: block;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--white);
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.links__admin li a:hover {
+    background: rgba(255, 255, 255, .1);
+}
+
+.links__admin .logout {
+    color: #ffdddd;
+    font-weight: 600;
+}
+
+
+.container__admin__content {
+    flex: 1;
+    padding: 40px;
+    background-color: var(--white);
+    overflow-y: auto;
+    color: var(--black);
+}
+
+.container__admin__content h1 {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/*
+
+_____________________________
+    MEDIA-QUERRYS
+_____________________________
+
+*/
+
+@media (max-width: 768px) {
+    .container__admin__dashboard {
+        flex-direction: column;
+    }
+
+    .container__admin__configuration {
+        width: 250px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        transform: translateX(-100%);
+        z-index: 100;
+    }
+
+    .container__admin__configuration.show {
+        transform: translateX(0);
+    }
+
+    .container__admin__content {
+        padding: 20px;
+    }
+
+    .menu-toggle {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: var(--black);
+        color: var(--white);
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        z-index: 101;
+    }
+}
+
+/*
+
+___________________________
+    END CSS
+___________________________
+
+*/

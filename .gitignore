@@ -1,0 +1,15 @@
+# Ignorar el directorio __pycache__ que contiene los archivos de cache de python
+
+**/__pycache__/
+
+# Ignorar los archivos .pyc generados por Python
+*.pyc
+
+# Ignorar los archivos .pyo (optimizados)
+*.pyo
+
+# Ignorar los archivos de caché de Jupyter notebooks
+.ipynb_checkpoints/
+
+# Ignorar archivos de configuración de entorno
+.env
