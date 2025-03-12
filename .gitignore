@@ -13,3 +13,6 @@
 
 # Ignorar archivos de configuración de entorno
 .env
+
+# Ignorar la carpeta logs propia
+logs/
