@@ -470,6 +470,7 @@ class UserApp:
             session.pop('carrito', None)
 
             if correo:
+                print(f"Enviando factura a {correo}...")
                 self.enviar_factura_por_correo(correo, nombre, mesa_id, carrito, total, transaccion_id, fecha)
 
             print('Transferencia registrada. Pendiente de verificación.')

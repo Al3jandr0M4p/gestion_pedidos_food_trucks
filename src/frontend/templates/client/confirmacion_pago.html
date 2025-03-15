@@ -7,7 +7,7 @@
 {% block body %}
     <header class="container__head">
         <h1>Confirmación de Pago</h1>
-        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
+        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada')) }}">
             <i class="fa-solid fa-arrow-left"></i> Volver al menú
         </a>
     </header>

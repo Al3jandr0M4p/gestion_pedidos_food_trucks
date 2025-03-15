@@ -18,6 +18,7 @@ Ejemplo:
 from flask import Flask
 from flask_cors import CORS
 from flask_caching import Cache
+from flask_mail import Mail
 
 # importaciones del logging
 import logging
@@ -75,9 +76,16 @@ class FoodTrucks:
             )
         )
         self.food.config['SECRET_KEY'] = Config.SECRET_KEY
+        self.food.config['MAIL_SERVER'] = 'smtp.gmail.com'
+        self.food.config['MAIL_PORT'] = 587
+        self.food.config['MAIL_USE_TLS'] = True
+        self.food.config['MAIL_USERNAME'] = os.getenv('EMAIL_USER')
+        self.food.config['MAIL_PASSWORD'] = os.getenv('EMAIL_PASSWORD')
+        self.food.config['MAIL_DEFAULT_SENDER'] = os.getenv('EMAIL_DEFAULT_SENDER')
+        self.mail = Mail(self.food)
         CORS(self.food)
         self.cache = Cache(self.food, config={'CACHE_TYPE': 'simple'})
-
+    
         # configuracion de las rutas de la app
         ConfigurationRoutesApp(self.food)
 
