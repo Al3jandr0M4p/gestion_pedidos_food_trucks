@@ -1,0 +1,47 @@
+{% extends 'layouts/base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client/confirmacion.css') }}">
+{% endblock %}
+
+{% block body %}
+    <header class="container__head">
+        <h1>Confirmación de Pago</h1>
+        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
+            <i class="fa-solid fa-arrow-left"></i> Volver al menú
+        </a>
+    </header>
+
+    <section class="container__confirmacion">
+        <div class="confirmacion__details">
+            <h2>¡Tu pago ha sido registrado!</h2>
+            
+            <div class="confirmacion__info">
+                <p><strong>ID de transacción:</strong> {{ transaccion.id }}</p>
+                <p><strong>Fecha:</strong> {{ transaccion.fecha }}</p>
+                <p><strong>Método de pago:</strong> {{ transaccion.metodo_pago }}</p>
+                <p><strong>Total:</strong> ${{ transaccion.monto }}</p>
+                <p><strong>Estado:</strong> {{ transaccion.estado }}</p>
+                
+                {% if transaccion.metodo_pago == 'tarjeta' %}
+                    <p class="estado-completado">¡Pago completado con éxito!</p>
+                {% elif transaccion.metodo_pago == 'efectivo' %}
+                    <p class="estado-pendiente">Por favor realiza el pago en la caja.</p>
+                {% else %}
+                    <p class="estado-pendiente">El pago está pendiente de verificación.</p>
+                {% endif %}
+            </div>
+            
+            <h3>Detalles de la compra</h3>
+            <div class="confirmacion__productos">
+                {% for detalle in detalles %}
+                    <div class="producto-item">
+                        <p><strong>{{ detalle.nombre_producto }}</strong></p>
+                        <p>Cantidad: {{ detalle.cantidad }}</p>
+                        <p>Precio: ${{ detalle.precio_unitario }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Obtener la data carrito
         carrito.forEach((producto, index) => {
             total += producto.precio * producto.cantidad;
 
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // vaciar el carrito
     btnVaciar.addEventListener("click", () => {
         carrito = [];
         localStorage.setItem("carrito", JSON.stringify(carrito));
@@ -64,9 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
         localStorage.setItem("total", totalConItbis.toFixed(2));
         localStorage.setItem("itbis", itbis.toFixed(2));
+        localStorage.setItem("carrito", JSON.stringify(carrito));
+        sessionStorage.carrito = JSON.stringify(carrito);
 
+        // redirijir a los metodos de pagos
         window.location.href = "/seleccionar-pago";
     });
 
+    // Actualizar el carrito
     actualizarCarrito();
 });

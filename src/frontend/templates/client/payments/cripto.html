@@ -7,23 +7,81 @@
 
 <div class="form-container">
     <h2>Pago con Criptomonedas</h2>
-    <form enctype="multipart/form-data">
-        <label for="crypto">Selecciona una criptomoneda:</label>
-        <select id="crypto" name="crypto">
-            <option disabled selected>Seleciona una cripto</option>
-            <option value="bitcoin">Bitcoin (BTC)</option>
-            <option value="ethereum">Ethereum (ETH)</option>
-            <option value="usdt">Tether (USDT)</option>
-        </select>
+    <form action="{{ url_for('procesar_pago') }}" method="post" enctype="multipart/form-data">
 
-        <label for="wallet">Dirección de la billetera:</label>
-        <input type="text" id="wallet" name="wallet" required>
+        <input type="hidden" name="metodo_pago" value="criptos">
+        <input type="hidden" name="carrito" value="carrito-input">
 
-        <label for="proof">Subir comprobante de pago:</label>
-        <input type="file" id="proof" name="proof" accept="image/*" required>
+        <div>
+            <label for="crypto">
+                Selecciona una criptomoneda:
+            </label>
+            <select id="crypto" name="crypto">
+                <option disabled selected>Seleciona una cripto</option>
+                <option value="bitcoin">Bitcoin (BTC)</option>
+                <option value="ethereum">Ethereum (ETH)</option>
+                <option value="usdt">Tether (USDT)</option>
+            </select>
+        </div>
+
+        <div class="wallet-info">
+            <p>
+                Envia el pago a la siguiente direccion:
+            </p>
+            <div class="wallet-address">
+                <span id="direccion-wallet">0x1234567890abcdef1234567890abcdef12345678</span>
+                <button type="button" onclick="copiarDireccion()">Copiar</button>
+            </div>
+        </div>
+
+        <div>
+            <label for="wallet">
+                Dirección de la billetera:
+            </label>
+            <input type="text" id="wallet" name="wallet" required>
+        </div>
+
+        <div>
+            <label for="proof">
+                Subir comprobante de pago:
+            </label>
+            <input type="file" id="proof" name="proof" accept="image/*" required>
+        </div>
 
         <button type="submit">Enviar Pago</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("carrito-input").value = localStorage.getItem("carrito") || "[]";
+
+        document.getElementById("crypto").addEventListener("change", function() {
+            const cypto = this.value;
+            let direccion = "";
+
+            switch(crypto) {
+                case "bitcoin":
+                    direccion = "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh";
+                    break;
+                case "ethereum":
+                    direccion = "0x1234567890abcdef1234567890abcdef12345678";
+                    break;
+                case "usdt":
+                    direccion = "TEFjsdkf8sdkfjsdf89JHsdf89sJsdfk8";
+                    break;
+            }
+
+            document.getElementById("direccion-wallet").textContent = direccion;
+        });
+    });
+
+    function copiarDireccion() {
+        const direccion = document.getElementById("direccion-wallet").textContent;
+        navigator.clipboard.writeText(direccion).then(() => {
+            alert("direccion copiada al portapapeles");
+        });
+    }
+</script>
     
 {% endblock %}

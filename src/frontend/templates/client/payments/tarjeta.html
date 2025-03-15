@@ -1,52 +1,100 @@
 {% include 'layouts/base.html'   %}
 {% block head %}
-    
+    <script src="https://js.stripe.com/v3/"></script>
 {% endblock %}
 
 {% block body %}
 
     <div class="container__tarjeta">
         <h2>Pago con Tarjeta</h2>
-        <form>
+        <form id="payment-form" action="{{ url_for('procesar_pago') }}" method="post">
+
+            <input type="hidden" name="metodo_pago" value="tarjeta">
+
             <div class="container__input">
-                <label for="">
-                    Nombre:
+                <label for="nombre">
+                    Nombre en la tarjeta:
                 </label>
                 <input type="text" autocomplete="off" name="nombreUsuario" id="nombre" required>
             </div>
 
             <div class="container__input">
-                <label for="">
-                    Numero Tarjeta:
+                <label for="card-element">
+                    Informacion de la tarjeta:
                 </label>
-                <input type="text" id="numeroTarjeta" name="numeroTarjeta" autocomplete="off" placeholder="#### #### #### ####" maxlength="19" required>
-            </div>
-
-            <div class="container__card__input">
-                <div>
-                    <label for="">
-                        Fecha Expiracion:
-                    </label>
-                    <input type="text" name="fechaExp" id="fechaExp" placeholder="MM/AA" maxlength="5" autocomplete="off" required>
-                </div>
-                <div>
-                    <label for="">
-                        CVV:
-                    </label>
-                    <input type="password" id="cvv" name="cvv" placeholder="###" maxlength="3" autocomplete="new-password" required>
+                <div id="card-element">
+                    <!-- Stripe Element se montara aqui -->
                 </div>
             </div>
 
-            <div class="containerr__input">
-                <label for="">
+            <div class="container__input">
+                <label for="monto-hidden">
                     Monto a Pagar:
                 </label>
-                <input type="number" name="monto" id="monto" required min="1">
+                <span id="monto-a-pagar">$0.00</span>
+                <input type="hidden" name="monto" id="monto-hidden">
             </div>
+
+            <div id="card-errors" role="alert" style="color: #f00;"></div>
 
             <button type="submit">Pagar</button>
 
         </form>
     </div>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const montoAPagar = document.getElementById("monto-a-pagar");
+            const montoHidden = document.getElementById("monto-hidden");
+
+            // Cargar el total y el ITBIS desde localStorage
+            const total = localStorage.getItem("total") || "0.00";
+            montoAPagar.textContent = `$${total}`;
+            montoHidden.value = total;
+
+            // Configurar Stripe
+            const stripe = Stripe('pk_test_51R1rahC8mDrO4oITEAe4lbHFYbySRp025uY4iwDXuNktd98M5UEZcFuNtFeahByR3NXLuYc0FWB0s5mFyFpsSYcL00VmEPiwKY');
+            const elements = stripe.elements();
+            const card = elements.create('card');
+            card.mount('#card-element');
+
+            card.addEventListener('change', function(e) {
+                const displayError = document.getElementById('card-errors');
+                if (e.error) {
+                    displayError.textContent = e.error.message;
+                } else {
+                    displayError.textContent = '';
+                }
+            });
+
+            const form = document.getElementById('payment-form');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                stripe.createToken(card).then(function(result) {
+                    if (result.error) {
+                        const errorElement = document.getElementById('card-errors');
+                        errorElement.textContent = result.error.message;
+                    } else {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.setAttribute('type', 'hidden');
+                        hiddenInput.setAttribute('name', 'stripeToken');
+                        hiddenInput.setAttribute('value', result.token.id);
+                        form.appendChild(hiddenInput);
+
+                        const carritoInput = document.createElement('input');
+                        carritoInput.setAttribute('type', 'hidden');
+                        carritoInput.setAttribute('name', 'carrito');
+                        carritoInput.setAttribute('value', localStorage.getItem('carrito'));
+                        form.appendChild(carritoInput);
+
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+    </script>
 
 {% endblock %}

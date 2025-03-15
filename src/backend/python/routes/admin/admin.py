@@ -3,16 +3,9 @@ Modulo de administracion de la aplicacion.
 
 Este modulo define la clase `AdminApp`, que configura y gestiona
 las rutas de administracion dentro de la aplicacion Flask.
-
-Ejemplo:
---------
->>> from flask import Flask
->>> from src.backend.python.routes.admin.admin import AdminApp
->>> app = Flask(__name__)
->>> AdminApp(app)
 """
 
-from flask import render_template, session, jsonify
+from flask import render_template, jsonify, session, request
 
 # importaciones propias
 from ....security.autentication import authentication_required
@@ -66,7 +59,8 @@ class AdminApp:
             Muestra el dashboard de administracion.
             Renderiza la plantilla 'admin/admin.html'.
             """
-            
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/dashboard.html')
             return render_template('admin/admin.html', name=session.get('user_name'))
         
         @self.admin.route('/admin/reports')
@@ -76,8 +70,9 @@ class AdminApp:
             Muestra la pagina de reportes administrativos.
             Redenriza la plantilla 'admin/reportes.html'.
             """
-
-            return render_template('admin/reportes.html')
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/reportes.html')
+            return render_template('admin/admin.html', name=session.get('user_name'))
 
         # Seccion de Gestion
         @self.admin.route('/admin/gestion')
@@ -87,8 +82,9 @@ class AdminApp:
             Muestra la pagina de gestion administrativa.
             Renderiza la plantilla 'admin/gestion.html'.
             """
-
-            return render_template('admin/gestion.html')
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/gestion.html')
+            return render_template('admin/admin.html', name=session.get('user_name'))
 
         # CRUD de los empleados
         @self.admin.route('/admin/gestion/employees')
@@ -102,13 +98,15 @@ class AdminApp:
             str
                 Renderiza la plantilla 'admin/employees.html' con la lista de empleados.
             """
-
-            with self.conn.cursor(dictionary=True) as cursor:
-                query = "SELECT * FROM users"
-                cursor.execute(query)
-                employees = cursor.fetchall()
-
-            return render_template('admin/employees.html', employees=employees)
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                try:
+                    with self.conn.cursor(dictionary=True) as cursor:
+                        cursor.execute("SELECT * FROM users")
+                        employees = cursor.fetchall()
+                except Error as e:
+                    print(f"Error al obtener los datos: {e}")
+                return render_template('admin/employees.html', employees=employees)
+            return render_template('admin/admin.html', name=session.get('user_name'))
 
         # Delete / Desactivar
         @self.admin.route('/admin/gestion/employees/toggle_status/<int:user_id>', methods=['POST'])
@@ -146,3 +144,6 @@ class AdminApp:
 
             except Exception as e:
                 return jsonify({"success": False, "error": str(e)}), 500
+            
+            except Error as e:
+                print(f"Error al actualizar los datos del los empleados/Usuarios: {e}")

@@ -7,7 +7,10 @@
     
     <div class="container__transferencia">
         <h2>Pago Transferencia</h2>
-        <form>
+        <form action="{{ url_for('procesar_pago')}}" method="post">
+
+            <input type="hidden" name="metodo_pago" value="transferencia">
+            <input type="hidden" name="carrito" id="carrito-input">
 
             <div class="container__input">
                 <label for="nombreUsuario">
@@ -17,18 +20,25 @@
             </div>
 
             <div class="container__input">
-                <label for="">
+                <label for="correo">
+                    Email:
+                </label>
+                <input type="email" name="correo" id="correo" autocomplete="off" required>
+            </div>
+
+            <div class="container__input">
+                <label for="numeroCuenta">
                     Numero de cuenta:
                 </label>
-                <input type="text" name="numeroCuenta" id="numeroCuenta" autocomplete="off" id="numeroCuenta" required pattern="\d{10,20}">
+                <input type="text" name="numeroCuenta" id="numeroCuenta" autocomplete="off" required pattern="\d{10,20}">
             </div>
 
             <div class="container__info__banco">
-                <label for="">
+                <label for="bancoDestino">
                     Banco:
                 </label>
                 <select name="banco" id="bancoDestino">
-                    <option value="" disabled selected>Seleccione un banco</option>
+                    <option disabled selected>Seleccione un banco</option>
                     <option value="Banco Popular">Banco Popular</option>
                     <option value="Banco Banreservas">Banco Banreservas</option>
                     <option value="Banco BHD">Banco BHD</option>
@@ -38,15 +48,23 @@
             </div>
 
             <div class="container__input">
-                <label for="">
+                <label for="monto">
                     Monto a Transferencia:
                 </label>
-                <input type="number" autocomplete="off" id="monto" required min="1">
+                <input type="number" name="monto" autocomplete="off" id="monto" required min="1" step="0.01">
             </div>
 
             <button type="submit">Realizar Transferencia</button>
-
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const total = localStorage.getItem('total') || "0.00";
+            document.getElementById("monto").value = total;
+
+            document.getElementById("carrito-input").value = localStorage.getItem("carrito") || "[]";
+        });
+    </script>
 
 {% endblock %}

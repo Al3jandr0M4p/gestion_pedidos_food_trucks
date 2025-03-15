@@ -16,10 +16,11 @@
             </div>
 
             <div class="container__input">
-                <label for="monto">
-                    Monto a pagar:
+                <label for="monto-hidden">
+                    Monto a Pagar:
                 </label>
-                <input type="number" name="monto" id="monto" required min="1">
+                <span id="monto-a-pagar">$0.00</span>
+                <input type="hidden" name="monto" id="monto-hidden">
             </div>
 
             <button type="submit">Pagar</button>
@@ -50,6 +51,18 @@
                 alert("Pago en efectivo confirmado. Procesando pedido...");
                 window.location.href = "/ver-carrito";
             });
+
+            const montoAPagar = document.getElementById("monto-a-pagar");
+            const montoHidden = document.getElementById("monto-hidden");
+        
+            setTimeout(() => {
+                // Obtener total del localStorage
+                const total = localStorage.getItem("total") || "0.00";
+                console.log("Monto obtenido del localStorage:", total);
+                // Mostrar el monto correctamente
+                montoAPagar.textContent = `$${total}`;
+                montoHidden.value = total;
+            }, 500)
         })
     </script>
 

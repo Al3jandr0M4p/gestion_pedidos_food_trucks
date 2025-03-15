@@ -9,10 +9,14 @@
 
 <div class="container__form">
 
+    <div class="container__logo__img">
+        <img src="{{ url_for('static', filename='assets/logo-login.svg') }}" alt="Logo login">
+    </div>
+
     <form action="/login" method="post">
 
         <div class="container__logo">
-            <h1>Inicia sesion en tu cuenta..</h1>
+            <h1>Inicia sesión en tu cuenta</h1>
         </div>
 
         <div class="container__input__name">
@@ -26,7 +30,12 @@
             <label for="password">
                 Password:
             </label>
-            <input type="password" name="passwd" id="passwd" autocomplete="new-password" required>
+            <div class="password-wrapper">
+                <input type="password" name="passwd" id="passwd" autocomplete="new-password" required>
+                <button type="button" id="togglePassword">
+                    👁️
+                </button>
+            </div>
         </div>
 
         <button type="submit" class="btn__primary">Entrar</button>
@@ -34,5 +43,18 @@
     </form>
 
 </div>
+
+<script>
+    document.getElementById("togglePassword").addEventListener("click", function() {
+        let passwdInput = document.getElementById("passwd");
+        if (passwdInput.type === "password") {
+            passwdInput.type = "text";
+            this.textContent = "🙈";
+        } else {
+            passwdInput.type = "password";
+            this.textContent = "👁️";
+        }
+    });
+</script>
 
 {% endblock %}
