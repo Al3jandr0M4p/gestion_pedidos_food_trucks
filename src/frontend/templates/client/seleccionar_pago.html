@@ -2,7 +2,6 @@
 
 {% block head %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/client/pago.css') }}">
-
 {% endblock %}
 
 {% block body %}
@@ -28,9 +27,6 @@
     
                 <input type="radio" id="tabEfectivo" name="metodo_pago" value="efectivo" onclick="openModal('modalEfectivo')">
                 <label for="tabEfectivo" class="tab"><i class="fas fa-money-bill-wave"></i> Efectivo</label>
-
-                <input type="radio" id="tabCripto" name="metodo_pago" value="criptos" onclick="openModal('modalCripto')">
-                <label for="tabCripto" class="tab"><i class="fab fa-bitcoin"></i> Cripto</label>
             </div>
         </form>
 
@@ -58,13 +54,6 @@
         <div class="modal__content">
             <span class="close" onclick="closeModal('modalEfectivo')">&times;</span>
             {% include 'client/payments/efectivo.html' %}
-        </div>
-    </div>
-
-    <div id="modalCripto" class="modal">
-        <div class="modal__content">
-            <span class="close" onclick="closeModal('modalCripto')">&times;</span>
-            {% include 'client/payments/cripto.html' %}
         </div>
     </div>
 

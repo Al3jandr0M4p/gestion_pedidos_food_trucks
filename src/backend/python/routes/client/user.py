@@ -27,7 +27,6 @@ import stripe
 from ....db.database import DBConfig, Error
 from ...utils.mail_utils import enviar_correo
 
-
 class UserApp:
     """
     Clase para gestionar las rutas de usuario en la aplicacion Flask
@@ -278,6 +277,52 @@ class UserApp:
                 print(f'Error al mostrar la confirmación: {str(e)}')
                 flash(f'Error al mostrar la confirmación: {str(e)}')
                 return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
+        
+        @self.user.route('/user/confirmar-pago/<transaccion_id>/<token>')
+        def confirmar_pago(transaccion_id, token):
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query = """
+                    SELECT * FROM transacciones
+                    WHERE id = %s AND token_confirmacion = %s
+                    """
+                    cursor.execute(query, (transaccion_id, token))
+                    transaccion = cursor.fetchone()
+
+                    if not transaccion:
+                        print("Enlace de confirmacion invalido o expirado.")
+                        return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
+
+                    if transaccion.get('estado') == "completado":
+                        print("Este pago ya ha sido confirmado")
+                        return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+
+                    update_query = """ 
+                    UPDATE transacciones
+                    SET estado = 'completado', fecha_confirmacion = NOW()
+                    WHERE id = %s
+                    """
+                    cursor.execute(update_query, (transaccion_id))
+                    self.conn.commit()
+
+                    if transaccion.get('metodo_pago') == 'transferencia' and transaccion.get('datos_adicionales'):
+                        datos = json.loads(transaccion['datos_adicionales'])
+                        if 'stripe_payment_intent_id' in datos:
+                            stripe.api_key = os.getenv('PRIVATE_KEY')
+                            payment_intent_id = datos['stripe_payment_intent_id']
+                    
+                    if 'datos_adicionales' in transaccion and transaccion['datos_adicionales']:
+                        datos = json.loads(transaccion['datos_adicionales'])
+                        if 'nombre' in datos:
+                            correo = datos.get('correo')
+                            self.enviar_confirmacion_pago(correo, datos.get('nombre', 'Cliente'), transaccion_id)
+                    
+                    print("Pago confirmado exitosamente")
+                    return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+                
+            except Exception as e:
+                print(f"Error al confirmar pago: {str(e)}")
+                return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
 
         @self.user.route('/user/assign_mesa')
         def assign_mesa():
@@ -333,21 +378,29 @@ class UserApp:
     def procesar_pago_tarjeta(self, mesa_id, carrito, total, transaccion_id, fecha):
         try:
             stripe.api_key = os.getenv('PRIVATE_KEY')
+            if not stripe.api_key:
+                print("ERROR: PRIVATE_KEY no esta configurada")
+                return redirect(url_for('seleccionar_pago'))
 
             token = request.form.get('stripeToken')
             nombre = request.form.get('nombreUsuario')
+            correo = request.form.get('correo')
+
+            print(f"Datos recibidos - Token: {token}, Nombre: {nombre}, Correo: {correo}, Total: {total}")
 
             if not token:
                 print('Error: No se recibió el token de pago')
                 flash('Error: No se recibió el token de pago')
                 return redirect(url_for('seleccionar_pago'))
             
+            print(f"Intentando crear cargo por {total} USD")
             charge = stripe.Charge.create(
                 amount=int(total * 100),
                 currency="usd",
                 source=token,
-                description=f"Pago de mesa {mesa_id}"
+                description=f"Pago de mesa {mesa_id} - Cliente {nombre}"
             )
+            print(f"Cargo creado exitosamente: {charge.id}")
 
             with self.conn.cursor() as cursor:
                 query = """ 
@@ -365,10 +418,14 @@ class UserApp:
 
                 self.conn.commit()
             
+            if correo:
+                print(f"Enviando factura a {correo}...")
+                self.enviar_factura_por_correo(correo, nombre, mesa_id, carrito, total, transaccion_id, fecha)
+
             session.pop('carrito', None)
 
             print('Pago con tarjeta procesado exitosamente')
-            flash('Pago con tarjeta procesado exitosamente')
+            flash('Pago con tarjeta procesado exitosamente. El carrito ha sido vaciado.')
             return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
         
         except stripe.error.StripeError as e:
@@ -418,12 +475,8 @@ class UserApp:
                 payment_intent.id,
                 expand=["next_action"]
             )
-            
-            instrucciones_bancarias = None
-            if (hasattr(payment_intent, 'next_action') and 
-            payment_intent.next_action is not None and 
-            hasattr(payment_intent.next_action, 'display_bank_transfer_instructions')):
-                instrucciones_bancarias = payment_intent.next_action.display_bank_transfer_instructions
+
+            instrucciones_bancarias = getattr(payment_intent.next_action, 'display_bank_transfer_instructions', None)
             
             with self.conn.cursor() as cursor:
                 query = """
@@ -431,28 +484,15 @@ class UserApp:
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """
 
-                bank_instructions = None
-                if (hasattr(payment_intent, 'next_action') and 
-                payment_intent.next_action is not None and 
-                hasattr(payment_intent.next_action, 'display_bank_transfer_instructions')):
-                    bank_instructions = payment_intent.next_action.display_bank_transfer_instructions
-
                 datos_adicionales = json.dumps({
                     'nombre': nombre,
+                    'correo': correo,
                     'stripe_payment_intent_id': payment_intent.id,
                     'stripe_customer_id': customer.id,
-                    'instrucciones_bancarias': (
-                        payment_intent.next_action.display_bank_transfer_instructions 
-                        if hasattr(payment_intent, 'next_action') and hasattr(payment_intent.next_action, 'display_bank_transfer_instructions')
-                        else None
-                    )
+                    'instrucciones_bancarias': instrucciones_bancarias
                 })
 
-                session['instrucciones_bancarias'] = (
-                    payment_intent.next_action.display_bank_transfer_instructions 
-                    if hasattr(payment_intent, 'next_action') and hasattr(payment_intent.next_action, 'display_bank_transfer_instructions')
-                    else None
-                )
+                session['instrucciones_bancarias'] = instrucciones_bancarias
 
                 cursor.execute(query, (transaccion_id, mesa_id, 'tranferencia', total, 'pendiente', fecha, datos_adicionales))
 
@@ -466,7 +506,6 @@ class UserApp:
                 self.conn.commit()
 
             session['payment_intent_id'] = payment_intent.id
-            session['instrucciones_bancarias'] = payment_intent.next_action.display_bank_transfer_instructions if hasattr(payment_intent, 'next_action') else None
             session.pop('carrito', None)
 
             if correo:
@@ -487,116 +526,6 @@ class UserApp:
             self.conn.rollback()
             print(f'Error al procesar la transferencia: {str(e)}')
             flash(f'Error al procesar la transferencia: {str(e)}')
-            return redirect(url_for('seleccionar_pago'))
-    
-    def procesar_pago_cripto(self, mesa_id, carrito, total, transaccion_id, fecha):
-        try:
-
-            stripe.api_key = os.getenv("PRIVATE_KEY")
-
-            nombre = request.form.get('nombreUsuario', 'Cliente')
-            correo = request.form.get('correo')
-            cripto_seleccionada = request.form.get('crypto', 'bitcoin')
-
-            customer = stripe.Customer.create(
-                name=nombre,
-                email=correo,
-                description=f"Cliente para mese {mesa_id} - Pago cripto"
-            )
-
-            cripto_mapping = {
-                'bitcoin': 'bitcoin',
-                'ethereum': 'ethereum',
-                'litecoin': 'litecoin',
-                'usdc': 'usdc'
-            }
-
-            cripto_stripe = cripto_mapping.get(cripto_seleccionada.lower(), 'bitcoin')
-
-            payment_intent = stripe.PaymentIntent.create(
-                amount=int(total * 100),
-                currency="usd",
-                customer=customer.id,
-                payment_method_types=['crypto'],
-                payment_method_data={
-                    'type': "crypto",
-                    "crypto": {
-                        "currency": cripto_stripe
-                    }
-                },
-                payment_method_options={
-                    "crypto": {
-                        "currency": cripto_stripe
-                    }
-                }
-            )
-
-            payment_intent = stripe.PaymentIntent.retrieve(
-                payment_intent.id,
-                expand=["next_action"]
-            )
-
-            comprobante_url = None
-            if 'proof' in request.files:
-                archivo = request.files['proof']
-                if archivo and archivo.filename:
-                    filename = f"{transaccion_id}_{archivo.filename}"
-                    filepath = os.path.join('static/uploads/comprobantes', filename)
-                    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-                    archivo.save(filepath)
-                    comprobante_url = f"/static/uploads/comprobantes/{filename}"
-
-            with self.conn.cursor() as cursor:
-                query = """
-                INSERT INTO transacciones (id, mesa_id, metodo_pago, monto, estado, fecha, datos_adicionales)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """
-
-                crypto_instructions = None
-                if (hasattr(payment_intent, 'next_action') and payment_intent.next_action is not None and hasattr(payment_intent.next_action, 'crypto_deposit')):
-                    crypto_instructions = payment_intent.next_action.crypto_deposit
-
-                datos_adicionales = json.dumps({
-                    'cripto': cripto_seleccionada,
-                    'stripe_payment_intent_id': payment_intent.id,
-                    'stripe_customer_id': customer.id,
-                    'comprobante': comprobante_url,
-                    'instrucciones_crypto': crypto_instructions
-                })
-
-                cursor.execute(query, (transaccion_id, mesa_id, 'cripto', total, 'pendiente', fecha, datos_adicionales))
-
-                for item in carrito:
-                    query_detalle = """
-                    INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
-                    VALUES (%s, %s, %s, %s)
-                    """
-                    cursor.execute(query_detalle, (transaccion_id, item.get('id'), item.get('cantidad'), item.get('precio')))
-                
-                self.conn.commit()
-            
-            session['payment_intent_id'] = payment_intent.id
-            session['instrucciones_crypto'] = (
-                payment_intent.next_action.crypto_deposit
-                if hasattr(payment_intent, 'next_action') and hasattr(payment_intent.next_action, 'crypto_deposit') 
-                else None
-            )
-            session.pop('carrito', None)
-
-            print('Pago con criptomoneda registrado. Pendiente de verificación.')
-            flash('Pago con criptomoneda registrado. Pendiente de verificación.')
-            return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
-        
-        except stripe.error.StripeError as e:
-            self.conn.rollback()
-            print(f'Error de Stripe al procesar pago con criptomoneda: {str(e)}')
-            flash(f'Error al procesar el pago con criptomoneda: {str(e)}')
-            return redirect(url_for('seleccionar_pago'))
-                                   
-        except Exception as e:
-            self.conn.rollback()
-            print(f'Error al procesar el pago con criptomoneda: {str(e)}')
-            flash(f'Error al procesar el pago con criptomoneda: {str(e)}')
             return redirect(url_for('seleccionar_pago'))
 
     def procesar_pago_efectivo(self, mesa_id, carrito, total, transaccion_id, fecha):
@@ -630,6 +559,43 @@ class UserApp:
             flash(f'Error al registrar el pago en efectivo: {str(e)}')
             return redirect(url_for('seleccionar_pago'))
     
+    def enviar_confirmacion_pago(self, correo, nombre, transaccion_id):
+        try:
+            confirmacion_html = f"""
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; }}
+                    .confirmacion {{ border: 1px solid #ddd; padding: 20px; max-width: 600px; margin: 0 auto; }}
+                    .header {{ text-align: center; margin-bottom: 20px; color: #4CAF50; }}
+                </style>
+            </head>
+            <body>
+                <div class="confirmacion">
+                    <div class="header">
+                        <h2>Confirmación de Pago</h2>
+                    </div>
+                    
+                    <p>Estimado(a) {nombre},</p>
+                    
+                    <p>Nos complace informarle que su pago para la transacción <strong>{transaccion_id}</strong> ha sido confirmado exitosamente.</p>
+                    
+                    <p>Su pedido ya está siendo procesado y estará listo en breve.</p>
+                    
+                    <p>¡Gracias por su preferencia!</p>
+                    
+                    <p>Atentamente,<br>
+                    El equipo de FoodTrucks</p>
+                </div>
+            </body>
+            </html>
+            """
+            
+            enviar_correo(f"Confirmación de Pago - {transaccion_id}", correo, confirmacion_html)
+            
+        except Exception as e:
+            print(f"Error al enviar la confirmación por correo: {str(e)}")
+
     def enviar_factura_por_correo(self, correo, nombre, mesa_id, carrito, total, transaccion_id, fecha):
         try:
 
@@ -649,6 +615,21 @@ class UserApp:
                             'precio': item.get('precio'),
                             'subtotal': item.get('cantidad') * item.get('precio')
                         })
+            
+            confirmation_token = str(uuid.uuid4())
+
+            with self.conn.cursor() as cursor:
+                query = """ 
+                UPDATE transacciones
+                SET token_confirmacion = %s
+                WHERE id = %s
+                """
+                cursor.execute(query, (confirmation_token, transaccion_id))
+                self.conn.commit()
+            
+            base_url = "https://74zb1whg-5000.use2.devtunnels.ms/"
+            confirmation_url = f"{base_url}/user/confirmar-pago/{transaccion_id}/{confirmation_token}"
+
             factura_html = f"""
             <html>
             <head>
@@ -682,7 +663,6 @@ class UserApp:
                             <th>Subtotal</th>
                         </tr>
             """
-
             for producto in productos_con_nombre:
                 factura_html += f""" 
                     <tr>
@@ -692,7 +672,6 @@ class UserApp:
                         <td>${producto['subtotal']:.2f}</td>
                     </tr>
                 """
-            
             factura_html += f""" 
                     </table>
                     
@@ -702,7 +681,11 @@ class UserApp:
                     
                     <p>¡Gracias por su compra!</p>
                     <p>Estado: Pendiente de verificación</p>
-                    <p>Recibirá una confirmación cuando su pago sea verificado.</p>
+                    <div class="confirmation">
+                        <p>Para confirmar su pago, haga clic en el siguiente enlace:</p>
+                        <p><a href="{confirmation_url}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Confirmar Pago</a></p>
+                        <p>Este enlace es válido por 24 horas.</p>
+                    </div>
                 </div>
             </body>
             </html>

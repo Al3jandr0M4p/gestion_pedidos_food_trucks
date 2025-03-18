@@ -7,7 +7,7 @@
 {% block body %}
     <header class="container__head">
         <h1>Carrito de Compras</h1>
-        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada')) }}">
+        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
             <i class="fa-solid fa-arrow-left"></i> Volver al menu
         </a>      
     </header>

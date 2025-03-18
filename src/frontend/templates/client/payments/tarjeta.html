@@ -1,14 +1,12 @@
-{% include 'layouts/base.html'   %}
+{% include 'layouts/base.html' %}
 {% block head %}
     <script src="https://js.stripe.com/v3/"></script>
 {% endblock %}
 
 {% block body %}
-
     <div class="container__tarjeta">
         <h2>Pago con Tarjeta</h2>
         <form id="payment-form" action="{{ url_for('procesar_pago') }}" method="post">
-
             <input type="hidden" name="metodo_pago" value="tarjeta">
 
             <div class="container__input">
@@ -19,11 +17,18 @@
             </div>
 
             <div class="container__input">
+                <label for="email">
+                    Email:
+                </label>
+                <input type="email" autocomplete="off" name="correo" id="email">
+            </div>
+
+            <div class="container__input">
                 <label for="card-element">
-                    Informacion de la tarjeta:
+                    Información de la tarjeta:
                 </label>
                 <div id="card-element">
-                    <!-- Stripe Element se montara aqui -->
+                    <!-- Stripe Element se montará aquí -->
                 </div>
             </div>
 
@@ -38,63 +43,8 @@
             <div id="card-errors" role="alert" style="color: #f00;"></div>
 
             <button type="submit">Pagar</button>
-
         </form>
     </div>
 
-    <script>
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const montoAPagar = document.getElementById("monto-a-pagar");
-            const montoHidden = document.getElementById("monto-hidden");
-
-            // Cargar el total y el ITBIS desde localStorage
-            const total = localStorage.getItem("total") || "0.00";
-            montoAPagar.textContent = `$${total}`;
-            montoHidden.value = total;
-
-            // Configurar Stripe
-            const stripe = Stripe('pk_test_51R1rahC8mDrO4oITEAe4lbHFYbySRp025uY4iwDXuNktd98M5UEZcFuNtFeahByR3NXLuYc0FWB0s5mFyFpsSYcL00VmEPiwKY');
-            const elements = stripe.elements();
-            const card = elements.create('card');
-            card.mount('#card-element');
-
-            card.addEventListener('change', function(e) {
-                const displayError = document.getElementById('card-errors');
-                if (e.error) {
-                    displayError.textContent = e.error.message;
-                } else {
-                    displayError.textContent = '';
-                }
-            });
-
-            const form = document.getElementById('payment-form');
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                stripe.createToken(card).then(function(result) {
-                    if (result.error) {
-                        const errorElement = document.getElementById('card-errors');
-                        errorElement.textContent = result.error.message;
-                    } else {
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.setAttribute('type', 'hidden');
-                        hiddenInput.setAttribute('name', 'stripeToken');
-                        hiddenInput.setAttribute('value', result.token.id);
-                        form.appendChild(hiddenInput);
-
-                        const carritoInput = document.createElement('input');
-                        carritoInput.setAttribute('type', 'hidden');
-                        carritoInput.setAttribute('name', 'carrito');
-                        carritoInput.setAttribute('value', localStorage.getItem('carrito'));
-                        form.appendChild(carritoInput);
-
-                        form.submit();
-                    }
-                });
-            });
-        });
-
-    </script>
-
+    <script src="{{ url_for('static', filename='js/payments/tarjeta.js') }}" type="text/javascript"></script>
 {% endblock %}
