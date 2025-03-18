@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - HTTP Exception</title>
+</head>
+<body>
+
+    <div class="container">
+        <h1 id="error-code">Error</h1>
+        <p id="error-message">
+            Ocurrio un error inesperado.
+        </p>
+        <p>
+            {% if user_id %}
+                <a href="{{ url_for('admin_dashboard') }}" aria-label="Volver al dashboard">
+                    Vuelve al dashboard administrativo
+                </a>
+            {% elif session['mesa_asignada'] %}
+                <a href="{{ url_for('menu_user', mesa_id=session['mesa_asignada']) }}" aria-label="Volver a mi mesa">
+                    Volver a mi mesa
+                </a>
+            {% else %}
+                <a href="/user/splash" aria-label="Volver a la página de inicio">
+                    Volver a la página de inicio
+                </a>
+            {% endif %}
+        </p>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code") || "Unknow";
+        const message = params.get("message") || "Ocurrio un error inesperado.";
+
+        document.getElementById("error-code").textContent `Error ${code}`;
+        document.getElementById('error-message').textContent = message;
+    </script>
+    
+</body>
+</html>

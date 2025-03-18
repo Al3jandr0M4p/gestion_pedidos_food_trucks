@@ -265,18 +265,30 @@ class UserApp:
                         instrucciones = session.get('instrucciones_crypto')
                         if not instrucciones and datos_adicionales:
                             instrucciones = datos_adicionales.get('instrucciones_crypto')
+                    
+                    mesa_id = session.get('mesa_asignada')
+                    if not mesa_id:
+                        mesa_id = transaccion.get('mesa_id')
+
+                        if mesa_id:
+                            session['mesa_asignada'] = mesa_id
 
                     return render_template(
                         'client/confirmacion_pago.html',transaccion=transaccion, 
                         detalles=detalles, instrucciones=instrucciones,
                         datos=datos_adiccionales, 
-                        metodo_pago=metodo_pago
+                        metodo_pago=metodo_pago,
+                        mesa_id=mesa_id
                     )
                 
             except Exception as e:
                 print(f'Error al mostrar la confirmación: {str(e)}')
                 flash(f'Error al mostrar la confirmación: {str(e)}')
-                return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
+                mesa_id = session.get('mesa_asignada')
+                if mesa_id:
+                    return redirect(url_for('menu_user', mesa_id=mesa_id))
+                else:
+                    return redirect(url_for('splash_screen'))
         
         @self.user.route('/user/confirmar-pago/<transaccion_id>/<token>')
         def confirmar_pago(transaccion_id, token):
@@ -590,7 +602,7 @@ class UserApp:
             </body>
             </html>
             """
-            
+
             enviar_correo(f"Confirmación de Pago - {transaccion_id}", correo, confirmacion_html)
             
         except Exception as e:

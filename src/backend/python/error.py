@@ -80,7 +80,8 @@ class Errors:
             """
 
             self.logger.error((f"HTTP Exception: {error}"))
-            return render_template('errors/httpException.html', error=error)
+            mesa_asignada = session.get("mesa_asignada")
+            return render_template('errors/httpException.html', error=error, mesa_asignada=mesa_asignada, user_id=session.get('user_id'))
         
         @self.error.errorhandler(400)
         def bad_request(e):

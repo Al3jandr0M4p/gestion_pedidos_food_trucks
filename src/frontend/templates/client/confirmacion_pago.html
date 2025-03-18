@@ -7,7 +7,7 @@
 {% block body %}
     <header class="container__head">
         <h1>Confirmación de Pago</h1>
-        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada')) }}">
+        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
             <i class="fa-solid fa-arrow-left"></i> Volver al menú
         </a>
     </header>
@@ -45,13 +45,5 @@
         </div>
     </section>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            localStorage.removeItem("carrito");
-            localStorage.removeItem("total");
-            localStorage.removeItem("itbis");
-            sessionStorage.removeItem("carrito");
-            alert("Productos comprados exitosamente.")
-        });
-    </script>
+    <script src="{{ url_for('static', filename='js/client/payments/confirm_pago.js') }}"></script>
 {% endblock %}
