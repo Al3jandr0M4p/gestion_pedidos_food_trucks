@@ -3,13 +3,6 @@ Modulo de gestion de usuarios de la aplicacion
 
 Este modulo define la clase `UserApp` que configura y gestiona 
 las rutas relacionadas con los usuarios en la aplicacion Flask
-
-Ejemplo
--------
->>> from flask import Flask
->>> from src.backend.python.routes.user import UserApp
->>> app = Flask(__name__)
->>> UserApp(app)
 """
 
 from flask import render_template, url_for, redirect, send_file, jsonify, flash, session, request
@@ -76,10 +69,6 @@ class UserApp:
 
         Incluye la logica para generar codigos QR, asignar mesas 
         y mostrar el menu de foodtrucks
-
-        Returns:
-        -------
-        None
         """
 
         @self.user.route('/')
@@ -110,7 +99,43 @@ class UserApp:
             buffer.seek(0)
 
             # return send_file(buffer, mimetype="image/png", as_attachment=True, download_name="qr.png")
-            return "<b>Ya el qrcode ya fue entregado.<b>"
+            return "<b style='text-align: center;'>Ya el qrcode ya fue entregado.<b>"
+        
+        @self.user.route('/user/enviar-feedback', methods=['POST'])
+        def enviar_feedback():
+            """ 
+            Procesa el feedback del usuario sobre su compra
+
+            returns:
+            --------
+            str
+                Redirecciona al menu de foodtrucks
+            """
+            try:
+                transaccion_id = request.form.get('transaccion_id')
+                puntuacion = request.form.get('puntuacion')
+                comentario = request.form.get('comentario')
+                mesa_id = session.get('mesa_asignada')
+
+                if not transaccion_id or not puntuacion:
+                    print("ERROR: Informacion de feedback incompleta")
+                    return redirect(url_for('menu_user', mesa_id=mesa_id))
+                
+                with self.conn.cursor() as cursor:
+                    query = """
+                    INSERT INTO feedback (transaccion_id, puntuacion, comentario, fecha)
+                    VALUES (%s, %s, %s, NOW())
+                    """
+                    cursor.execute(query, transaccion_id, puntuacion, comentario)
+                    self.conn.commit()
+                
+                session.pop("transaccion_completada", None)
+
+                print("Gracias por tu feedback")
+                return redirect(url_for('menu_user', mesa_id=mesa_id))
+            except Exception as e:
+                print(f"Error al procesar el feedback: {str(e)}")
+                return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
         
         @self.user.route('/user/menu/<mesa_id>')
         def menu_user(mesa_id):
@@ -138,7 +163,11 @@ class UserApp:
 
             session['foodtrucks'] = foodtrucks
 
-            return render_template('client/menu.html', mesa_id=int(mesa_id), foodtrucks=foodtrucks)
+            return render_template(
+                'client/menu.html', 
+                mesa_id=int(mesa_id), 
+                foodtrucks=foodtrucks
+            )
         
         @self.user.route('/user/menu/foodtruck/<int:foodtruck_id>')
         def menu_foodtruck(foodtruck_id):
@@ -172,18 +201,38 @@ class UserApp:
         
         @self.user.route('/user/splash')
         def splash_screen():
+            """
+            Muestra la pantalla de inicia (splash screen)
+            de la aplicacion.
+            """
             return render_template('client/splash.html')
 
         @self.user.route('/ver-carrito')
         def ver_carrito():
+            """ 
+            Muestra el contenido del carrito de compras.
+            """
             return render_template('client/carrito.html')
         
         @self.user.route('/seleccionar-pago')
         def select_payment():
+            """
+            Muestra la pantalla de seleccion de
+            metodo de pagos.
+            """
             return render_template('client/seleccionar_pago.html')
         
         @self.user.route('/procesar-pago', methods=['POST'])
         def procesar_pago():
+            """
+            Procesa el pago segun el metodo
+            seleccionado por el usuario.
+
+            Returns
+            -------
+            str
+                Redirecciona a la pagina correspondiente segun el resultado del proceso de pago.
+            """
             metodo_pago = request.form.get('metodo_pago')
             mesa_id = session.get('mesa_asignada')
             carrito = request.form.get('carrito')
@@ -206,13 +255,37 @@ class UserApp:
 
             try:
                 if metodo_pago == "tarjeta":
-                    return self.procesar_pago_tarjeta(mesa_id, carrito, total, transaccion_id, fecha)
+                    return self.procesar_pago_tarjeta(
+                        mesa_id, 
+                        carrito, 
+                        total, 
+                        transaccion_id, 
+                        fecha
+                    )
                 elif metodo_pago == 'transferencia':
-                    return self.procesar_pago_transferencia(mesa_id, carrito, total, transaccion_id, fecha)
+                    return self.procesar_pago_transferencia(
+                        mesa_id, 
+                        carrito, 
+                        total, 
+                        transaccion_id, 
+                        fecha
+                    )
                 elif metodo_pago == 'criptos':
-                    return self.procesar_pago_cripto(mesa_id, carrito, total, transaccion_id, fecha)
+                    return self.procesar_pago_cripto(
+                        mesa_id, 
+                        carrito, 
+                        total, 
+                        transaccion_id, 
+                        fecha
+                    )
                 elif metodo_pago == 'efectivo':
-                    return self.procesar_pago_efectivo(mesa_id, carrito, total, transaccion_id, fecha)
+                    return self.procesar_pago_efectivo(
+                        mesa_id, 
+                        carrito, 
+                        total, 
+                        transaccion_id, 
+                        fecha
+                    )
                 else:
                     flash('Método de pago no válido')
                     return redirect(url_for('select_payment'))
@@ -223,6 +296,20 @@ class UserApp:
         
         @self.user.route('/comfirmacion-pago/<transaccion_id>')
         def confirmacion_pago(transaccion_id):
+            """
+            Muestra la confirmacion de pago para una transaccion
+            especifica.
+
+            Parametros:
+            -----------
+            transaccion_id : str
+                ID de la transaccion
+            
+            Returns:
+            --------
+            str
+                Renderiza la plantilla 'client/confirmacion_pago.html' con los detalles o redirecciona en caso de error.
+            """
 
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
@@ -274,7 +361,8 @@ class UserApp:
                             session['mesa_asignada'] = mesa_id
 
                     return render_template(
-                        'client/confirmacion_pago.html',transaccion=transaccion, 
+                        'client/confirmacion_pago.html', 
+                        transaccion=transaccion,
                         detalles=detalles, instrucciones=instrucciones,
                         datos=datos_adiccionales, 
                         metodo_pago=metodo_pago,
@@ -292,6 +380,22 @@ class UserApp:
         
         @self.user.route('/user/confirmar-pago/<transaccion_id>/<token>')
         def confirmar_pago(transaccion_id, token):
+            """
+            Confirma un pago mediante un token de confirmacion 
+
+            Parametros:
+            -----------
+            transaccion_id : str
+                ID de la transaccion
+            token : str
+                Token de confirmacion del pago
+            
+            Returns:
+            --------
+            str
+                Redirecciona al menu de usuario o a la pagina de
+                confirmacion segun el resultado.
+            """
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
                     query = """
@@ -314,7 +418,7 @@ class UserApp:
                     SET estado = 'completado', fecha_confirmacion = NOW()
                     WHERE id = %s
                     """
-                    cursor.execute(update_query, (transaccion_id))
+                    cursor.execute(update_query, (transaccion_id,))
                     self.conn.commit()
 
                     if transaccion.get('metodo_pago') == 'transferencia' and transaccion.get('datos_adicionales'):
@@ -327,10 +431,22 @@ class UserApp:
                         datos = json.loads(transaccion['datos_adicionales'])
                         if 'nombre' in datos:
                             correo = datos.get('correo')
-                            self.enviar_confirmacion_pago(correo, datos.get('nombre', 'Cliente'), transaccion_id)
+                            self.enviar_confirmacion_pago(correo, datos.get('nombre'), transaccion_id)
+                    
+                    mesa_id = transaccion.get('mesa_id')
+                    if not mesa_id:
+                        mesa_id = session.get('mesa_asignada')
+                    else:
+                        session['mesa_asignada'] = mesa_id
                     
                     print("Pago confirmado exitosamente")
-                    return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+                    
+                    return redirect(url_for(
+                        'menu_user', 
+                        mesa_id=mesa_id, 
+                        mostrar_feedback='true', 
+                        transaccion_id=transaccion_id
+                    ))
                 
             except Exception as e:
                 print(f"Error al confirmar pago: {str(e)}")
@@ -383,11 +499,28 @@ class UserApp:
                     return "No hay mesas disponibles"
 
         except Error as e:
-            if self.conn:
-                self.conn.rollback()
+            self.conn.rollback()
             return f"Error en la asignación de la mesa: {str(e)}"
     
     def procesar_pago_tarjeta(self, mesa_id, carrito, total, transaccion_id, fecha):
+        """
+        Procesa un pago con tarjeta de credito utilizando
+        la api `Stripe`.
+
+        Parametros:
+        ----------
+        mesa_id : int
+            ID de la mesa asignada
+        carrito : list
+            Lista de productos en el carrito
+        total : float
+            Monto total a pagar
+        transaccion_id : str
+            ID de la transaccion
+        fecha : str
+            Fecha de la transaccion
+        """
+
         try:
             stripe.api_key = os.getenv('PRIVATE_KEY')
             if not stripe.api_key:
@@ -432,7 +565,15 @@ class UserApp:
             
             if correo:
                 print(f"Enviando factura a {correo}...")
-                self.enviar_factura_por_correo(correo, nombre, mesa_id, carrito, total, transaccion_id, fecha)
+                self.enviar_factura_por_correo(
+                    correo, 
+                    nombre, 
+                    mesa_id, 
+                    carrito, 
+                    total, 
+                    transaccion_id, 
+                    fecha
+                )
 
             session.pop('carrito', None)
 
@@ -453,6 +594,24 @@ class UserApp:
             return redirect(url_for('seleccionar_pago'))
     
     def procesar_pago_transferencia(self, mesa_id, carrito, total, transaccion_id, fecha):
+        """
+        Procesa un pago por transferencia bancaria
+        utilizando la api `Stripe`.
+
+        Parametros:
+        -----------
+        mesa_id : int
+            ID de la mesa asignada
+        carrito : list
+            Lista de productos en el carrito
+        total : float
+            Monto total a pagar
+        transaccion_id : str
+            ID de la transaccion
+        fecha : str
+            Fecha de la transaccion
+        """
+
         try:
             stripe.api_key = os.getenv("PRIVATE_KEY")
 
@@ -522,7 +681,15 @@ class UserApp:
 
             if correo:
                 print(f"Enviando factura a {correo}...")
-                self.enviar_factura_por_correo(correo, nombre, mesa_id, carrito, total, transaccion_id, fecha)
+                self.enviar_factura_por_correo(
+                    correo, 
+                    nombre, 
+                    mesa_id, 
+                    carrito, 
+                    total, 
+                    transaccion_id, 
+                    fecha
+                )
 
             print('Transferencia registrada. Pendiente de verificación.')
             flash('Transferencia registrada. Pendiente de verificación.')
@@ -541,6 +708,23 @@ class UserApp:
             return redirect(url_for('seleccionar_pago'))
 
     def procesar_pago_efectivo(self, mesa_id, carrito, total, transaccion_id, fecha):
+        """
+        Procesa un pago en efectivo
+
+        Parametros:
+        -----------
+        mesa_id : int
+            ID de la mesa asignada
+        carrito : list
+            Lista de productos en el carrito
+        total : float
+            Monto total a pagar
+        transaccion_id : str
+            ID de la transaccion
+        fecha : str
+            Fecha de la transaccion
+        """
+
         try:
 
             with self.conn.cursor() as cursor:
@@ -571,46 +755,29 @@ class UserApp:
             flash(f'Error al registrar el pago en efectivo: {str(e)}')
             return redirect(url_for('seleccionar_pago'))
     
-    def enviar_confirmacion_pago(self, correo, nombre, transaccion_id):
-        try:
-            confirmacion_html = f"""
-            <html>
-            <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; }}
-                    .confirmacion {{ border: 1px solid #ddd; padding: 20px; max-width: 600px; margin: 0 auto; }}
-                    .header {{ text-align: center; margin-bottom: 20px; color: #4CAF50; }}
-                </style>
-            </head>
-            <body>
-                <div class="confirmacion">
-                    <div class="header">
-                        <h2>Confirmación de Pago</h2>
-                    </div>
-                    
-                    <p>Estimado(a) {nombre},</p>
-                    
-                    <p>Nos complace informarle que su pago para la transacción <strong>{transaccion_id}</strong> ha sido confirmado exitosamente.</p>
-                    
-                    <p>Su pedido ya está siendo procesado y estará listo en breve.</p>
-                    
-                    <p>¡Gracias por su preferencia!</p>
-                    
-                    <p>Atentamente,<br>
-                    El equipo de FoodTrucks</p>
-                </div>
-            </body>
-            </html>
-            """
-
-            enviar_correo(f"Confirmación de Pago - {transaccion_id}", correo, confirmacion_html)
-            
-        except Exception as e:
-            print(f"Error al enviar la confirmación por correo: {str(e)}")
-
     def enviar_factura_por_correo(self, correo, nombre, mesa_id, carrito, total, transaccion_id, fecha):
-        try:
+        """
+        Envia una factura por correo electronico al cliente
 
+        Parametros:
+        -----------
+        correo : str
+            Direccion de correo electronico del cliente
+        nombre : str
+            Nombre del cliente
+        mesa_id : int
+            ID de la mesa asinada
+        carrito : list
+            Lista de productos en el carrito
+        total : float
+            Monto total a pagar
+        transaccion_id : str
+            ID de la transaccion
+        fecha : str
+            Fecha de la transaccion
+        """
+
+        try:
             productos_con_nombre = []
             with self.conn.cursor(dictionary=True) as cursor:
                 for item in carrito:
@@ -707,6 +874,56 @@ class UserApp:
 
         except Exception as e:
             print(f"Error al enviar la factura por correo: {str(e)}")
+    
+    def enviar_confirmacion_pago(self, correo, nombre, transaccion_id):
+        """
+        Envia una confirmacion del pago del cliente
+
+        Parametros:
+        ----------
+        correo : str
+            Direccion de correo del cliente
+        nombre : str
+            Nombre del cliente
+        transaccion_id : str
+            ID de la transaccion
+        """
+
+        try:
+            confirmacion_html = f"""
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; }}
+                    .confirmacion {{ border: 1px solid #ddd; padding: 20px; max-width: 600px; margin: 0 auto; }}
+                    .header {{ text-align: center; margin-bottom: 20px; color: #4CAF50; }}
+                </style>
+            </head>
+            <body>
+                <div class="confirmacion">
+                    <div class="header">
+                        <h2>Confirmación de Pago</h2>
+                    </div>
+                    
+                    <p>Estimado(a) {nombre},</p>
+                    
+                    <p>Nos complace informarle que su pago para la transacción <strong>{transaccion_id}</strong> ha sido confirmado exitosamente.</p>
+                    
+                    <p>Su pedido ya está siendo procesado y estará listo en breve.</p>
+                    
+                    <p>¡Gracias por su preferencia!</p>
+                    
+                    <p>Atentamente,<br> El equipo de FoodTrucks</p>
+                </div>
+            </body>
+            </html>
+            """
+
+            enviar_correo(f"Confirmación de Pago - {transaccion_id}", correo, confirmacion_html)
+            
+        except Exception as e:
+            print(f"Error al enviar la confirmación por correo: {str(e)}")
+
 
     # CRUD FOODTRUCKS
     def get_food_trucks(self):

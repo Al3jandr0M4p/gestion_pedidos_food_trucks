@@ -5,13 +5,6 @@ Modulo de configuracion de rutas de la aplicacion.
 
 Este modulo define la clase `ConfigurationRoutesApp`, que configura
 y registra todas las rutas de la app Flask.
-
-Ejemplo:
---------
->>> from flask import Flask
->>> from src.backend.python.routes.route import ConfigurationRoutesApp
->>> app = Flask(__name__)
->>> ConfigurationRoutesApp(app)
 """
 
 # Importaciones propias
@@ -62,10 +55,6 @@ class ConfigurationRoutesApp:
         Registra las rutas de la aplicacion Flask.
 
         Incluye rutas para autenticacion, administracion y usuarios.
-
-        Returns:
-        --------
-        None
         """
         
         # Authorized

@@ -88,6 +88,42 @@
     </div>
 </section>
 
+<section id="feedbackModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Gracias por tu compra!</h2>
+        <p>
+            Nos gustaria conocer tu opinion sobre tu experiencia. Calificanos 😍!
+        </p>
+
+        <form action="/user/enviar-feedback" method="post">
+            <input type="hidden" name="transaccion_id" id="transaccion_id" value="">
+
+            <div class="rating">
+                <p>
+                    Como calificarias tu experiencia? 🤔
+                </p>
+                <div class="stars">
+                    <input type="radio" name="puntuacion" value="5" id="star5"><label for="star5">★</label>
+                    <input type="radio" name="puntuacion" value="4" id="star4"><label for="star4">★</label>
+                    <input type="radio" name="puntuacion" value="3" id="star3"><label for="star3">★</label>
+                    <input type="radio" name="puntuacion" value="2" id="star2"><label for="star2">★</label>
+                    <input type="radio" name="puntuacion" value="1" id="star1"><label for="star1">★</label>
+                </div>
+            </div>
+
+            <div class="feedback-comment">
+                <p>
+                    Ahi algun comentario adicional ❤️!
+                </p>
+                <textarea name="comentario" rows="4" placeholder="Escribe tu comentario aqui..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-feedback">Enviar feedback</button>
+        </form>
+    </div>
+</section>
+
 <script src="{{ url_for('static', filename='js/client/menu.js') }}"></script>
     
 {% endblock %}

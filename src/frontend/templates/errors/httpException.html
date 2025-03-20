@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Error - HTTP Exception</title>
 </head>
@@ -29,14 +30,7 @@
         </p>
     </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get("code") || "Unknow";
-        const message = params.get("message") || "Ocurrio un error inesperado.";
-
-        document.getElementById("error-code").textContent `Error ${code}`;
-        document.getElementById('error-message').textContent = message;
-    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/errors/http.js') }}"></script>
     
 </body>
 </html>

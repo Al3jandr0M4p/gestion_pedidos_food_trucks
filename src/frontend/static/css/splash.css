@@ -1,0 +1,84 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #fff;
+    color: #222;
+    font-family: 'Poppins', sans-serif;
+}
+
+.container__slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    position: relative;
+}
+
+.slider__wrapper {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+.slider__icons__categories {
+    display: flex;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+    transition: transform 0.3s ease-in-out;
+}
+
+.slider__icons__categories li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100px;
+    min-width: 100px;
+}
+
+.slider__icons__categories li div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.slider__icons__categories img {
+    width: 50%;
+    height: auto;
+    animation: loadingBounce 1.6s infinite ease-in-out;
+}
+
+/* Animación con delays progresivos */
+.slider__icons__categories li:nth-child(1) img {
+    animation-delay: 0s;
+}
+.slider__icons__categories li:nth-child(2) img {
+    animation-delay: 0.5s;
+}
+.slider__icons__categories li:nth-child(3) img {
+    animation-delay: 1.5s;
+}
+
+@keyframes loadingBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.slider__wrapper::-webkit-scrollbar {
+    display: none;
+}

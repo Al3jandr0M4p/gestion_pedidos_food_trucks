@@ -12,7 +12,7 @@ Ejemplo
 >>> RegisterApp(app)
 """
 
-from flask import render_template, request, flash
+from flask import render_template, flash, request
 from werkzeug.security import generate_password_hash
 
 # Importaciones propias
@@ -104,7 +104,4 @@ class RegisterApp:
                 except Exception as e:
                     flash("Ocurrio un error inesperado", "error")
                     print(f"Error general: {e}")
-                finally:
-                    if self.conn:
-                        self.conn.close()
             return render_template('auth/register.html')

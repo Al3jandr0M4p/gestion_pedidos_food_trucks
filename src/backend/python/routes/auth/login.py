@@ -102,8 +102,6 @@ class Login:
 
                             if session['rol'] == 'admin':
                                 return redirect(url_for('admin_dashboard'))
-                            else:
-                                return redirect(url_for('dashboard_empleado'))
                         else:
                             flash("Credenciales incorrectas intentalo denuevo", "error")
                     except Error as e:
