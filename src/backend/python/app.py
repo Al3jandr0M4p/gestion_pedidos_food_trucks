@@ -12,9 +12,6 @@ from flask_cors import CORS
 from flask_caching import Cache
 from flask_mail import Mail
 
-# Importaciones del logging
-import logging
-from rich.logging import RichHandler
 import os
 
 # Importaciones propias
@@ -88,7 +85,7 @@ class FoodTrucks:
         self.start_logging()
 
         # Configuración del manejo de errores
-        Errors(self.food, self.error_logger).setup_error_handlers()
+        Errors(self.food).setup_error_handlers()
     
     def start_logging(self):
         '''
@@ -100,39 +97,6 @@ class FoodTrucks:
         - `http`: Logger para registrar las peticiones HTTP.
         - `console`: Logger de consola con formato enriquecido usando `RichHandler`.
         '''
-
-        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        
-        # Logger General
-        self.general_logger = logging.getLogger('general')
-        self.general_logger.setLevel(logging.INFO)
-        general_handler = logging.FileHandler('logs/general.log', encoding='utf-8')
-        general_handler.setFormatter(logging.Formatter(log_format))
-        self.general_logger.addHandler(general_handler)
-
-        # Logger Errores
-        self.error_logger = logging.getLogger("errors")
-        self.error_logger.setLevel(logging.ERROR)
-        error_handler = logging.FileHandler("logs/errors.log", encoding="utf-8")
-        error_handler.setFormatter(logging.Formatter(log_format))
-        self.error_logger.addHandler(error_handler)
-
-        # Logger para peticiones HTTP
-        self.http_logger = logging.getLogger("http")
-        self.http_logger.setLevel(logging.DEBUG)
-        http_handler = logging.FileHandler("logs/http.log", encoding="utf-8")
-        http_handler.setFormatter(logging.Formatter(log_format))
-        self.http_logger.addHandler(http_handler)
-
-        # Logger de consola con RichHandler
-        console_handler = RichHandler()
-        console_handler.setFormatter(logging.Formatter(log_format))
-        
-        self.general_logger.addHandler(console_handler)
-        self.error_logger.addHandler(console_handler)
-        self.http_logger.addHandler(console_handler)
-        
-        self.general_logger.info("Configuración de logging completada")
     
     def run_app(self):
         '''
@@ -141,8 +105,4 @@ class FoodTrucks:
         Registra un mensaje en los logs antes de iniciar la aplicación.
         En caso de error durante el inicio, el error se registra en el logger de errores.
         '''
-        self.general_logger.info("Iniciando aplicación en '0.0.0.0'")
-        try:
-            self.food.run(debug=True, host="0.0.0.0")
-        except Exception as e:
-            self.error_logger.error(f"Error al iniciar la aplicación: {str(e)}")
+        self.food.run(debug=True, host="0.0.0.0")

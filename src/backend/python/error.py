@@ -6,14 +6,6 @@ Modulo de manejo de errores para la aplicacion Flask.
 Este modulo define la clase `Errors`, que configura el manejo de errores
 personalizados dentro de la aplicacion, registrando los errores y
 mostrando plantillas HTML especificas.
-
-Ejemplo:
--------
->>> from flask import Flask
->>> from src.backend.python.error import Errors
->>> app = Flask(__name__)
->>> error_logger = app.logger
->>> Errors(app, error_logger).setup_error_handlers()
 """
 
 from flask import render_template, session, request
@@ -40,7 +32,7 @@ class Errors:
         Configura los manejadores de errores personalizados para la aplicacion.
     """
 
-    def __init__(self, app, error_logger):
+    def __init__(self, app):
         """
         Inicializa la clase con la aplicacion Flask y logger de errores.
 
@@ -52,7 +44,6 @@ class Errors:
             Logger utilizado para registrar los errores.
         """
         self.error = app
-        self.logger = error_logger
     
     def setup_error_handlers(self):
         """
@@ -67,10 +58,6 @@ class Errors:
         - 404 (Not Found)
         - 500 (Internal Server Error)
         - Excepciones HTTP generales
-
-        Returns:
-        -------
-        None
         """
 
         @self.error.errorhandler(HTTPException)
@@ -78,8 +65,6 @@ class Errors:
             """
             Maneja expciones HTTP genericas.
             """
-
-            self.logger.error((f"HTTP Exception: {error}"))
             mesa_asignada = session.get("mesa_asignada")
             return render_template('errors/httpException.html', error=error, mesa_asignada=mesa_asignada, user_id=session.get('user_id'))
         
@@ -88,8 +73,6 @@ class Errors:
             """
             Maneja el error 400 (Solicitudes incorrecta).
             """
-
-            self.logger.error(f"Solicitud incorrecta: {request.url} - Error: {e}", exc_info=True)
             return render_template('errors/400.html', request_url=request.url)
         
         @self.error.errorhandler(404)
@@ -97,8 +80,6 @@ class Errors:
             """
             Maneja el error 404 (Pagina no encontrada).
             """
-
-            self.logger.error(f"Pagina no encontrada: {request.url} - Error: {e}", exc_info=True)
             mesa_asignada = session.get('mesa_asignada')
             return render_template('errors/404.html', mesa_asignada=mesa_asignada, user_id=session.get('user_id'))
         
@@ -107,8 +88,6 @@ class Errors:
             """
             Maneja el error 403 (Acceso denegado).
             """
-
-            self.logger.error(f"Acceso denegado: {request.url} - Error: {e}", exc_info=True)
             return render_template('errors/403.html', request_url=request.url)
         
         @self.error.errorhandler(500)
@@ -116,6 +95,4 @@ class Errors:
             """
             Maneja el error 500 (Error interno del servidor).
             """
-
-            self.logger.error(f"Error interno del servidor: {request.url} - Error: {e}", exc_info=True)
             return render_template('errors/500.html')

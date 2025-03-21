@@ -53,7 +53,8 @@ class UserApp:
         Parametros
         ----------
         app : Flask
-            Instancia de la aplicacion Flask donde se configuraran las rutas
+            Instancia de la aplicacion Flask donde 
+            se configuraran las rutas.
         """
         self.user = app
         self.setup_routes()
@@ -93,9 +94,15 @@ class UserApp:
             qr.add_data(target_url)
             qr.make(fit=True)
 
-            img = qr.make_image(fill='black', back_color='white')
+            img = qr.make_image(
+                fill='black', 
+                back_color='white'
+            )
             buffer = BytesIO()
-            img.save(buffer, format="PNG")
+            img.save(
+                buffer, 
+                format="PNG"
+            )
             buffer.seek(0)
 
             # return send_file(buffer, mimetype="image/png", as_attachment=True, download_name="qr.png")
@@ -119,23 +126,36 @@ class UserApp:
 
                 if not transaccion_id or not puntuacion:
                     print("ERROR: Informacion de feedback incompleta")
-                    return redirect(url_for('menu_user', mesa_id=mesa_id))
+                    return redirect(url_for(
+                        'menu_user', 
+                        mesa_id=mesa_id
+                    ))
                 
                 with self.conn.cursor() as cursor:
                     query = """
                     INSERT INTO feedback (transaccion_id, puntuacion, comentario, fecha)
                     VALUES (%s, %s, %s, NOW())
                     """
-                    cursor.execute(query, transaccion_id, puntuacion, comentario)
+                    cursor.execute(query, (
+                        transaccion_id, 
+                        puntuacion, 
+                        comentario
+                    ))
                     self.conn.commit()
                 
                 session.pop("transaccion_completada", None)
 
                 print("Gracias por tu feedback")
-                return redirect(url_for('menu_user', mesa_id=mesa_id))
+                return redirect(url_for(
+                    'menu_user', 
+                    mesa_id=mesa_id
+                ))
             except Exception as e:
                 print(f"Error al procesar el feedback: {str(e)}")
-                return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
+                return redirect(url_for(
+                    'menu_user', 
+                    mesa_id=session.get('mesa_asignada')
+                ))
         
         @self.user.route('/user/menu/<mesa_id>')
         def menu_user(mesa_id):
@@ -154,7 +174,9 @@ class UserApp:
                 informacion de los foodtrucks
             """
             if not mesa_id.isdigit():
-                return render_template('errors/404.html'), 404
+                return render_template(
+                    'errors/404.html'
+                ), 404
             
             print("mesa_id:", mesa_id)
             
@@ -193,7 +215,10 @@ class UserApp:
                     productos = cursor.fetchall()
                     self.conn.commit()
                     
-                    return render_template('client/menu_foodtruck.html', productos=productos)
+                    return render_template(
+                        'client/menu_foodtruck.html', 
+                        productos=productos
+                    )
                 
                 except Error as e:
                     print(f"Error al obtener productos: {e}")
@@ -231,7 +256,8 @@ class UserApp:
             Returns
             -------
             str
-                Redirecciona a la pagina correspondiente segun el resultado del proceso de pago.
+                Redirecciona a la pagina correspondiente segun
+                el resultado del proceso de pago.
             """
             metodo_pago = request.form.get('metodo_pago')
             mesa_id = session.get('mesa_asignada')
@@ -239,7 +265,9 @@ class UserApp:
 
             if not mesa_id:
                 flash('Error: No hay mesas asignada')
-                return redirect(url_for('ver_carrito'))
+                return redirect(url_for(
+                    'ver_carrito'
+                ))
             
             if not carrito:
                 carrito = session.get('carrito', '[]')
@@ -247,7 +275,9 @@ class UserApp:
             if isinstance(carrito, str):
                 carrito = json.loads(carrito)
             
-            total = sum(item.get('precio', 0) * item.get('cantidad', 0) for item in carrito)
+            total = sum(
+                item.get('precio', 0) * item.get('cantidad', 0)  for item in carrito
+            )
 
             transaccion_id = str(uuid.uuid4())
             now = datetime.now()
@@ -288,11 +318,15 @@ class UserApp:
                     )
                 else:
                     flash('Método de pago no válido')
-                    return redirect(url_for('select_payment'))
+                    return redirect(url_for(
+                        'select_payment'
+                    ))
             
             except Exception as e:
                 flash(f'Error al procesar el pago: {str(e)}')
-                return redirect(url_for('select_payment'))
+                return redirect(url_for(
+                    'select_payment'
+                ))
         
         @self.user.route('/comfirmacion-pago/<transaccion_id>')
         def confirmacion_pago(transaccion_id):
@@ -308,7 +342,8 @@ class UserApp:
             Returns:
             --------
             str
-                Renderiza la plantilla 'client/confirmacion_pago.html' con los detalles o redirecciona en caso de error.
+                Renderiza la plantilla 'client/confirmacion_pago.html' 
+                con los detalles o redirecciona en caso de error.
             """
 
             try:
@@ -323,7 +358,10 @@ class UserApp:
                     if not transaccion:
                         print('Transacción no encontrada')
                         flash('Transacción no encontrada')
-                        return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
+                        return redirect(url_for(
+                            'menu_user', 
+                            mesa_id=session.get('mesa_asignada')
+                        ))
                     
                     query_detalles = """ 
                     SELECT td.*, p.nombre_producto as nombre_completo
@@ -374,9 +412,14 @@ class UserApp:
                 flash(f'Error al mostrar la confirmación: {str(e)}')
                 mesa_id = session.get('mesa_asignada')
                 if mesa_id:
-                    return redirect(url_for('menu_user', mesa_id=mesa_id))
+                    return redirect(url_for(
+                        'menu_user', 
+                        mesa_id=mesa_id
+                    ))
                 else:
-                    return redirect(url_for('splash_screen'))
+                    return redirect(url_for(
+                        'splash_screen'
+                    ))
         
         @self.user.route('/user/confirmar-pago/<transaccion_id>/<token>')
         def confirmar_pago(transaccion_id, token):
@@ -402,7 +445,10 @@ class UserApp:
                     SELECT * FROM transacciones
                     WHERE id = %s AND token_confirmacion = %s
                     """
-                    cursor.execute(query, (transaccion_id, token))
+                    cursor.execute(query, (
+                        transaccion_id, 
+                        token
+                    ))
                     transaccion = cursor.fetchone()
 
                     if not transaccion:
@@ -411,7 +457,10 @@ class UserApp:
 
                     if transaccion.get('estado') == "completado":
                         print("Este pago ya ha sido confirmado")
-                        return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+                        return redirect(url_for(
+                            'confirmacion_pago', 
+                            transaccion_id=transaccion_id
+                        ))
 
                     update_query = """ 
                     UPDATE transacciones
@@ -431,7 +480,11 @@ class UserApp:
                         datos = json.loads(transaccion['datos_adicionales'])
                         if 'nombre' in datos:
                             correo = datos.get('correo')
-                            self.enviar_confirmacion_pago(correo, datos.get('nombre'), transaccion_id)
+                            self.enviar_confirmacion_pago(
+                                correo, 
+                                datos.get('nombre'), 
+                                transaccion_id
+                            )
                     
                     mesa_id = transaccion.get('mesa_id')
                     if not mesa_id:
@@ -450,7 +503,10 @@ class UserApp:
                 
             except Exception as e:
                 print(f"Error al confirmar pago: {str(e)}")
-                return redirect(url_for('menu_user', mesa_id=session.get('mesa_asignada')))
+                return redirect(url_for(
+                    'menu_user', 
+                    mesa_id=session.get('mesa_asignada')
+                ))
 
         @self.user.route('/user/assign_mesa')
         def assign_mesa():
@@ -464,14 +520,20 @@ class UserApp:
             """
             mesa_asignada = session.get('mesa_asignada')
             if mesa_asignada:
-                return redirect(url_for('menu_user', mesa_id=mesa_asignada))
+                return redirect(url_for(
+                    'menu_user', 
+                    mesa_id=mesa_asignada
+                ))
 
             future = self.executor.submit(self.assign_mesa_task)
             mesa_id = future.result()
 
             if isinstance(mesa_id, int):
                 session['mesa_asignada'] = mesa_id
-                return redirect(url_for('menu_user', mesa_id=mesa_id))
+                return redirect(url_for(
+                    'menu_user', 
+                    mesa_id=mesa_id
+                ))
             
             return mesa_id
 
@@ -523,6 +585,7 @@ class UserApp:
 
         try:
             stripe.api_key = os.getenv('PRIVATE_KEY')
+
             if not stripe.api_key:
                 print("ERROR: PRIVATE_KEY no esta configurada")
                 return redirect(url_for('seleccionar_pago'))
@@ -539,6 +602,7 @@ class UserApp:
                 return redirect(url_for('seleccionar_pago'))
             
             print(f"Intentando crear cargo por {total} USD")
+
             charge = stripe.Charge.create(
                 amount=int(total * 100),
                 currency="usd",
@@ -552,14 +616,26 @@ class UserApp:
                 INSERT INTO transacciones (id, mesa_id, metodo_pago, monto, estado, fecha)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """
-                cursor.execute(query, (transaccion_id, mesa_id, 'tarjeta', total, 'completado', fecha))
+                cursor.execute(query, (
+                    transaccion_id, 
+                    mesa_id, 
+                    'tarjeta', 
+                    total, 
+                    'completado', 
+                    fecha
+                ))
 
                 for item in carrito:
                     query_detalle = """
                     INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
                     VALUES (%s, %s, %s, %s)
                     """
-                    cursor.execute(query_detalle, (transaccion_id, item.get('id'), item.get('cantidad'), item.get('precio')))
+                    cursor.execute(query_detalle, (
+                        transaccion_id, 
+                        item.get('id'), 
+                        item.get('cantidad'), 
+                        item.get('precio')
+                    ))
 
                 self.conn.commit()
             
@@ -579,7 +655,10 @@ class UserApp:
 
             print('Pago con tarjeta procesado exitosamente')
             flash('Pago con tarjeta procesado exitosamente. El carrito ha sido vaciado.')
-            return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+            return redirect(url_for(
+                'confirmacion_pago', 
+                transaccion_id=transaccion_id
+            ))
         
         except stripe.error.StripeError as e:
             self.conn.rollback()
@@ -633,9 +712,11 @@ class UserApp:
                     "type": "customer_balance",
                 },
                 payment_method_options={
-                    "customer_balance": {
+                    "customer_balance": 
+                    {
                         "funding_type": "bank_transfer",
-                        "bank_transfer": {
+                        "bank_transfer": 
+                        {
                             "type": "us_bank_transfer"
                         }
                     }
@@ -647,7 +728,11 @@ class UserApp:
                 expand=["next_action"]
             )
 
-            instrucciones_bancarias = getattr(payment_intent.next_action, 'display_bank_transfer_instructions', None)
+            instrucciones_bancarias = getattr(
+                payment_intent.next_action, 
+                'display_bank_transfer_instructions', 
+                None
+            )
             
             with self.conn.cursor() as cursor:
                 query = """
@@ -665,14 +750,27 @@ class UserApp:
 
                 session['instrucciones_bancarias'] = instrucciones_bancarias
 
-                cursor.execute(query, (transaccion_id, mesa_id, 'tranferencia', total, 'pendiente', fecha, datos_adicionales))
+                cursor.execute(query, (
+                    transaccion_id, 
+                    mesa_id, 
+                    'tranferencia', 
+                    total, 
+                    'pendiente', 
+                    fecha, 
+                    datos_adicionales
+                ))
 
                 for item in carrito:
                     query_detalle = """ 
                     INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
                     VALUES (%s, %s, %s, %s)
                     """
-                    cursor.execute(query_detalle, (transaccion_id, item.get('id'), item.get('cantidad'), item.get('precio')))
+                    cursor.execute(query_detalle, (
+                        transaccion_id, 
+                        item.get('id'), 
+                        item.get('cantidad'), 
+                        item.get('precio')
+                    ))
                 
                 self.conn.commit()
 
@@ -693,7 +791,10 @@ class UserApp:
 
             print('Transferencia registrada. Pendiente de verificación.')
             flash('Transferencia registrada. Pendiente de verificación.')
-            return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+            return redirect(url_for(
+                'confirmacion_pago', 
+                transaccion_id=transaccion_id
+            ))
         
         except stripe.error.StripeError as e:
             self.conn.rollback()
@@ -733,7 +834,14 @@ class UserApp:
                 INSERT INTO transacciones (id, mesa_id, metodo_pago, monto, estado, fecha)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 """
-                cursor.execute(query, (transaccion_id, mesa_id, 'efectivo', total, 'pendiente', fecha))
+                cursor.execute(query, (
+                    transaccion_id, 
+                    mesa_id, 
+                    'efectivo', 
+                    total, 
+                    'pendiente', 
+                    fecha
+                ))
 
                 for item in carrito:
 
@@ -741,13 +849,21 @@ class UserApp:
                     INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
                     VALUES (%s, %s, %s, %s)
                     """
-                    cursor.execute(query_detalle, (transaccion_id, item.get('id'), item.get('cantidad'), item.get('precio')))
+                    cursor.execute(query_detalle, (
+                        transaccion_id, 
+                        item.get('id'), 
+                        item.get('cantidad'), 
+                        item.get('precio')
+                    ))
 
                 self.conn.commit()
 
                 print('Pago en efectivo registrado. Por favor paga en la caja.')
                 flash('Pago en efectivo registrado. Por favor paga en la caja.')
-                return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+                return redirect(url_for(
+                    'confirmacion_pago', 
+                    transaccion_id=transaccion_id
+                ))
 
         except Exception as e:
             self.conn.rollback()
@@ -803,7 +919,10 @@ class UserApp:
                 SET token_confirmacion = %s
                 WHERE id = %s
                 """
-                cursor.execute(query, (confirmation_token, transaccion_id))
+                cursor.execute(query, (
+                    confirmation_token, 
+                    transaccion_id
+                ))
                 self.conn.commit()
             
             base_url = "https://74zb1whg-5000.use2.devtunnels.ms/"
@@ -870,7 +989,11 @@ class UserApp:
             </html>
             """
 
-            enviar_correo(transaccion_id, correo, factura_html)
+            enviar_correo(
+                transaccion_id, 
+                correo, 
+                factura_html
+            )
 
         except Exception as e:
             print(f"Error al enviar la factura por correo: {str(e)}")
@@ -919,7 +1042,11 @@ class UserApp:
             </html>
             """
 
-            enviar_correo(f"Confirmación de Pago - {transaccion_id}", correo, confirmacion_html)
+            enviar_correo(
+                f"Confirmación de Pago - {transaccion_id}", 
+                correo, 
+                confirmacion_html
+            )
             
         except Exception as e:
             print(f"Error al enviar la confirmación por correo: {str(e)}")
