@@ -11,46 +11,44 @@
     <div class="container">
         <header class="header">
             <h1>Descubre Food Trucks Increíbles</h1>
-            <p>Explora una experiencia gastronómica única en las mejores cocinas sobre ruedas de la ciudad</p>
+            <p>
+                Estos camiones de comida ofrecen una variedad de platillos de alta calidad, desde comida 
+                callejera gourmet hasta platos internacionales y opciones veganas o especializadas.
+            </p>
         </header>
 
         <div class="container__slider">
+            <h2>Categorias</h2>
             <nav class="slider__wrapper">
                 <ul class="slider__icons__categories">
                     <li>
                         <div>
                             <img src="{{ url_for('static', filename='assets/icons/pizza.png') }}" alt="icon pizza">
-                            <p>Pizza</p>
                         </div>
                     </li>
                     <li>
                         <div>
                             <img src="{{ url_for('static', filename='assets/icons/hamburguesa.png') }}" alt="icon hamburguesa">
-                            <p>Hamburguesa</p>
                         </div>
                     </li>
                     <li>
                         <div>
                             <img src="{{ url_for('static', filename='assets/icons/sushi.png') }}" alt="icon sushi">
-                            <p>Sushi</p>
                         </div>
                     </li>
                     <li>
                         <div>
                             <img src="{{ url_for('static', filename='assets/icons/tacos.png') }}" alt="icon tacos">
-                            <p>Tacos</p>
                         </div>
                     </li>
                     <li>
                         <div>
                             <img src="{{ url_for('static', filename='assets/icons/aguacate.png') }}" alt="icon vegana">
-                            <p>Vegana</p>
                         </div>
                     </li>
                     <li>
                         <div>
                             <img src="{{ url_for('static', filename='assets/icons/donas.png') }}" alt="icon donas">
-                            <p>Donas</p>
                         </div>
                     </li>
                 </ul>
@@ -58,7 +56,6 @@
         </div>
 
         <div class="cards-grid">
-
             {% for foodtruck in session.get('foodtrucks') %}
                 <article class="food-card">
                     <div class="card-image">
@@ -84,43 +81,6 @@
             {% endfor %}
         </div>
 
-        <p id="noResults" style="display: none; text-align: center; margin-top: 20px;">No hay coincidencias con tu búsqueda</p>
-    </div>
-</section>
-
-<section id="feedbackModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Gracias por tu compra!</h2>
-        <p>
-            Nos gustaria conocer tu opinion sobre tu experiencia. Calificanos 😍!
-        </p>
-
-        <form action="/user/enviar-feedback" method="post">
-            <input type="hidden" name="transaccion_id" id="transaccion_id" value="">
-
-            <div class="rating">
-                <p>
-                    Como calificarias tu experiencia? 🤔
-                </p>
-                <div class="stars">
-                    <input type="radio" name="puntuacion" value="5" id="star5"><label for="star5">★</label>
-                    <input type="radio" name="puntuacion" value="4" id="star4"><label for="star4">★</label>
-                    <input type="radio" name="puntuacion" value="3" id="star3"><label for="star3">★</label>
-                    <input type="radio" name="puntuacion" value="2" id="star2"><label for="star2">★</label>
-                    <input type="radio" name="puntuacion" value="1" id="star1"><label for="star1">★</label>
-                </div>
-            </div>
-
-            <div class="feedback-comment">
-                <p>
-                    Ahi algun comentario adicional ❤️!
-                </p>
-                <textarea name="comentario" rows="4" placeholder="Escribe tu comentario aqui..."></textarea>
-            </div>
-
-            <button type="submit" class="submit-feedback">Enviar feedback</button>
-        </form>
     </div>
 </section>
 

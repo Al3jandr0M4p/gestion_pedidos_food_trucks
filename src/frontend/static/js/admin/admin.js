@@ -1,13 +1,8 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Botón de menú responsivo
-    const menuButton = document.createElement('button');
-    menuButton.className = 'menu-toggle';
-    menuButton.textContent = '☰';
+const menuToggle = document.getElementById('menuToggle');
+const sidebar = document.querySelector('.container__admin__configuration');
 
-    menuButton.onclick = () => {
-        const menu = document.querySelector('.container__admin__configuration');
-        menu.classList.toggle('show');
-    };
-
-    document.body.appendChild(menuButton);
-});
+if (menuToggle) {
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('show');
+    });
+}

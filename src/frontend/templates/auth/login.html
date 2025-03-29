@@ -1,49 +1,68 @@
-{% extends 'layouts/base.html' %}
-{% block head %}
+<!DOCTYPE html>
+<html lang="en">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-    
-{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
 
-{% block body %}
+<body>
 
-<div class="container__form">
+    <div class="container__form">
 
-    <div class="container__logo__img">
-        <img src="{{ url_for('static', filename='assets/logo-login.svg') }}" alt="Logo login">
+        <div class="container__logo__img">
+            <img src="{{ url_for('static', filename='assets/logo-login.svg') }}" alt="Logo login">
+        </div>
+
+        <form action="/login" method="post">
+
+            <div class="container__logo">
+                <h1>Inicia sesión en tu cuenta</h1>
+            </div>
+
+            <div class="container__input__name">
+                <label for="name">
+                    Username:
+                </label>
+                <input type="text" name="name" id="name" autocomplete="off" required>
+            </div>
+
+            <div class="container__input__password">
+                <label for="passwd">
+                    Password:
+                </label>
+                <div class="password-wrapper">
+                    <input type="password" name="passwd" id="passwd" autocomplete="new-password" required>
+                    <button type="button" id="togglePassword">
+                        👁️
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn__primary">Entrar</button>
+
+        </form>
+
     </div>
 
-    <form action="/login" method="post">
+    <div class="container__notificacion">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            <ul id="flash-messages">
+                {% for category, message in messages %}
+                    <li data-category="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
 
-        <div class="container__logo">
-            <h1>Inicia sesión en tu cuenta</h1>
-        </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/auth/login.js') }}" defer></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/notificacion.js') }}" defer></script>
 
-        <div class="container__input__name">
-            <label for="name">
-                Username:
-            </label>
-            <input type="text" name="name" id="name" autocomplete="off" required>
-        </div>
+</body>
 
-        <div class="container__input__password">
-            <label for="password">
-                Password:
-            </label>
-            <div class="password-wrapper">
-                <input type="password" name="passwd" id="passwd" autocomplete="new-password" required>
-                <button type="button" id="togglePassword">
-                    👁️
-                </button>
-            </div>
-        </div>
-
-        <button type="submit" class="btn__primary">Entrar</button>
-
-    </form>
-
-</div>
-
-<script type="text/javascript" src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
-
-{% endblock %}
+</html>

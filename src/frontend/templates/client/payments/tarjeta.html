@@ -1,6 +1,7 @@
 {% include 'layouts/base.html' %}
 {% block head %}
     <script src="https://js.stripe.com/v3/"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/tarjeta.css') }}">
 {% endblock %}
 
 {% block body %}

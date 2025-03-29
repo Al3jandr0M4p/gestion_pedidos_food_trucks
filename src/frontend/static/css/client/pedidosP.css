@@ -33,11 +33,6 @@ body {
     padding-bottom: 2rem;
 }
 
-@keyframes gradient {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
 .container__head h1 {
     font-size: 3.2rem;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
@@ -47,12 +42,6 @@ body {
     letter-spacing: -0.02em;
     position: relative;
     display: inline-block;
-}
-
-@keyframes float {
-    0% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(5deg); }
-    100% { transform: translateY(0) rotate(0deg); }
 }
 
 .container__head a {
@@ -127,9 +116,6 @@ body {
 
 .container__producto:hover {
     transform: translateY(-8px) rotateX(2deg) rotateY(1deg);
-    box-shadow: 
-        0 20px 40px rgba(249, 115, 22, 0.2),
-        0 0 20px rgba(249, 115, 22, 0.1);
 }
 
 .container__producto:hover::before {
@@ -167,7 +153,6 @@ body {
 
 .container__producto:hover h2::after {
     width: 100%;
-    box-shadow: 0 2px 4px rgba(249, 115, 22, 0.2);
 }
 
 .container__producto p {
@@ -182,18 +167,12 @@ body {
     padding: 1.5rem;
     border-radius: 1rem;
     border: 1px solid rgba(249, 115, 22, 0.15);
-    box-shadow: 
-        inset 0 2px 4px rgba(249, 115, 22, 0.05),
-        0 2px 4px rgba(249, 115, 22, 0.05);
     transition: all 0.3s ease;
 }
 
 .container__producto:hover p {
     transform: scale(1.02);
     background: linear-gradient(135deg, #ffedd5, #fff5eb);
-    box-shadow: 
-        inset 0 2px 8px rgba(249, 115, 22, 0.1),
-        0 4px 8px rgba(249, 115, 22, 0.1);
 }
 
 .precio {
@@ -226,15 +205,11 @@ body {
     overflow: hidden;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
 }
 
 .agregar__carrito:hover {
     background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
     transform: translateY(-2px);
-    box-shadow: 
-        0 8px 20px rgba(249, 115, 22, 0.3),
-        0 0 0 2px rgba(249, 115, 22, 0.4);
     letter-spacing: 2px;
 }
 
@@ -291,7 +266,7 @@ body {
     opacity: 1;
 }
 
-@keyframes pulse {
+/* @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
@@ -299,7 +274,7 @@ body {
 
 .cart-pulse {
     animation: pulse 0.6s ease-in-out;
-}
+} */
 
 @media (max-width: 1280px) {
     .container__menu {

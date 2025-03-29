@@ -1,26 +1,26 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
     --font: 'Poppins', sans-serif;
-
-    /* Neutral Colors */
-    --white: #fff;
-    --black: #000;
+    
+    --primary: #ff7d20;
+    --primary-dark: #ea580c;
+    --background: #fff5eb;
+    --sidebar-bg: #1a1a1a;
+    --sidebar-hover: #333333;
+    --sidebar-active: #f98c3e;
+    --text-primary: #1a1a1a;
+    --danger: #ea2d2d;
+    --white: #ffffff;
+    --border-color: #ffedd5;
+    --shadow: 0 4px 12px rgba(249, 115, 22, 0.1);
+    --transition: all 0.3s ease;
 }
-
-/*
-
-________________________________
-    CSS-GENERAL
-________________________________
-
-*/
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    appearance: none;
     text-decoration: none;
     list-style: none;
 }
@@ -31,16 +31,10 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    overflow-y: hidden;
+    overflow-x: hidden;
+    color: var(--text-primary);
+    background-color: var(--background);
 }
-
-/*
-
-__________________________________
-    SECTION: DASHBOARD
-__________________________________
-
-*/
 
 .container__admin__dashboard {
     display: flex;
@@ -48,13 +42,49 @@ __________________________________
 }
 
 .container__admin__configuration {
-    width: 250px;
-    padding: 20px;
+    width: 280px;
+    padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
+    background-color: var(--primary);
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    position: relative;
+    z-index: 10;
+}
+
+.logo {
+    text-align: center;
+    color: var(--white);
+    margin-bottom: 2rem;
+}
+
+.logo-container {
+    display: flex;
     align-items: center;
-    background-color: var(--black);
-    transition: transform 0.3s ease-in-out;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.logo-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+.tagline {
+    font-size: 0.8rem;
+    font-weight: 300;
+    margin-top: 0.25rem;
+    opacity: 0.8;
+    letter-spacing: 0.5px;
 }
 
 .navbar__admin {
@@ -65,53 +95,109 @@ __________________________________
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 15px;
+    gap: 0.5rem;
 }
 
 .links__admin li {
     width: 100%;
+    border-radius: 8px;
+    transition: var(--transition);
 }
 
 .links__admin li a {
-    display: block;
-    padding: 10px 15px;
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--white);
-    border-radius: 5px;
-    transition: background 0.3s;
+    border-radius: 8px;
+    transition: var(--transition);
+}
+
+.links__admin li a:before {
+    content: "";
+    width: 4px;
+    height: 0;
+    background: var(--primary);
+    position: absolute;
+    left: 0;
+    transition: var(--transition);
+}
+
+.links__admin li a.active {
+    background: var(--sidebar-active);
+    color: var(--white);
+    font-weight: 600;
+}
+
+.links__admin li a.active:before {
+    height: 24px;
 }
 
 .links__admin li a:hover {
-    background: rgba(255, 255, 255, .1);
+    background-color: var(--sidebar-active);
+    transform: translateX(5px);
 }
 
-.links__admin .logout {
-    color: #ffdddd;
+.links__admin li:last-child {
+    margin-top: 2rem;
+}
+
+.links__admin li:last-child a {
+    color: var(--danger);
     font-weight: 600;
+    border: 1px solid rgba(229, 62, 62, 0.3);
 }
 
+.links__admin li:last-child a:hover {
+    background-color: rgba(229, 62, 62, 0.1);
+}
 
 .container__admin__content {
     flex: 1;
-    padding: 40px;
-    background-color: var(--white);
+    padding: 2rem;
+    background-color: var(--background);
     overflow-y: auto;
-    color: var(--black);
+    transition: var(--transition);
 }
 
 .container__admin__content h1 {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/*
+.menu-toggle {
+    display: none;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+}
 
-_____________________________
-    MEDIA-QUERRYS
-_____________________________
+.menu-toggle:hover {
+    background: var(--primary-dark);
+}
 
-*/
+@media (max-width: 1024px) {
+    .container__admin__configuration {
+        width: 240px;
+    }
+}
 
 @media (max-width: 768px) {
     .container__admin__dashboard {
@@ -119,13 +205,12 @@ _____________________________
     }
 
     .container__admin__configuration {
-        width: 250px;
+        width: 280px;
         position: fixed;
-        top: 0;
-        left: 0;
         height: 100vh;
         transform: translateX(-100%);
         z-index: 100;
+        transition: transform 0.3s ease;
     }
 
     .container__admin__configuration.show {
@@ -133,28 +218,17 @@ _____________________________
     }
 
     .container__admin__content {
-        padding: 20px;
+        width: 100%;
+        padding: 1.5rem;
     }
 
     .menu-toggle {
-        display: block;
-        position: fixed;
-        top: 15px;
-        left: 15px;
-        background: var(--black);
-        color: var(--white);
-        padding: 10px 15px;
-        border: none;
-        cursor: pointer;
-        border-radius: 5px;
-        z-index: 101;
+        display: flex;
     }
 }
 
-/*
-
-___________________________
-    END CSS
-___________________________
-
-*/
+@media (max-width: 576px) {
+    .container__admin__content {
+        padding: 1rem;
+    }
+}

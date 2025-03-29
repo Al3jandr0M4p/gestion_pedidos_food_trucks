@@ -13,46 +13,23 @@ from ....security.autentication import authentication_required
 from ....db.database import DBConfig, Error
 
 class AdminApp:
-    """
-    Clase para gestionar la administracion de la aplicacion Flask.
-
-    Esta clase configura las rutas del panel de administracion,
-    la gestion de empleados y el sistema de reportes.
-
-    Atributos:
-    ----------
-    admin : Flask
-        Instancia de la aplicacion Flask donde se registran las rutas.
-    conn : mysql.connector.connection.MySQLConnection
-        Conexion a la base de datos MySQL.
-
-    Metodos:
-    -------
-    setup_routes()
-        Configura las rutas del panel de administracion
-    """
-
     def __init__(self, app):
         """
-        Inicializa la clase con la aplicacion Flask.
+        Inicializa AdminApp con Flask app.
 
-        Parametros:
-        ----------
-        app = Flask
-            Instancia de la aplicacion Flask donde se configuraran las rutas.
+        :param app: Flask app instancia.
         """
         self.admin = app
-        self.setup_routes()
 
         db = DBConfig()
         self.conn = db.get_db_config()
+        self.setup_routes()
     
     def setup_routes(self):
         """
         Confifura las rutas del panel de administracion.
         Incluye rutas para el dashboard, reportes, gestion y CRUD de empleados.
         """
-
         @self.admin.route('/admin')
         @authentication_required
         def admin_dashboard():
@@ -60,7 +37,9 @@ class AdminApp:
             Muestra el dashboard de administracion.
             Renderiza la plantilla 'admin/admin.html'.
             """
-            return render_template('admin/admin.html')
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/dashboard.html')
+            return render_template('admin/admin.html', section="dashboard")
         
         @self.admin.route('/admin/reports')
         @authentication_required
@@ -69,181 +48,231 @@ class AdminApp:
             Muestra la pagina de reportes administrativos.
             Redenriza la plantilla 'admin/reportes.html'.
             """
-            return render_template('admin/reportes.html')
-
-        # Seccion de Gestion
-        @self.admin.route('/admin/gestion')
-        @authentication_required
-        def admin_gestion():
-            """
-            Muestra la pagina de gestion administrativa.
-            Renderiza la plantilla 'admin/gestion.html'.
-            """
-            return render_template('admin/gestion.html')
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/reportes.html')
+            return render_template('admin/admin.html', section="reports")
         
+        @self.admin.route('/admin/pedidos')
+        def admin_pedidos():
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/pedidos.html')
+            return render_template('admin/admin.html', section="pedidos")
+        
+
         # CRUD de FoodTrucks
+        @self.admin.route('/admin/foodtrucks')
+        def foodtrucks():
+
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query = """
+                    SELECT * FROM trucks
+                    """
+                    cursor.execute(query)
+                    trucks = cursor.fetchall()
+            
+            except Error as e:
+                print(f"Error al obtener los foodtrucks: {e}")
+                flash(f"Error al obtener a los empleados: {e}", "error")
+                return redirect(url_for('foodtrucks'))
+            
+            return render_template('admin/admin.html', section="foodtrucks", trucks=trucks)
+
+        # CRUD de productos
+        # Proximamente crud de productosn
 
         # CRUD de Empleados
         @self.admin.route('/admin/employees')
-        def employees():
-            render_employees = self.get_employees()
-            return render_template('/admin/employees.html', employees=render_employees)
+        @authentication_required
+        def employee():
+
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query = """ 
+                    SELECT * FROM users WHERE estado = 'activo'
+                    """
+                    cursor.execute(query)
+                    employees = cursor.fetchall()
+
+                    query_disabled = """ 
+                    SELECT * FROM user_desabilitados
+                    """
+                    cursor.execute(query_disabled)
+                    employees_disabled = cursor.fetchall()
+                    
+            except Error as e:
+                print(f"Error al obtener a los empleados: {e}")
+                flash(f"Error al obtener a los empleados: {e}", "error")
+                return redirect(url_for('employee'))
+
+            return render_template('admin/admin.html', section="employees", employees=employees, employees_disabled=employees_disabled)
         
-        @self.admin.route('/admin/employees/create', methods=['GET', 'POST'])
+        @self.admin.route('/admin/employees/create_employee', methods=['GET', 'POST'])
+        @authentication_required
         def create_employee():
+
             if request.method == "POST":
-                nombre = request.form.get('nombre')
+
+                name = request.form.get('nombre')
                 password = request.form.get('password')
                 email = request.form.get('email')
                 rol = request.form.get('rol')
+                password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
-                result = self.insert_employee(nombre, password, email, rol)
-                if result:
+                try:
+                    with self.conn.cursor() as cursor:
+                        query = """
+                        INSERT INTO users (name, password, email, rol)
+                        VALUES (%s, %s, %s, %s)
+                        """
+                        cursor.execute(query, (name, password_hash, email, rol))
+                        self.conn.commit()
+                    
                     flash("Empleado creado exitosamente", "success")
-                    return redirect(url_for('employees'))
-                else:
-                    flash("Error al crear el empleado", "danger")
+                    return redirect(url_for('employee'))
+                
+                except Error as e:
+                    flash(f"Error creando el empleado: {str(e)}", "error")
 
-            return render_template('/admin/crear_employees.html')
-        
-        @self.admin.route('/admin/employees/edit/<int:id>', methods=['GET', 'POST'])
-        def edit_employee(id):
-            if request.method == "POST":
-                nombre = request.form.get('nombre')
-                password = request.form.get('password')
-                email = request.form.get('email')
-                rol = request.form.get('rol')
+            return render_template('admin/admin.html', section="create_employee")
 
-                result = self.update_employee(id, nombre, password, email, rol)
-                if result:
-                    flash("Empleado actualizado con exito", "success")
-                    return redirect(url_for("employees"))
-                else:
-                    flash("Error al actualizar al empleado", "danger")
+        @self.admin.route('/admin/employees/update_employee/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
+        def update_employee(id):
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query = """
+                    SELECT id, name, email, rol
+                    FROM users
+                    WHERE id = %s
+                    """
+                    cursor.execute(query, (id,))
+                    employee = cursor.fetchone()
+
+                    if not employee:
+                        flash("Empleado no encontrado", "error")
+                        return redirect(url_for('employee'))
+
+                    if request.method == "POST":
+                        name = request.form.get('nombre')
+                        password = request.form.get('password')
+                        email = request.form.get('email')
+                        rol = request.form.get('rol')
+
+                        try:
+                            with self.conn.cursor() as update_cursor:
+                                if password:
+                                    password_hash = generate_password_hash(password, method='pbkdf2:sha256')
+                                    query = """
+                                    UPDATE users SET name = %s, password = %s, email = %s, rol = %s
+                                    WHERE id = %s
+                                    """
+                                    update_cursor.execute(query, (name, password_hash, email, rol, id))
+                                else:
+                                    query = """
+                                    UPDATE users 
+                                    SET name = %s, email = %s, rol = %s
+                                    WHERE id = %s
+                                    """
+                                    update_cursor.execute(query, (name, email, rol, id))
+
+                                self.conn.commit()
+                                flash("Usuario actualizado exitosamente", "success")
+                                return redirect(url_for('employee'))
+                        
+                        except Error as e:
+                            self.conn.rollback()
+                            print(f"Error al actualizar el usuario: {e}")
+                            flash(f"Error al actualizar el usuario: {e}", "error")
+                    
+                    return render_template('admin/admin.html', section="edit_employee", employee=employee)
             
-            employee = self.get_employees_by_id(id)
-            if employees:
-                return render_template('/admin/edit_employee.html', employee=employee)
-
-            flash("Empleado no encontrado", "danger")
-            return redirect(url_for("employees"))
+            except Error as e:
+                print(f"Error al obtener datos del empleado: {e}")
+                flash(f"Error al obtener datos del empleado: {e}", "error")
+                return redirect(url_for('employee'))
         
-        @self.admin.route('/admin/employees/delete/<int:id>', methods=['POST'])
+        @self.admin.route('/admin/employees/disable_employee/<int:id>')
+        @authentication_required
         def disable_employee(id):
-            result = self.disable_employee(id)
-            if result:
-                flash("Empleado eliminado con exito", "success")
-            else:
-                flash("Error al eliminar el empleado", "danger")
-            
-            return redirect(url_for("employees"))
-        
-    def get_employees(self):
-        try:
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query_employee = """
+                    SELECT id, name, password, email, rol
+                    FROM users
+                    WHERE id = %s AND estado = 'activo'
+                    """ 
+                    cursor.execute(query_employee, (id,))
+                    employee = cursor.fetchone()
 
-            with self.conn.cursor(dictionary=True) as cursor:
-                query = """ 
-                SELECT * FROM users
-                """
-                cursor.execute(query)
-                employees = cursor.fetchall()
-                return employees
-            
-        except Error as e:
-            print(f"Error al obtener los usuarios: {e}")
-    
-    def get_employee_by_id(self, id):
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                query = """
-                SELECT * FROM users WHERE id = %s
-                """
-                cursor.execute(query, (id,))
-                employee = cursor.fetchone()
-                return employee
-        
-        except Error as e:
-            print(f"Error al obtener el empleado: {str(e)}")
-            return None
-
-    def insert_employee(self, nombre, password, email, rol):
-        try:
-            with self.conn.cursor() as cursor:
-                hashed_passsword = generate_password_hash(password)
-                query = """
-                INSERT INTO users (name, password, email, rol)
-                VALUES (%s, %s, %s, %s)
-                """
-                cursor.execute(query, (nombre, hashed_passsword, email, rol))
-                self.conn.commit()
-                return True
-        except Error as e:
-            print(f"Error al insertar el empleado: {str(e)}")
-            return False
-    
-    def update_employee(self, id, nombre, password, email, rol):
-        try:
-            with self.conn.cursor() as cursor:
-                if password and password.strip():
-                    hashed_password = generate_password_hash(password)
-                    query = """
-                    UPDATE users 
-                    SET name = %s, password = %s, email = %s, rol = %s 
-                    WHERE = %s
+                    if not employee:
+                        flash("Empleado no encontrado o ya desabilitado", "error")
+                        return redirect(url_for('employee'))
+                    
+                    insert_disabled = """
+                    INSERT INTO user_desabilitados (id, name, password, email, rol, disabled_at)
+                    VALUES (%s, %s, %s, %s, %s, NOW())
                     """
-                    cursor.execute(query, (nombre, hashed_password, email, rol, id))
-                else:
-                    query = """
-                    UPDATE users 
-                    SET name = %s, email = %s, rol = %s 
-                    WHERE = %s
+                    cursor.execute(insert_disabled, (
+                        employee['id'],
+                        employee['name'],
+                        employee['password'],
+                        employee['email'],
+                        employee['rol']
+                    ))
+
+                    update_user_status = """
+                    UPDATE users
+                    SET estado = 'inactivo'
+                    WHERE id = %s
                     """
-                    cursor.execute(query, (nombre, email, rol, id))
-                
-                self.conn.commit()
-                return cursor.rowcount > 0
-        except Error as e:
-            print(f"Error al actualizar el empleado: {str(e)}")
-            return False
-    
-    def disable_employee(self, id):
-        try:
-            with self.conn.cursor(dictionary=True) as cursor:
-                select_query = """
-                SELECT * FROM users
-                WHERE id = %s
-                """
-                cursor.execute(select_query, (id,))
-                user_data = cursor.fetchone()
+                    cursor.execute(update_user_status, (id,))
 
-                if not user_data:
-                    return False
-                
-                self.conn.start_transaction()
-
-                insert_query = """
-                INSERT INTO user_desabilitados (id, name, password, email, rol, updated_at, disabled_at) 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-                """
-                cursor.execute(insert_query, (
-                    user_data['id'],
-                    user_data['name'],
-                    user_data['password'],
-                    user_data['email'],
-                    user_data['rol'],
-                    user_data.get('created_at'),
-                    user_data.get('updated_at')
-                ))
-
-                delete_query = """
-                DELETE FROM users
-                WHERE id = %s
-                """
-                cursor.execute(delete_query, (id,))
-                self.conn.commit()
-                return True
+                    self.conn.commit()
+                    flash("Empleado deshabilitado exitosamente", "success")
+                    return redirect(url_for('employee'))
+            except Error as e:
+                self.conn.rollback()
+                print(f"Error al intentar desabilitar un usuario: {e}")
+                flash(f"Error al intentar desabilitar un usuario: {e}", "error")
+                return redirect(url_for('employee'))
         
-        except Error as e:
-            self.conn.rollback()
-            print(f"Error al deshabilitar el empleado: {str(e)}")
-            return False
+        @self.admin.route('/admin/employees/habilitar_employee/<int:id>')
+        @authentication_required
+        def habilitar_employee(id):
+            try:
+
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query_disabled = """ 
+                    SELECT id, name, password, email, rol
+                    FROM user_desabilitados
+                    WHERE id = %s
+                    """
+                    cursor.execute(query_disabled, (id,))
+                    employee_disabled = cursor.fetchone()
+
+                    if not employee_disabled:
+                        flash("Empleado no encontrado o ya habilitado", "success")
+
+                    update_user_status = """
+                    UPDATE users
+                    SET estado = 'activo'
+                    WHERE id = %s
+                    """
+                    cursor.execute(update_user_status, (id,))
+
+                    delete_disabled = """
+                    DELETE FROM user_desabilitados
+                    WHERE id = %s
+                    """
+                    cursor.execute(delete_disabled, (id,))
+
+                    self.conn.commit()
+                    flash("Empleado habilitado exitosamente", "success")
+                    return redirect(url_for('employee'))
+                
+            except Error as e:
+                self.conn.rollback()
+                print(f"Error al intentar habilitar un usuario: {e}")
+                flash(f"Error al intentar habilitar un usuario: {e}", "error")
+                return redirect(url_for('employee'))

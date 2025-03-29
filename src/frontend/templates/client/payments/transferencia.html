@@ -1,5 +1,7 @@
 {% include 'layouts/base.html'   %}
 {% block head %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/transferencia.css') }}">
     
 {% endblock %}
 
@@ -7,7 +9,7 @@
     
     <div class="container__transferencia">
         <h2>Pago Transferencia</h2>
-        <form action="{{ url_for('procesar_pago')}}" method="post">
+        <form id="transferencia-payment-form" action="{{ url_for('procesar_pago')}}" method="post">
 
             <input type="hidden" name="metodo_pago" value="transferencia">
             <input type="hidden" name="carrito" id="carrito-input">

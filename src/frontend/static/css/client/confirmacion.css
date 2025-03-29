@@ -1,0 +1,129 @@
+:root {
+    --font: 'Poppins', sans-serif;
+    --primary: #f97316;
+    --primary-light: #fb923c;
+    --primary-dark: #ea580c;
+    --text-dark: #1a1a1a;
+    --text-light: #4b5563;
+    --background: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font);
+    line-height: 1.6;
+    background-color: var(--background);
+    color: var(--text-dark);
+    padding: 4rem 2rem;
+    overflow-x: hidden;
+}
+
+.container__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 3rem;
+    border-bottom: 1px solid var(--text-light);
+    padding-bottom: 1rem;
+}
+
+.container__head h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.container__head a {
+    text-decoration: none;
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.container__head a:hover {
+    color: var(--primary-dark);
+}
+
+.container__confirmacion {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.confirmacion__details {
+    text-align: center;
+}
+
+.confirmacion__details h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary);
+}
+
+.confirmacion__info {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.confirmacion__info p {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+}
+
+.estado-completado {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.estado-pendiente {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.confirmacion__productos {
+    margin-top: 2rem;
+}
+
+.producto-item {
+    border: 1px solid var(--primary-light);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.producto-item p {
+    margin: 0.25rem 0;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 2rem 1rem;
+    }
+
+    .container__head h1 {
+        font-size: 2rem;
+    }
+
+    .confirmacion__details h2 {
+        font-size: 1.5rem;
+    }
+
+    .container__confirmacion {
+        padding: 1.5rem;
+    }
+}

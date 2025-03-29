@@ -4,6 +4,19 @@ document.addEventListener('DOMContentLoaded', function() {
     notificationContainer.className = "notification-container";
     document.body.appendChild(notificationContainer);
 
+    let showNotification = (icon, message, className) => {
+        const notification = document.createElement('div');
+        notification.className = className;
+        notification.innerHTML = `<span class="icon">${icon}</span> <span>${message}</span>`;
+
+        notificationContainer.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.opacity = "0";
+            setTimeout(() => notification.remove(), 500);
+        }, 3000);
+    }
+
     messages.forEach((msg) => {
         const messageText = msg.innerText;
         const category = msg.dataset.category;
@@ -21,17 +34,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
         showNotification(icon, messageText, className);
     });
-
-    let showNotification = (icon, message, className) => {
-        const notification = document.createElement('div');
-        notification.className = className;
-        notification.innerHTML = `<span class="icon">${icon}</span> <span>${message}</span>`;
-
-        notificationContainer.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.opacity = "0";
-            setTimeout(() => notification.remove(), 500);
-        }, 3000);
-    }
 });

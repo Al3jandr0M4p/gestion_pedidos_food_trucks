@@ -27,15 +27,19 @@ document.addEventListener("DOMContentLoaded", () => {
         e.preventDefault();
 
         // Desactivar el botón para evitar múltiples envíos
-        document.querySelector('#payment-form button[type="submit"]').disabled = true;
+        const submitButton = document.querySelector('#payment-form button[type="submit"]');
+        submitButton.disabled = true;
 
         stripe.createToken(card).then(function(result) {
+            console.log("Stripe token creado: ", result);
+
             if (result.error) {
                 // Reactivar el botón si hay error
-                document.querySelector('#payment-form button[type="submit"]').disabled = false;
+                submitButton.disabled = false;
                 const errorElement = document.getElementById('card-errors');
                 errorElement.textContent = result.error.message;
             } else {
+                console.log("Token generado:", result.token.id);
                 // Agregar token a la forma
                 const hiddenInput = document.createElement('input');
                 hiddenInput.setAttribute('type', 'hidden');
@@ -43,17 +47,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 hiddenInput.setAttribute('value', result.token.id);
                 form.appendChild(hiddenInput);
 
-                // Adjuntar el carrito al formulario
                 const carritoInput = document.createElement('input');
                 carritoInput.setAttribute('type', 'hidden');
                 carritoInput.setAttribute('name', 'carrito');
                 carritoInput.setAttribute('value', localStorage.getItem('carrito'));
                 form.appendChild(carritoInput);
 
+                console.log("Token que se va a enviar:", hiddenInput.value);
+
                 // Enviar el formulario
                 console.log('Enviando formulario de pago con tarjeta');
                 form.submit();
             }
+        }).catch(function(error) {
+            console.log("Stripe token error en la creacion: ", error);
+            submitButton.disabled = false;
         });
     });
 });

@@ -1,46 +1,80 @@
-{% extends 'layouts/base.html' %}
-{% block head %}
+<!DOCTYPE html>
+<html lang="en">
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin.css') }}">
+</head>
 
-{% endblock %}
+<body>
 
-{% block body %}
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+    </button>
 
-<section class="container__admin__dashboard">
+    <section class="container__admin__dashboard">
+        <aside class="container__admin__configuration">
+            <div class="logo">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                            <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>
+                        </svg>
+                    </div>
+                    <h1>FoodOrder</h1>
+                </div>
+                <p class="tagline">Delicious delivery</p>
+            </div>
 
-    <aside class="container__admin__configuration">
+            <nav class="navbar__admin">
+                <ul class="links__admin">
+                    <!-- Dashboard -->
+                    <li><a href="/admin" data-section="dashboard">Dashboard</a></li>
+                    <!-- Pedidos -->
+                    <li><a href="/admin/pedidos" data-section="pedidos">Pedidos</a></li>
+                    <!-- Employees -->
+                    <li><a href="/admin/employees" data-section="employees">Empleados</a></li>
+                    <!-- Foodtrucks -->
+                    <li><a href="/admin/foodtrucks" data-section="foodtrucks">Foodtrucks</a></li>
+                    <!-- reportes -->
+                    <li><a href="/admin/reports" data-section="reports">Reportes</a></li>
+                    <!-- deslogueo -->
+                    <li><a href="/logout">Cerrar session</a></li>
+                </ul>
 
-        <nav class="navbar__admin">
+            </nav>
 
-            <ul class="links__admin">
-                <!-- dashboard administrativo -->
-                <li><a href="/admin">Dashboard</a></li>
+        </aside>
 
-                <!-- gestion de la app -->
-                <li><a href="/admin/gestion">Gestion</a></li>
-                <li><a href="/admin/pedidos">Pedidos</a></li>
+        <main class="container__admin__content">
+            {% if section == "dashboard" %}
+                {% include 'admin/dashboard.html'   %}
+            {% elif section == "pedidos" %}
+                {% include 'admin/pedidos.html'   %}
+            {% elif section == "reports" %}
+                {% include 'admin/reportes.html'   %}
+            
+            {% elif section == "employees" %}
+                {% include "admin/custom/employees.html" %}
+            {% elif section == "create_employee" %}
+                {% include "admin/custom/crear_employees.html" %}
+            {% elif section == "edit_employee" %}
+                {% include "admin/custom/edit_employee.html" %}
+            
+            {% elif section == "foodtrucks" %}
+                {% include 'admin/trucks.html'   %}
+            {% endif %}
+        </main>
 
-                <!-- Employees -->
-                <li><a href="/admin/gestion/employees">Empleados</a></li>
+    </section>
 
-                <!-- reportes -->
-                <li><a href="/admin/reports">Reportes</a></li>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/admin/admin.js') }}"></script>
 
-                <!-- deslogueo -->
-                <li><a href="/logout">Cerrar session</a></li>
-            </ul>
+</body>
 
-        </nav>
-
-    </aside>
-
-    <main class="container__admin__content">
-        <h1>Bienvenido {{ name }} al dashboard administrativo</h1>
-    </main>
-
-</section>
-
-<script type="text/javascript" src="{{ url_for('static', filename='js/admin.js') }}"></script>
-    
-{% endblock %}
+</html>

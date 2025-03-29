@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -7,6 +8,7 @@
     <title>Cargando...</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/splash.css') }}">
 </head>
+
 <body>
 
     <div class="container__slider">
@@ -15,7 +17,8 @@
             <ul class="slider__icons__categories">
                 <li>
                     <div>
-                        <img src="{{ url_for('static', filename='assets/icons/hamburguesa.png') }}" alt="icon hamburguesa">
+                        <img src="{{ url_for('static', filename='assets/icons/hamburguesa.png') }}"
+                            alt="icon hamburguesa">
                     </div>
                 </li>
                 <li>
@@ -32,7 +35,12 @@
         </nav>
     </div>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/splash.js') }}"></script>
+    <script>
+        setTimeout(function () {
+            window.location.href = "/user/assign_mesa";
+        }, 3000);
+    </script>
 
 </body>
+
 </html>

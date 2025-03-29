@@ -11,7 +11,6 @@ y registra todas las rutas de la app Flask.
 
 # Authorized
 from .auth.login import Login
-from .auth.register import RegisterApp
 from .auth.logout import Logout
 
 # administration
@@ -26,26 +25,11 @@ class ConfigurationRoutesApp:
 
     Esta clase se encarga de registrar las rutas relacionadas con
     autenticacion, administracion y usuarios dentro de la aplicacion.
-
-    Atributos:
-    ---------
-    routes : Flask
-        Instancia de la aplicacion Flask donde se registran las rutas.
-    
-    Metodos:
-    -------
-    setup_routes_app()
-        Registra las rutas en la aplicacion Flask.
     """
 
     def __init__(self, app):
         """
         Inicializa la clase con la aplicacion Flask.
-
-        Parametros:
-        -----------
-        app : Flask
-            Instancia de la aplicacion Flask donde se configuran las rutas.
         """
         self.routes = app
         self.setup_routes_app()
@@ -59,7 +43,6 @@ class ConfigurationRoutesApp:
         
         # Authorized
         Logout(self.routes)
-        RegisterApp(self.routes)
         Login(self.routes)
         
         # Administration

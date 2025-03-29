@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/custom/employees.css') }}">
+</head>
+
+<body>
+
+    <div class="employees-container">
+        <h1>Gestion de Empleados</h1>
+        
+        <div class="messages">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+        
+        <div class="actions-bar">
+            <a href="{{ url_for('create_employee') }}" class="btn btn-primary">
+                <i class="icon-plus"></i> Añadir Empleado
+            </a>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h2>Empleados Activos</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if employees %}
+                                {% for employee in employees %}
+                                    <tr>
+                                        <td>{{ employee.id }}</td>
+                                        <td>{{ employee.name }}</td>
+                                        <td>{{ employee.email }}</td>
+                                        <td>{{ employee.rol }}</td>
+                                        <td class="actions">
+                                            <a href="{{ url_for('update_employee', id=employee.id) }}" class="btn btn-sm btn-edit">
+                                                <i class="icon-edit"></i> Editar
+                                            </a>
+                                            <a href="{{ url_for('disable_employee', id=employee.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro que desea deshabilitar este empleado?')">
+                                                <i class="fas fa-user-slash"></i> Deshabilitar
+                                            </a>
+                                            
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay empleados activos</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2>Empleados Deshabilitados</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Fecha Deshabilitado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if employees_disabled %}
+                                {% for employee in employees_disabled %}
+                                    <tr>
+                                        <td>{{ employee.id }}</td>
+                                        <td>{{ employee.name }}</td>
+                                        <td>{{ employee.email }}</td>
+                                        <td>{{ employee.rol }}</td>
+                                        <td>{{ employee.disabled_at }}</td>
+                                        <td>
+                                            <a href="{{ url_for('habilitar_employee', id=employee.id) }}" class="btn btn-sm btn-success" onclick="return confirm('¿Está seguro que desea habilitar este empleado?')">
+                                                <i class="fas fa-user-check"></i> Habilitar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No hay empleados deshabilitados</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, .5);">
+        <div class="modal-content" style="background: #fff; padding: 20px; margin: 15%  auto; width: 50%; text-align: center;">
+            <p id="modalMessage"></p>
+            <form id="confirmForm" method="post">
+                <button type="submit" class="btn btn-danger">Si</button>
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let openModal = (employeeId, employeeName, action) => {
+            const modal = document.getElementById('confirmationModal');
+            document.getElementById('modalMessage').innerText = `Estas seguro de que deseas ${action} a ${employeeName}?`;
+            document.getElementById('confirmForm').action = `/admin/employees/${action}_employee/${employeeId}`;
+            modal.style.display = "block";
+        }
+
+        let closeModal = () => {
+            document.getElementById('confirmationModal').style.display = "none"; 
+        }
+    </script>
+
+</body>
+
+</html>

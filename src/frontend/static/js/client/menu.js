@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     const slider = document.querySelector(".slider__wrapper");
     let isDown = false;
     let startX;
@@ -6,50 +6,8 @@ document.addEventListener("DOMContentLoaded", function () {
     let autoScroll;
     let isMobile = window.innerWidth <= 768;
 
-    // modal feedback
-    const modal = document.getElementById('feedbackModal');
-
-    // Verificar si debe mostrarse el modal (usando URLSearchParams)
-    const urlParams = new URLSearchParams(window.location.search);
-    const mostrarFeedback = urlParams.get('mostrar_feedback');
-    const transaccionId = urlParams.get('transaccion_id');
-
-    const feedbackFlag = localStorage.getItem('mostrar_feedback');
-
-    if (mostrarFeedback === 'true' || feedbackFlag === 'true') {
-        // si tenemos la transaccionId, lo asignamos al campo oculto
-        if (transaccionId) {
-            const transaccionInput = document.getElementById('transaccion_id');
-            if (transaccionInput) {
-                transaccionId.value = transaccionId;
-            }
-        }
-
-        if (modal) {
-            modal.style.display = 'flex';
-
-            // limpiar el flag de localStorage despues de mostrar
-            localStorage.removeItem('mostrar_feedback');
-        }
-    }
-
-    // manejo del modal
-    const closeButton = document.querySelector('#feedbackModal .close');
-    if (closeButton) {
-        closeButton.onclick = () => {
-            modal.style.display = 'none';
-        }
-    }
-
-    // cerrar modal al hacer clic fuera del contenido
-    window.onclick = (event) => {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
-    }
-
     // resto del codigo para el slider
-    function startAutoScroll() {
+    let startAutoScroll = () => {
         if (!isMobile) {
             autoScroll = setInterval(() => {
                 if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth) {
@@ -61,7 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    function stopAutoScroll() {
+    let stopAutoScroll = () => {
         clearInterval(autoScroll);
     }
 
