@@ -51,7 +51,7 @@ class Login:
             """
             if request.method == "POST":
                 name = request.form.get('name').lower()
-                passwd = request.form.get('passwd', '')
+                passwd = request.form.get('passwd')
 
                 with self.conn.cursor(dictionary=True) as cursor:
                     query = """

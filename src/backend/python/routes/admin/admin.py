@@ -7,12 +7,23 @@ las rutas de administracion dentro de la aplicacion Flask.
 
 from flask import render_template, flash, redirect, url_for, session, request
 from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
+import os
 
 # importaciones propias
 from ....security.autentication import authentication_required
 from ....db.database import DBConfig, Error
 
 class AdminApp:
+    # carpeta donde se guardaran las imagenes
+    UPLOAD_FOLDER = 'static/uploads'
+    # Extensiones permitidas de las carpetas
+    ALLOWED_EXTENSIONS = {
+        'png',
+        'jpg',
+        'jpeg'
+    }
+
     def __init__(self, app):
         """
         Inicializa AdminApp con Flask app.
@@ -24,6 +35,9 @@ class AdminApp:
         db = DBConfig()
         self.conn = db.get_db_config()
         self.setup_routes()
+    
+    def allowed_file(self, filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in self.ALLOWED_EXTENSIONS
     
     def setup_routes(self):
         """
@@ -39,7 +53,7 @@ class AdminApp:
             """
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return render_template('admin/dashboard.html')
-            return render_template('admin/admin.html', section="dashboard")
+            return render_template('admin/admin.html', name=session.get('user_name'), section="dashboard")
         
         @self.admin.route('/admin/reports')
         @authentication_required
@@ -57,12 +71,30 @@ class AdminApp:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return render_template('admin/pedidos.html')
             return render_template('admin/admin.html', section="pedidos")
-        
+
+        @self.admin.route('/admin/mesas')
+        def mesas_app():
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query = """
+                    SELECT * FROM mesas
+                    """
+                    cursor.execute(query)
+                    mesas = cursor.fetchall()
+                    print("Mesas: ", mesas)
+            
+            except Error as e:
+                print(f"Error al obtener las mesas: {str(e)}")
+                flash(f"Error al obtener las mesas: {str(e)}", "error")
+                return redirect(url_for("admin_dashboard"))
+
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('admin/mesas.html', mesas=mesas)
+            return render_template('admin/admin.html', section="mesas", mesas=mesas)
 
         # CRUD de FoodTrucks
         @self.admin.route('/admin/foodtrucks')
         def foodtrucks():
-
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
                     query = """
@@ -70,16 +102,167 @@ class AdminApp:
                     """
                     cursor.execute(query)
                     trucks = cursor.fetchall()
+
+                    disabled_trucks = """
+                    SELECT *
+                    FROM trucks_desabilitados
+                    """
+                    cursor.execute(disabled_trucks)
+                    disabled_foodtrucks = cursor.fetchall()
             
             except Error as e:
                 print(f"Error al obtener los foodtrucks: {e}")
                 flash(f"Error al obtener a los empleados: {e}", "error")
                 return redirect(url_for('foodtrucks'))
             
-            return render_template('admin/admin.html', section="foodtrucks", trucks=trucks)
+            return render_template('admin/admin.html', section="foodtrucks", trucks=trucks, disabled_foodtrucks=disabled_foodtrucks)
+        
+        @self.admin.route('/admin/foodtrucks/create_trucks', methods=['GET', 'POST'])
+        def create_trucks():
+            if request.method == "POST":
+                nombre_truck = request.form.get('nombreTrucks')
+                imagen_trucks = request.form.get('imagenTrucks')
+                info_truck = request.form.get('informacionTrucks')
+                especialidad_truck = request.form.get('especialidadTrucks')
 
-        # CRUD de productos
-        # Proximamente crud de productosn
+                if imagen_trucks and self.allowed_file(imagen_trucks.filename):
+                    filename = secure_filename(imagen_trucks.filename)
+                    filepath = os.path.join(self.UPLOAD_FOLDER, filename)
+                    imagen_trucks.save(filepath)
+
+                    try:
+                        with self.conn.cursor() as cursor:
+                            query = """ 
+                            INSERT INTO trucks (nombre_truck, imagen_foodtrucks, info_foodtrucks, especialidad)
+                            VALUES (%s, %s, %s, %s)
+                            """
+                            cursor.execute(query, (nombre_truck, filepath, info_truck, especialidad_truck))
+                            self.conn.commit()
+                        
+                        flash("Food trucks creado exitosamente!", "success")
+                        return redirect(url_for('foodtrucks'))
+                    
+                    except Error as e:
+                        print("No se pudo crear el food trucks")
+                        flash(f"No se pudo crear el food trucks {str(e)}", "error")
+            
+            return render_template('/admin/admin.html', section="create_trucks")
+        
+        @self.admin.route('/admin/foodtrucks/update_trucks/<int:id>', methods=['GET', 'POST'])
+        def update_trucks(id):
+            with self.conn.cursor(dictionary=True) as cursor:
+                query = """
+                SELECT *
+                FROM trucks
+                WHERE id = %s
+                """
+                cursor.execute(query, (id,))
+                trucks = cursor.fetchone()
+
+                if not trucks:
+                    flash("Truck no encontrado", "error")
+                    return redirect(url_for('foodtrucks'))
+
+                if request.method == "POST":
+                    nombre_truck = request.form.get('nombreTrucks')
+                    imagen_trucks = request.form.get('imagenTrucks')
+                    info_truck = request.form.get('informacionTrucks')
+                    especialidad_truck = request.form.get('especialidadTrucks')
+                    
+                    if imagen_trucks and self.allowed_file(imagen_trucks.filename):
+                        filename = secure_filename(imagen_trucks.filename)
+                        filepath = os.path.join(self.UPLOAD_FOLDER, filename)
+                        imagen_trucks.save(filepath)
+
+                        try:
+                            with self.conn.cursor() as update_cursor:
+                                query = """
+                                UPDATE trucks 
+                                SET nombre_truck = %s, imagen_foodtrucks = %s, info_foodtruck = %s, especialidad = %s
+                                WHERE id = %s
+                                """
+                                update_cursor.execute(query, (nombre_truck, filepath, info_truck, especialidad_truck))
+                                self.conn.commit()
+                            
+                            flash("Truck actualizado exitosamente!", "success")
+                            return redirect(url_for('foodtrucks'))
+                        
+                        except Error as e:
+                            print(f"Error al actualizar el truck!: {str(e)}")
+                            flash(f"Error al actualizar el truck!: {str(e)}", "error")
+
+            return render_template('/admin/admin.html', section="update_trucks", trucks=trucks)
+
+        @self.admin.route('/admin/foodtrucks/desabilitar_trucks/<int:id>', methods=['GET', 'POST'])
+        def deshabilitar_trucks(id):
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    select_query = """
+                    SELECT id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad
+                    FROM trucks
+                    WHERE id = %s
+                    """
+                    cursor.execute(select_query, (id,))
+                    truck = cursor.fetchone()
+
+                    if not truck:
+                        flash("Truck no encontrado", "error")
+                        return redirect(url_for('foodtrucks'))
+                    
+                    insert_query = """
+                    INSERT INTO trucks_desabilitados (id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(insert_query, (truck["id"], truck["nombre_truck"], truck["imagen_foodtruck"], truck["info_foodtruck"], truck["especialidad"]))
+                    
+                    delete_query = """
+                    DELETE FROM trucks WHERE id = %s
+                    """
+                    cursor.execute(delete_query, (id,))
+                    
+                self.conn.commit()
+                flash("Truck deshabilitado exitosamente!", "success")
+            except Error as e:
+                print(f"Error al habilitar el truck!: {str(e)}")
+                flash(f"Error al habilitar el truck!: {str(e)}", "error")
+
+            return redirect(url_for('foodtrucks'))
+
+        @self.admin.route('/admin/foodtrucks/habilitar_trucks/<int:id>', methods=['GET', 'POST'])
+        def habilitar_trucks(id):
+            try:
+                with self.conn.cursor() as cursor:
+                    select_query = """
+                    SELECT id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad
+                    FROM trucks_desabilitados
+                    WHERE id = %s
+                    """
+                    cursor.execute(select_query, (id,))
+                    truck = cursor.fetchone()
+                    
+                    if not truck:
+                        flash("Truck no encontrado en la lista de deshabilitados", "error")
+                        return redirect(url_for('foodtrucks'))
+                    
+                    insert_query = """
+                    INSERT INTO trucks (id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad, estado_truck)
+                    VALUES (%s, %s, %s, %s, %s, 'activo')
+                    """
+                    cursor.execute(insert_query, (truck["id"], truck["nombre_truck"], truck["imagen_foodtruck"], truck["info_foodtruck"], truck["especialidad"]))
+                    
+                    delete_query = """
+                    DELETE FROM trucks_desabilitados WHERE id = %s
+                    """
+                    cursor.execute(delete_query, (id,))
+                    
+                    self.conn.commit()
+                
+                flash("Truck habilitado exitosamente!", "success")
+            except Error as e:
+                print(f"Error al habilitar el truck!: {str(e)}")
+                flash(f"Error al habilitar el truck!: {str(e)}", "error")
+            
+            return redirect(url_for('foodtrucks'))
 
         # CRUD de Empleados
         @self.admin.route('/admin/employees')

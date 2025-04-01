@@ -25,28 +25,6 @@ class FoodTrucks:
 
     Esta clase configura la aplicación Flask, inicializa las rutas,
     maneja errores y establece el sistema de logging.
-
-    Atributos:
-    ----------
-    food : Flask
-        Instancia de la aplicación Flask.
-    cache : flask_caching.Cache
-        Configuración de caché de la aplicación.
-    mail : flask_mail.Mail
-        Configuración del servicio de correo.
-    general_logger : logging.Logger
-        Logger principal de la aplicación.
-    error_logger : logging.Logger
-        Logger para errores de la aplicación.
-    http_logger : logging.Logger
-        Logger para registrar peticiones HTTP.
-    
-    Métodos:
-    --------
-    start_logging()
-        Configura el sistema de logging de la aplicación.
-    run_app()
-        Inicia la aplicación Flask en el host `0.0.0.0`.
     '''
 
     def __init__(self):
@@ -81,22 +59,8 @@ class FoodTrucks:
         # Configuración de las rutas
         ConfigurationRoutesApp(self.food)
 
-        # Configuración del logging
-        self.start_logging()
-
         # Configuración del manejo de errores
         Errors(self.food).setup_error_handlers()
-    
-    def start_logging(self):
-        '''
-        Configura el sistema de logging de la aplicación.
-
-        Se crean y configuran los siguientes loggers:
-        - `general`: Logger principal para información general.
-        - `errors`: Logger para registrar errores críticos.
-        - `http`: Logger para registrar las peticiones HTTP.
-        - `console`: Logger de consola con formato enriquecido usando `RichHandler`.
-        '''
     
     def run_app(self):
         '''

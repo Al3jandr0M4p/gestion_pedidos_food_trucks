@@ -1,11 +1,18 @@
-{% extends 'layouts/base.html' %}
-{% block head %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
 
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/pedidosP.css') }}">
+</head>
 
-{% endblock %}
+<body>
 
-{% block body %}
+
     <header class="container__head">
         <h1>Menu del Food Truck</h1>
 
@@ -18,23 +25,24 @@
 
     <section class="container__menu">
         {% if productos %}
-            {% for producto in productos %}
-                <div class="container__producto">
-                    <img src="{{ producto['imagen_producto'] }}" alt="{{ producto['nombre_producto'] }}" loading="eager">
-                    <h2>{{ producto['nombre_producto'] }}</h2>
-                    <p>{{ producto['descripcion'] }}</p>
-                    <span class="precio">${{ producto['precio'] }}</span>
-                    <button class="agregar__carrito" data-id="{{ producto['id'] }}" data-nombre="{{ producto['nombre_producto'] }}" data-precio="{{ producto['precio'] }}">
-                        comprar
-                    </button>
-                </div>
-            {% endfor %}
+        {% for producto in productos %}
+        <div class="container__producto">
+            <img src="{{ producto['imagen_producto'] }}" alt="{{ producto['nombre_producto'] }}" loading="eager">
+            <h2>{{ producto['nombre_producto'] }}</h2>
+            <p>{{ producto['descripcion'] }}</p>
+            <span class="precio">${{ producto['precio'] }}</span>
+            <button class="agregar__carrito" data-id="{{ producto['id'] }}"
+                data-nombre="{{ producto['nombre_producto'] }}" data-precio="{{ producto['precio'] }}">
+                comprar
+            </button>
+        </div>
+        {% endfor %}
         {% else %}
-            <div class="container__empty" style="text-align: center;">
-                <i class="fa-solid fa-utensils fa-3x"></i>
-                <p>No hay productos disponibles en este food trucks.</p>
-                <p>¡Vuelve pronto para nuevas delicias!</p>
-            </div>
+        <div class="container__empty" style="text-align: center;">
+            <i class="fa-solid fa-utensils fa-3x"></i>
+            <p>No hay productos disponibles en este food trucks.</p>
+            <p>¡Vuelve pronto para nuevas delicias!</p>
+        </div>
         {% endif %}
     </section>
 
@@ -50,4 +58,7 @@
     </div>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/client/pedidos.js') }}"></script>
-{% endblock %}
+
+</body>
+
+</html>

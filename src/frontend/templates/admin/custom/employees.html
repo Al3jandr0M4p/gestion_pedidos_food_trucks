@@ -64,7 +64,6 @@
                                             <a href="{{ url_for('disable_employee', id=employee.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Está seguro que desea deshabilitar este empleado?')">
                                                 <i class="fas fa-user-slash"></i> Deshabilitar
                                             </a>
-                                            
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -135,14 +134,14 @@
     </div>
 
     <script>
-        let openModal = (employeeId, employeeName, action) => {
+        function openModal (employeeId, employeeName, action) {
             const modal = document.getElementById('confirmationModal');
             document.getElementById('modalMessage').innerText = `Estas seguro de que deseas ${action} a ${employeeName}?`;
             document.getElementById('confirmForm').action = `/admin/employees/${action}_employee/${employeeId}`;
             modal.style.display = "block";
         }
 
-        let closeModal = () => {
+        function closeModal() {
             document.getElementById('confirmationModal').style.display = "none"; 
         }
     </script>

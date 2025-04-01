@@ -1,65 +1,56 @@
-{% include 'layouts/base.html'   %}
-{% block head %}
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/transferencia.css') }}">
-    
-{% endblock %}
 
-{% block body %}
-    
-    <div class="container__transferencia">
-        <h2>Pago Transferencia</h2>
-        <form id="transferencia-payment-form" action="{{ url_for('procesar_pago')}}" method="post">
+<div class="container__transferencia">
+    <h2>Pago Transferencia</h2>
+    <form id="transferencia-payment-form" action="{{ url_for('procesar_pago')}}" method="post">
 
-            <input type="hidden" name="metodo_pago" value="transferencia">
-            <input type="hidden" name="carrito" id="carrito-input">
+        <input type="hidden" name="metodo_pago" value="transferencia">
+        <input type="hidden" name="carrito" id="carrito-input">
 
-            <div class="container__input">
-                <label for="nombreUsuario">
-                    Nombre:
-                </label>
-                <input type="text" name="nombreUsuario" autocomplete="off" id="nombreUsuario" required>
-            </div>
+        <div class="container__input">
+            <label for="nombreUsuario">
+                Nombre:
+            </label>
+            <input type="text" name="nombreUsuario" autocomplete="off" id="nombreUsuario" required>
+        </div>
 
-            <div class="container__input">
-                <label for="correo">
-                    Email:
-                </label>
-                <input type="email" name="correo" id="correo" autocomplete="off" required>
-            </div>
+        <div class="container__input">
+            <label for="correo">
+                Email:
+            </label>
+            <input type="email" name="correo" id="correo" autocomplete="off" required>
+        </div>
 
-            <div class="container__input">
-                <label for="numeroCuenta">
-                    Numero de cuenta:
-                </label>
-                <input type="text" name="numeroCuenta" id="numeroCuenta" autocomplete="off" required pattern="\d{10,20}">
-            </div>
+        <div class="container__input">
+            <label for="numeroCuenta">
+                Numero de cuenta:
+            </label>
+            <input type="text" name="numeroCuenta" id="numeroCuenta" autocomplete="off" required pattern="\d{10,20}">
+        </div>
 
-            <div class="container__info__banco">
-                <label for="bancoDestino">
-                    Banco:
-                </label>
-                <select name="banco" id="bancoDestino">
-                    <option disabled selected>Seleccione un banco</option>
-                    <option value="Banco Popular">Banco Popular</option>
-                    <option value="Banco Banreservas">Banco Banreservas</option>
-                    <option value="Banco BHD">Banco BHD</option>
-                    <option value="Banco Vimenca/Western Union">Banco Vimenca/Western Union</option>
-                    <option value="otros">Otros</option>
-                </select>
-            </div>
+        <div class="container__info__banco">
+            <label for="bancoDestino">
+                Banco:
+            </label>
+            <select name="banco" id="bancoDestino">
+                <option disabled selected>Seleccione un banco</option>
+                <option value="Banco Popular">Banco Popular</option>
+                <option value="Banco Banreservas">Banco Banreservas</option>
+                <option value="Banco BHD">Banco BHD</option>
+                <option value="Banco Vimenca/Western Union">Banco Vimenca/Western Union</option>
+                <option value="otros">Otros</option>
+            </select>
+        </div>
 
-            <div class="container__input">
-                <label for="monto">
-                    Monto a Transferencia:
-                </label>
-                <input type="number" name="monto" autocomplete="off" id="monto" required min="1" step="0.01">
-            </div>
+        <div class="container__input">
+            <label for="monto">
+                Monto a Transferencia:
+            </label>
+            <input type="number" name="monto" autocomplete="off" id="monto" required min="1" step="0.01">
+        </div>
 
-            <button type="submit">Realizar Transferencia</button>
-        </form>
-    </div>
+        <button type="submit">Realizar Transferencia</button>
+    </form>
+</div>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/client/payments/transferencia.js') }}"></script>
-
-{% endblock %}
+<script type="text/javascript" src="{{ url_for('static', filename='js/client/payments/transferencia.js') }}"></script>

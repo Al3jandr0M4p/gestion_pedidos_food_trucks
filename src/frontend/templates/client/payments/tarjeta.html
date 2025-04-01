@@ -1,51 +1,46 @@
-{% include 'layouts/base.html' %}
-{% block head %}
-    <script src="https://js.stripe.com/v3/"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/tarjeta.css') }}">
-{% endblock %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/tarjeta.css') }}">
 
-{% block body %}
-    <div class="container__tarjeta">
-        <h2>Pago con Tarjeta</h2>
-        <form id="payment-form" action="{{ url_for('procesar_pago') }}" method="post">
-            <input type="hidden" name="metodo_pago" value="tarjeta">
+<div class="container__tarjeta">
+    <h2>Pago con Tarjeta</h2>
+    <form id="payment-form" action="{{ url_for('procesar_pago') }}" method="post">
+        <input type="hidden" name="metodo_pago" value="tarjeta">
 
-            <div class="container__input">
-                <label for="nombre">
-                    Nombre en la tarjeta:
-                </label>
-                <input type="text" autocomplete="off" name="nombreUsuario" id="nombre" required>
+        <div class="container__input">
+            <label for="nombre">
+                Nombre en la tarjeta:
+            </label>
+            <input type="text" autocomplete="off" name="nombreUsuario" id="nombre" required>
+        </div>
+
+        <div class="container__input">
+            <label for="email">
+                Email:
+            </label>
+            <input type="email" autocomplete="off" name="correo" id="email">
+        </div>
+
+        <div class="container__input">
+            <label for="card-element">
+                Información de la tarjeta:
+            </label>
+            <div id="card-element">
+                <!-- Stripe Element se montará aquí -->
             </div>
+        </div>
 
-            <div class="container__input">
-                <label for="email">
-                    Email:
-                </label>
-                <input type="email" autocomplete="off" name="correo" id="email">
-            </div>
+        <div class="container__input">
+            <label for="monto-hidden">
+                Monto a Pagar:
+            </label>
+            <span id="monto-a-pagar">$0.00</span>
+            <input type="hidden" name="monto" id="monto-hidden">
+        </div>
 
-            <div class="container__input">
-                <label for="card-element">
-                    Información de la tarjeta:
-                </label>
-                <div id="card-element">
-                    <!-- Stripe Element se montará aquí -->
-                </div>
-            </div>
+        <div id="card-errors" role="alert" style="color: #f00;"></div>
 
-            <div class="container__input">
-                <label for="monto-hidden">
-                    Monto a Pagar:
-                </label>
-                <span id="monto-a-pagar">$0.00</span>
-                <input type="hidden" name="monto" id="monto-hidden">
-            </div>
+        <button type="submit">Pagar</button>
+    </form>
+</div>
 
-            <div id="card-errors" role="alert" style="color: #f00;"></div>
-
-            <button type="submit">Pagar</button>
-        </form>
-    </div>
-
-    <script src="{{ url_for('static', filename='js/client/payments/tarjeta.js') }}"></script>
-{% endblock %}
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{{ url_for('static', filename='js/client/payments/tarjeta.js') }}"></script>

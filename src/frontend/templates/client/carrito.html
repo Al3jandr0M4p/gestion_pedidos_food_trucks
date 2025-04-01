@@ -1,20 +1,27 @@
-{% extends 'layouts/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block head %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/client/carrito.css') }}">
-{% endblock %}
+</head>
 
-{% block body %}
+<body>
+
     <header class="container__head">
         <h1>Carrito de Compras</h1>
         <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
             <i class="fa-solid fa-arrow-left"></i> Volver al menu
-        </a>      
+        </a>
     </header>
 
     <section class="container__carrito">
         <div id="lista-carrito"></div>
-        
+
         <div class="carrito__total">
             <h3>Total: <span id="total-precio">$0.00</span></h3>
             <button id="vaciar-carrito">Vaciar Carrito</button>
@@ -24,4 +31,7 @@
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/client/carrito.js') }}"></script>
 
-{% endblock %}
+
+</body>
+
+</html>

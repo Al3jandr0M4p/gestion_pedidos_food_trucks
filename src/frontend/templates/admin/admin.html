@@ -12,7 +12,7 @@
 <body>
 
     <button class="menu-toggle" id="menuToggle">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
     </button>
@@ -28,7 +28,7 @@
                     </div>
                     <h1>FoodOrder</h1>
                 </div>
-                <p class="tagline">Delicious delivery</p>
+                <p class="tagline">Delicious Food</p>
             </div>
 
             <nav class="navbar__admin">
@@ -43,6 +43,8 @@
                     <li><a href="/admin/foodtrucks" data-section="foodtrucks">Foodtrucks</a></li>
                     <!-- reportes -->
                     <li><a href="/admin/reports" data-section="reports">Reportes</a></li>
+                    <!-- mesas app -->
+                    <li><a href="/admin/mesas" data-section="mesas">Mesas</a></li>
                     <!-- deslogueo -->
                     <li><a href="/logout">Cerrar session</a></li>
                 </ul>
@@ -58,6 +60,8 @@
                 {% include 'admin/pedidos.html'   %}
             {% elif section == "reports" %}
                 {% include 'admin/reportes.html'   %}
+            {% elif section == "mesas" %}
+                {% include 'admin/mesas.html'   %}
             
             {% elif section == "employees" %}
                 {% include "admin/custom/employees.html" %}
@@ -67,7 +71,11 @@
                 {% include "admin/custom/edit_employee.html" %}
             
             {% elif section == "foodtrucks" %}
-                {% include 'admin/trucks.html'   %}
+                {% include 'admin/trucks/trucks.html'   %}
+            {% elif section == "create_trucks" %}
+                {% include 'admin/trucks/crear_trucks.html'   %}
+            {% elif section == "update_trucks" %}
+                {% include 'admin/trucks/update_trucks.html'   %}
             {% endif %}
         </main>
 

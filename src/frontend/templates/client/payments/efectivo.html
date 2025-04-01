@@ -1,40 +1,31 @@
-{% include 'layouts/base.html'   %}
-{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/efectivo.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/client/payments/efectivo.css') }}">
-    
-{% endblock %}
-
-{% block body %}
-
-    <div class="container__efectivo">
-        <h2>Pago en Efectivo</h2>
-        <form id="form-efectivo">
-            <div class="cotainer__input">
-                <label for="nombre">
-                    Nombre:
-                </label>
-                <input type="text" name="nombre" id="monto" required min="1">
-            </div>
-
-            <div class="container__input">
-                <label for="monto-hidden">
-                    Monto a Pagar:
-                </label>
-                <span id="monto-a-pagar">$0.00</span>
-                <input type="hidden" name="monto" id="monto-hidden">
-            </div>
-
-            <button type="submit">Pagar</button>
-        </form>
-        <div id="alerta-pendiente" style="display: none; padding: 10px; margin-top: 10px;">
-            <p>
-                Esperando confirmacion del pago...
-            </p>
+<div class="container__efectivo">
+    <h2>Pago en Efectivo</h2>
+    <form id="form-efectivo">
+        <div class="cotainer__input">
+            <label for="nombre">
+                Nombre:
+            </label>
+            <input type="text" name="nombre" id="monto" required min="1">
         </div>
-        <button id="confirmar-pago" style="display: none; margin-top: 10px;">Confirmar Pago</button>
+
+        <div class="container__input">
+            <label for="monto-hidden">
+                Monto a Pagar:
+            </label>
+            <span id="monto-a-pagar">$0.00</span>
+            <input type="hidden" name="monto" id="monto-hidden">
+        </div>
+
+        <button type="submit">Pagar</button>
+    </form>
+    <div id="alerta-pendiente" style="display: none; padding: 10px; margin-top: 10px;">
+        <p>
+            Esperando confirmacion del pago...
+        </p>
     </div>
+    <button id="confirmar-pago" style="display: none; margin-top: 10px;">Confirmar Pago</button>
+</div>
 
-    <script src="{{ url_for('static', filename='js/client/payments/efectivo.js') }}"></script>
-
-{% endblock %}
+<script src="{{ url_for('static', filename='js/client/payments/efectivo.js') }}"></script>

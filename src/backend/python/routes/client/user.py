@@ -175,8 +175,6 @@ class UserApp:
                     return self.procesar_pago_tarjeta(mesa_id, carrito, total, transaccion_id, fecha)
                 elif metodo_pago == 'transferencia':
                     return self.procesar_pago_transferencia(mesa_id, carrito, total, transaccion_id, fecha)
-                # elif metodo_pago == 'efectivo':
-                #     return self.procesar_pago_efectivo(mesa_id, carrito, total, transaccion_id, fecha)
                 else:
                     flash('Método de pago no válido')
                     return redirect(url_for('select_payment'))
@@ -260,10 +258,6 @@ class UserApp:
                     return redirect(url_for(
                         'menu_user', 
                         mesa_id=mesa_id
-                    ))
-                else:
-                    return redirect(url_for(
-                        'splash_screen'
                     ))
         
         @self.user.route('/user/confirmar-pago/<transaccion_id>/<token>')
@@ -595,52 +589,6 @@ class UserApp:
             print(f'Error al procesar la transferencia: {str(e)}')
             flash(f'Error al procesar la transferencia: {str(e)}')
             return redirect(url_for('select_payment'))
-
-    # def procesar_pago_efectivo(self, mesa_id, carrito, total, transaccion_id, fecha):
-    #     """
-    #     Procesa un pago en efectivo
-    #     """
-    #     try:
-    #         with self.conn.cursor() as cursor:
-    #             query = """ 
-    #             INSERT INTO transacciones (id, mesa_id, metodo_pago, monto, estado, fecha)
-    #             VALUES (%s, %s, %s, %s, %s, %s)
-    #             """
-    #             cursor.execute(query, (
-    #                 transaccion_id, 
-    #                 mesa_id, 
-    #                 'efectivo', 
-    #                 total, 
-    #                 'pendiente', 
-    #                 fecha
-    #             ))
-
-    #             for item in carrito:
-    #                 query_detalle = """ 
-    #                 INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
-    #                 VALUES (%s, %s, %s, %s)
-    #                 """
-    #                 cursor.execute(query_detalle, (
-    #                     transaccion_id, 
-    #                     item.get('id'), 
-    #                     item.get('cantidad'), 
-    #                     item.get('precio')
-    #                 ))
-
-    #             self.conn.commit()
-
-    #             print('Pago en efectivo registrado. Por favor paga en la caja.')
-    #             flash('Pago en efectivo registrado. Por favor paga en la caja.')
-    #             return redirect(url_for(
-    #                 'confirmacion_pago', 
-    #                 transaccion_id=transaccion_id
-    #             ))
-
-    #     except Exception as e:
-    #         self.conn.rollback()
-    #         print(f'Error al registrar el pago en efectivo: {str(e)}')
-    #         flash(f'Error al registrar el pago en efectivo: {str(e)}')
-    #         return redirect(url_for('select_payment'))
     
     def enviar_factura_por_correo(self, correo, nombre, mesa_id, carrito, total, transaccion_id, fecha):
         """
@@ -677,9 +625,8 @@ class UserApp:
                     transaccion_id
                 ))
                 self.conn.commit()
-            
-            base_url = "https://74zb1whg-5000.use2.devtunnels.ms/"
-            confirmation_url = f"{base_url}/user/confirmar-pago/{transaccion_id}/{confirmation_token}"
+
+            confirmation_url = f"https://74zb1whg-5000.use2.devtunnels.ms/user/confirmar-pago/{transaccion_id}/{confirmation_token}"
 
             factura_html = f"""
             <html>
@@ -774,10 +721,13 @@ class UserApp:
                     </div>
                     
                     <p>Estimado(a) {nombre},</p>
-                    <p>Nos complace informarle que su pago para la transacción <strong>{transaccion_id}</strong> ha sido confirmado exitosamente.</p>
+                    <p>
+                        Nos complace informarle que su pago para la transacción <strong>{transaccion_id}</strong> ha sido confirmado exitosamente.
+                    </p>
                     <p>Su pedido ya está siendo procesado y estará listo en breve.</p>
                     <p>¡Gracias por su preferencia!</p>
                     <p>Atentamente,<br> El equipo de FoodTrucks</p>
+
                 </div>
 
             </body>

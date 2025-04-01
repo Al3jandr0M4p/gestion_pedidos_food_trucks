@@ -1,10 +1,18 @@
-{% extends 'layouts/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block head %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagos</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/client/pago.css') }}">
-{% endblock %}
 
-{% block body %}
+</head>
+
+<body>
+
     <header class="container__head">
         <h1>Seleccionar Método de Pago</h1>
         <a href="{{ url_for('ver_carrito') }}">
@@ -19,13 +27,16 @@
                 Selecciona tu metodo de pago favorito y finaliza tu compra.
             </p>
             <div class="tabs">
-                <input type="radio" id="tabTransferencia" name="metodo_pago" value="transferencia" onclick="openModal('modalTransferencia')">
+                <input type="radio" id="tabTransferencia" name="metodo_pago" value="transferencia"
+                    onclick="openModal('modalTransferencia')">
                 <label for="tabTransferencia" class="tab"><i class='fas fa-university'></i> Transferencia</label>
-    
-                <input type="radio" id="tabTarjeta" name="metodo_pago" value="tarjeta" onclick="openModal('modalTarjeta')">
+
+                <input type="radio" id="tabTarjeta" name="metodo_pago" value="tarjeta"
+                    onclick="openModal('modalTarjeta')">
                 <label for="tabTarjeta" class="tab"><i class="fas fa-credit-card"></i> Tarjeta</label>
-    
-                <input type="radio" id="tabEfectivo" name="metodo_pago" value="efectivo" onclick="openModal('modalEfectivo')">
+
+                <input type="radio" id="tabEfectivo" name="metodo_pago" value="efectivo"
+                    onclick="openModal('modalEfectivo')">
                 <label for="tabEfectivo" class="tab"><i class="fas fa-money-bill-wave"></i> Efectivo</label>
             </div>
         </form>
@@ -66,4 +77,6 @@
 
     <script src="{{ url_for('static', filename='js/client/pago.js') }}" type="text/javascript"></script>
 
-{% endblock %}
+</body>
+
+</html>

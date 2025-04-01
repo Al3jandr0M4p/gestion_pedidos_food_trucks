@@ -1,69 +1,78 @@
-{% include 'layouts/base.html' %}
-{% block head %}
+<!DOCTYPE html>
+<html lang="en">
 
-<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/menu.css') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
 
-{% endblock %}
+    <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/menu.css') }}">
 
-{% block body %}
+</head>
 
-<section class="container__principal__section__menu">
-    <div class="container">
-        <header class="header">
-            <h1>Descubre Food Trucks Increíbles</h1>
-            <p>
-                Estos camiones de comida ofrecen una variedad de platillos de alta calidad, desde comida 
-                callejera gourmet hasta platos internacionales y opciones veganas o especializadas.
-            </p>
-        </header>
+<body>
 
-        <div class="container__slider">
-            <h2>Categorias</h2>
-            <nav class="slider__wrapper">
-                <ul class="slider__icons__categories">
-                    <li>
-                        <div>
-                            <img src="{{ url_for('static', filename='assets/icons/pizza.png') }}" alt="icon pizza">
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <img src="{{ url_for('static', filename='assets/icons/hamburguesa.png') }}" alt="icon hamburguesa">
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <img src="{{ url_for('static', filename='assets/icons/sushi.png') }}" alt="icon sushi">
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <img src="{{ url_for('static', filename='assets/icons/tacos.png') }}" alt="icon tacos">
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <img src="{{ url_for('static', filename='assets/icons/aguacate.png') }}" alt="icon vegana">
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <img src="{{ url_for('static', filename='assets/icons/donas.png') }}" alt="icon donas">
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+    <section class="container__principal__section__menu">
+        <div class="container">
+            <header class="header">
+                <h1>Descubre Food Trucks Increíbles</h1>
+                <p>
+                    Estos camiones de comida ofrecen una variedad de platillos de alta calidad, desde comida
+                    callejera gourmet hasta platos internacionales y opciones veganas o especializadas.
+                </p>
+            </header>
 
-        <div class="cards-grid">
-            {% for foodtruck in session.get('foodtrucks') %}
+            <div class="container__slider">
+                <h2>Categorias</h2>
+                <nav class="slider__wrapper">
+                    <ul class="slider__icons__categories">
+                        <li>
+                            <div>
+                                <img src="{{ url_for('static', filename='assets/icons/pizza.png') }}" alt="icon pizza">
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <img src="{{ url_for('static', filename='assets/icons/hamburguesa.png') }}"
+                                    alt="icon hamburguesa">
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <img src="{{ url_for('static', filename='assets/icons/sushi.png') }}" alt="icon sushi">
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <img src="{{ url_for('static', filename='assets/icons/tacos.png') }}" alt="icon tacos">
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <img src="{{ url_for('static', filename='assets/icons/aguacate.png') }}"
+                                    alt="icon vegana">
+                            </div>
+                        </li>
+                        <li>
+                            <div>
+                                <img src="{{ url_for('static', filename='assets/icons/donas.png') }}" alt="icon donas">
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="cards-grid">
+                {% for foodtruck in session.get('foodtrucks') %}
                 <article class="food-card">
                     <div class="card-image">
-                        <img src="{{ foodtruck['imagen_foodtruck'] }}" alt="{{ foodtruck['nombre_truck'] }}" loading="lazy">
+                        <img src="{{ foodtruck['imagen_foodtruck'] }}" alt="{{ foodtruck['nombre_truck'] }}"
+                            loading="lazy">
                     </div>
                     <div class="card-content">
                         <h3>{{ foodtruck['nombre_truck'] }}</h3>
-                        
+
                         <div class="info-item">
                             <i data-lucide="utensils"></i>
                             <span>{{ foodtruck['info_foodtruck'] }}</span>
@@ -72,18 +81,20 @@
                         <div class="specialty">
                             <p>{{ foodtruck['especialidad'] }}</p>
                         </div>
- 
+
                         <a href="{{ url_for('menu_foodtruck', foodtruck_id=foodtruck['id']) }}">
                             <button type="submit">Explorar Menu</button>
-                        </a>                        
+                        </a>
                     </div>
                 </article>
-            {% endfor %}
+                {% endfor %}
+            </div>
+
         </div>
+    </section>
 
-    </div>
-</section>
+    <script src="{{ url_for('static', filename='js/client/menu.js') }}"></script>
 
-<script src="{{ url_for('static', filename='js/client/menu.js') }}"></script>
-    
-{% endblock %}
+</body>
+
+</html>
