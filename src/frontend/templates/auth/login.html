@@ -11,6 +11,19 @@
 
 <body>
 
+
+    <div class="container__notificacion">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul id="flash-messages" style="display: none;">
+                    {% for category, message in messages %}
+                        <li data-category="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+    
     <div class="container__form">
 
         <div class="container__logo__img">
@@ -46,18 +59,6 @@
 
         </form>
 
-    </div>
-
-    <div class="container__notificacion">
-        {% with messages = get_flashed_messages(with_categories=True) %}
-            {% if messages %}
-            <ul id="flash-messages">
-                {% for category, message in messages %}
-                    <li data-category="{{ category }}">{{ message }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-        {% endwith %}
     </div>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/auth/login.js') }}" defer></script>

@@ -17,7 +17,6 @@ import os
 # Importaciones propias
 from ..config.config import Config
 from .routes.route import ConfigurationRoutesApp
-from .error import Errors
 
 class FoodTrucks:
     '''
@@ -54,13 +53,9 @@ class FoodTrucks:
         
         self.mail = Mail(self.food)
         CORS(self.food)
-        self.cache = Cache(self.food, config={'CACHE_TYPE': 'simple'})
         
         # Configuración de las rutas
         ConfigurationRoutesApp(self.food)
-
-        # Configuración del manejo de errores
-        Errors(self.food).setup_error_handlers()
     
     def run_app(self):
         '''

@@ -18,11 +18,9 @@ class Login:
     Esta clase configura la ruta de inicio de sesion y maneja la
     logica para autenticar a los usuarios.
     """
-
     def __init__(self, app):
         """
         Inicializa la clase con la aplicacion Flask
-
         """
         self.login = app
         self.setup_routes()
@@ -43,11 +41,6 @@ class Login:
         def login():
             """
             Maneja la logica de inicio de sesion.
-
-            Si la solicitud es POST, intenta autenticar al usuario con las
-            credenciales proporcionadas. En caso de exito, redirige al
-            dashboard correspondiente; de lo contrario, muestra un mensaje
-            de error.
             """
             if request.method == "POST":
                 name = request.form.get('name').lower()
@@ -63,7 +56,12 @@ class Login:
                     print("Employee: ", employee)
 
                     try:
-                        if employee and check_password_hash(employee['password'], passwd):
+                        if employee:
+                            if employee['estado'] == 'inactivo':
+                                flash("Tu cuenta ha sido deshabilitada. Contacta con el administrador", "error")
+                                return redirect(url_for('login'))
+                            
+                        if check_password_hash(employee['password'], passwd):
 
                             flash("Usuario logueado exitosamente", "success")
                             session['user_id'] = employee['id']
@@ -74,6 +72,7 @@ class Login:
                                 return redirect(url_for('admin_dashboard'))
                         else:
                             flash("Credenciales incorrectas intentalo denuevo", "error")
+
                     except Error as e:
                         flash("Ocurrio un error. Por favor, intente nuevamente.", "error")
                         print("Ocurrio un error. Por favor, intente nuevamente.", str(e))

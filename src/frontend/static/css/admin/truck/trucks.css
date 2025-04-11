@@ -1,3 +1,4 @@
+/* 🌍 Estilos base (los tuyos ya están bien definidos) */
 :root {
     --font: 'Poppins', sans-serif;
     --dark-color: #1a1a1a;
@@ -29,13 +30,13 @@ body {
     background: #fff;
 }
 
-.employees-container {
+.foodtruck-container {
     padding: 1rem;
     max-width: 1200px;
     margin: 0 auto;
 }
 
-.employees-container h1 {
+.foodtruck-container h1 {
     margin-bottom: 1.5rem;
     color: var(--text-primary);
 }
@@ -77,7 +78,6 @@ body {
 .btn-edit {
     background-color: #3498db;
     color: white;
-    margin-right: 0.5rem;
 }
 .btn-edit:hover {
     background-color: #2980b9;
@@ -156,6 +156,14 @@ body {
     gap: 0.5rem;
 }
 
+.img-circular {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+}
+
 .mt-4 {
     margin-top: 1.5rem;
 }
@@ -193,30 +201,32 @@ body {
     color: #721c24;
 }
 
+/* Iconos */
 .icon-plus::before {
     content: "+";
     margin-right: 0.5rem;
 }
-
 .icon-edit::before {
     content: "✏️";
     margin-right: 0.3rem;
 }
-
 .icon-trash::before {
     content: "🗑️";
     margin-right: 0.3rem;
 }
-
 .icon-check::before {
     content: "✓";
     margin-right: 0.3rem;
 }
 
 @media (min-width: 1400px) {
-    .employees-container {
+    .foodtruck-container {
         max-width: 1400px;
         padding: 2rem;
+    }
+
+    .card-header h2 {
+        font-size: 1.5rem;
     }
 
     .card-body {
@@ -227,14 +237,10 @@ body {
         font-size: 1rem;
         padding: 0.75rem 1.25rem;
     }
-
-    .card-header h2 {
-        font-size: 1.5rem;
-    }
 }
 
 @media (max-width: 768px) {
-    .employees-container {
+    .foodtruck-container {
         padding: 0.5rem;
     }
 
@@ -248,11 +254,6 @@ body {
         justify-content: center;
     }
 
-    .btn-sm {
-        font-size: 0.9rem;
-        padding: 0.4rem 0.8rem;
-    }
-
     .card-body {
         padding: 1rem;
     }
@@ -261,6 +262,11 @@ body {
     .table td {
         padding: 0.5rem;
         font-size: 0.85rem;
+    }
+
+    .img-circular {
+        width: 40px;
+        height: 40px;
     }
 
     .card-header h2 {
@@ -275,6 +281,11 @@ body {
 
     .btn-sm {
         font-size: 0.8rem;
+    }
+
+    .img-circular {
+        width: 35px;
+        height: 35px;
     }
 
     .notification {

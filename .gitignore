@@ -14,5 +14,9 @@
 # Ignorar archivos de configuración de entorno
 .env
 
+# Ignorar archivos formatos de ayuda de la app
+consejos.txt
+ia.txt
+
 # Ignorar la carpeta logs propia
 logs/

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Gestion de productos!</h1>
+
+        {% for truck in trucks %}
+        <h2>{{ truck.nombre_truck }}</h2>
+        <p><strong>Especialidad:</strong> {{ truck.especialidad }}</p>
+        <p><strong>Estado:</strong> {{ truck.estado_truck }}</p>
+        <p>
+            <a class="add-button" href="{{ url_for('create_products', id=truck.id) }}">
+                ➕ Agregar producto
+            </a>
+        </p>
+        <p>
+            <a href="{{ url_for('foodtrucks') }}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Imagen</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set productos_truck = productos | selectattr('truck_id', 'equalto', truck.id) | list %}
+                {% if productos_truck %}
+                {% for producto in productos_truck %}
+                <tr>
+                    <td>{{ producto.nombre_producto }}</td>
+                    <td>{{ producto.descripcion }}</td>
+                    <td>{{ producto.precio }}</td>
+                    <td>
+                        <img src="{{ producto.imagen_producto }}" alt="img" width="80">
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No hay productos para este truck.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        {% endfor %}
+    </div>
+
+</body>
+
+</html>

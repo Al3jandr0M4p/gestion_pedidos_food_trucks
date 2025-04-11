@@ -5,9 +5,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/custom/employees.css') }}">
+    <title>Employees</title>
 </head>
 
 <body>
@@ -15,17 +18,18 @@
     <div class="employees-container">
         <h1>Gestion de Empleados</h1>
         
-        <div class="messages">
-            {% with messages = get_flashed_messages(with_categories=true) %}
+        <div class="container__notificacion">
+            {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+                    <ul id="flash-messages" style="display: none;">
+                        {% for category, message in messages %}
+                            <li data-category="{{ category }}">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
             {% endwith %}
         </div>
+        
         
         <div class="actions-bar">
             <a href="{{ url_for('create_employee') }}" class="btn btn-primary">
@@ -34,9 +38,10 @@
         </div>
         
         <div class="card">
-            <div class="card-header">
+            <header class="card-header">
                 <h2>Empleados Activos</h2>
-            </div>
+            </header>
+            
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
@@ -49,6 +54,7 @@
                                 <th>Acciones</th>
                             </tr>
                         </thead>
+                        
                         <tbody>
                             {% if employees %}
                                 {% for employee in employees %}
@@ -79,9 +85,10 @@
         </div>
         
         <div class="card mt-4">
-            <div class="card-header">
+            <head class="card-header">
                 <h2>Empleados Deshabilitados</h2>
-            </div>
+            </header>
+
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
@@ -145,6 +152,7 @@
             document.getElementById('confirmationModal').style.display = "none"; 
         }
     </script>
+    <script src="{{ url_for('static', filename='js/notificacion.js') }}"></script>
 
 </body>
 

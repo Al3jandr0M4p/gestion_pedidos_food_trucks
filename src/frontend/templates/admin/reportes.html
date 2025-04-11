@@ -10,10 +10,78 @@
 
 <body>
 
-    <div class="container-reports">
-        <h1>Gestion de Reportes</h1>
+    <section class="container-reports">
+        <h1>📊 Reportes Administrativos</h1>
+
+        <div class="actions-bar">
+            <a href="/admin/reports/pdf" class="btn btn-success">Descargar PDF</a>
+        </div>
+
+        <article class="card mt-4">
+            <header class="card-header">
+                <h2>Ventas por Metodo de Pago</h2>
+            </header>
+
+            <div class="card-body">
+                <canvas id="graficoMetodosPago"></canvas>
+            </div>
+        </article>
+
+        <article class="card mt-4">
+            <header class="card-header">
+                <h2>Ingresos por Food Truck</h2>
+            </header>
+
+            <div class="card-body">
+                <canvas id="graficoTrucks"></canvas>
+            </div>
+        </article>
+
+        <article class="card mt-4">
+            <header class="card-header">
+                <h2>Ventas por Producto</h2>
+            </header>
         
-    </div>
+            <div class="card-body">
+                <canvas id="graficoVentasProducto"></canvas>
+            </div>
+        </article>
+        
+        <article class="card mt-4">
+            <header class="card-header">
+                <h2>Número de Transacciones por Food Truck</h2>
+            </header>
+        
+            <div class="card-body">
+                <canvas id="graficoTransaccionesTruck"></canvas>
+            </div>
+        </article>
+        
+        <article class="card mt-4">
+            <header class="card-header">
+                <h2>Ventas por Hora</h2>
+            </header>
+        
+            <div class="card-body">
+                <canvas id="graficoVentasHora"></canvas>
+            </div>
+        </article>
+        
+        <article class="card mt-4">
+            <header class="card-header">
+                <h2>Estado de las Mesas (Ocupadas y Libres)</h2>
+            </header>
+        
+            <div class="card-body">
+                <canvas id="graficoEstadoMesas"></canvas>
+            </div>
+        </article>
+        
+        
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/admin/reports.js') }}"></script>
 
 </body>
 

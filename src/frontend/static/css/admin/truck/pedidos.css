@@ -1,0 +1,352 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+    transition: all 0.3s ease;
+}
+
+:root {
+    --orange-primary: #FF7833;
+    --orange-secondary: #FF5C00;
+    --orange-light: #FFA366;
+    --bg-white: #FFFFFF;
+    --bg-light: #F8F8F8;
+    --text-dark: #333333;
+    --text-medium: #666666;
+    --text-light: #999999;
+    --completed: #4CAF50;
+    --pending: #FF5252;
+}
+
+.page-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: var(--orange-secondary);
+    font-weight: 600;
+}
+
+.container {
+    border-radius: 8px;
+    padding: 25px;
+    overflow: hidden;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 14px;
+    background: transparent;
+    color: var(--text-dark);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead {
+    background-color: var(--orange-primary);
+}
+
+th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+    word-wrap: break-word; /* Ajusta las palabras largas */
+}
+
+th:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    height: 50%;
+    width: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+tbody tr {
+    border: none;
+    background-color: var(--bg-white);
+}
+
+tbody tr:nth-child(even) {
+    background-color: var(--bg-light);
+}
+
+tbody tr:hover {
+    background-color: rgba(255, 120, 51, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f0f0f0;
+    word-wrap: break-word; /* Ajusta las palabras largas */
+}
+
+td:first-child {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: var(--text-medium);
+    border-left: 3px solid transparent;
+}
+
+tr:has(.estado-completado) td:first-child {
+    border-left: 3px solid var(--completed);
+}
+
+tr:has(.estado-pendiente) td:first-child {
+    border-left: 3px solid var(--pending);
+}
+
+td:nth-child(4) {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+td:nth-child(4)::before {
+    content: '$';
+    margin-right: 2px;
+    opacity: 0.7;
+}
+
+.estado-completado {
+    display: inline-block;
+    color: white;
+    background-color: var(--completed);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado-pendiente {
+    display: inline-block;
+    color: white;
+    background-color: var(--pending);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+td:nth-child(6) {
+    color: var(--text-light);
+    font-size: 13px;
+}
+
+td:last-child {
+    max-width: 250px;
+}
+
+td:last-child span {
+    display: inline-block;
+    margin: 3px 4px 3px 0;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+tbody:empty::after {
+    content: "No hay pedidos disponibles";
+    display: block;
+    text-align: center;
+    padding: 30px;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px 0;
+}
+
+.pagination-info {
+    color: var(--text-medium);
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+}
+
+.pagination-button {
+    background-color: var(--bg-white);
+    border: 1px solid #e0e0e0;
+    color: var(--text-medium);
+    height: 36px;
+    min-width: 36px;
+    border-radius: 4px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.pagination-button:hover {
+    background-color: var(--bg-light);
+    border-color: #d0d0d0;
+}
+
+.pagination-button.active {
+    background-color: var(--orange-primary);
+    color: white;
+    border-color: var(--orange-primary);
+}
+
+.pagination-button:disabled,
+.pagination-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination-button.nav-button {
+    font-weight: bold;
+    width: 40px;
+}
+
+.page-size-selector {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.page-size-selector label {
+    margin-right: 8px;
+    color: var(--text-medium);
+    font-size: 14px;
+}
+
+.page-size-selector select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+    background-color: var(--bg-white);
+    color: var(--text-dark);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.pagination-row {
+    display: none;
+}
+
+.pagination-row.active {
+    display: table-row;
+}
+
+/* Responsivo */
+@media (max-width: 1024px) {
+    .container {
+        padding: 20px;
+    }
+
+    .page-title {
+        font-size: 22px;
+    }
+
+    table {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        display: block;
+    }
+
+    td, th {
+        min-width: 100px;
+    }
+
+    td:last-child {
+        min-width: 200px;
+    }
+
+    .pagination-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pagination-top {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .pagination-info {
+        text-align: center;
+        margin: 10px 0;
+    }
+
+    .pagination-controls {
+        justify-content: center;
+    }
+
+    .pagination-button {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+    }
+
+    .page-size-selector select {
+        width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    table {
+        font-size: 10px;
+    }
+
+    td,
+    th {
+        padding: 10px;
+    }
+
+    .pagination-button {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+
+    .page-size-selector select {
+        width: 100px;
+    }
+}

@@ -1,17 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pedidos</title>
+    <title>Pedidos - FoodOrder</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/truck/pedidos.css') }}">
 </head>
+
 <body>
-    
-    <section class="container-pedidos">
-        <h1>Pedidos de los usuarios</h1>
-        
-    </section>
+
+    <div class="main-content">
+        <h1 class="page-title">Pedidos de la app</h1>
+
+        <div class="container">
+            <div class="table-wrapper">
+                <table id="pedidosTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Mesa</th>
+                            <th>Método de Pago</th>
+                            <th>Monto</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Detalles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pedido in pedidos %}
+                        <tr class="pagination-row">
+                            <td>{{ pedido.id }}</td>
+                            <td>{{ pedido.mesa_id }}</td>
+                            <td>{{ pedido.metodo_pago }}</td>
+                            <td>{{ pedido.monto }}</td>
+                            <td>
+                                {% if pedido.estado == 'completado' %}
+                                <span class="estado-completado">{{ pedido.estado }}</span>
+                                {% else %}
+                                <span class="estado-pendiente">{{ pedido.estado }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ pedido.fecha }}</td>
+                            <td>
+                                {% for detalle in pedido.detalles %}
+                                <span>{{ detalle.nombre_producto }} x{{ detalle.cantidad }}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-container">
+                <div class="pagination-top">
+                    <div class="page-size-selector">
+                        <label for="page-size">Mostrar:</label>
+                        <select id="page-size" onchange="changePageSize(this.value)">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="pagination-info" id="pagination-info">
+                    Mostrando <span id="page-start">1</span> a <span id="page-end">10</span> de <span id="total-items">0</span> pedidos
+                </div>
+
+                <div class="pagination-controls" id="pagination-controls">
+                    <button class="pagination-button nav-button" id="prev-page" onclick="prevPage()" disabled>&lt;</button>
+                    <div id="page-numbers" class="page-numbers"></div>
+                    <button class="pagination-button nav-button" id="next-page" onclick="nextPage()">&gt;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin/pedidos.js') }}"></script>
 
 </body>
+
 </html>

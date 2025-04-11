@@ -5,24 +5,23 @@ Este modulo define la clase `AdminApp`, que configura y gestiona
 las rutas de administracion dentro de la aplicacion Flask.
 """
 
-from flask import render_template, flash, redirect, url_for, session, request
+from flask import render_template, flash, redirect, url_for, send_file, jsonify, session, request
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
+from io import BytesIO
+import requests
 import os
+import pdfkit
 
 # importaciones propias
 from ....security.autentication import authentication_required
 from ....db.database import DBConfig, Error
+from ...utils.report_utils import obtener_reportes_generales
 
 class AdminApp:
-    # carpeta donde se guardaran las imagenes
-    UPLOAD_FOLDER = 'static/uploads'
-    # Extensiones permitidas de las carpetas
-    ALLOWED_EXTENSIONS = {
-        'png',
-        'jpg',
-        'jpeg'
-    }
+    # carpeta donde se guardaran las imagenes y las extenciones permitidas
+    UPLOAD_FOLDER = r'static\uploads'
+    ALLOWED_EXTENSIONS = { 'png', 'jpg', 'jpeg' }
 
     def __init__(self, app):
         """
@@ -32,8 +31,11 @@ class AdminApp:
         """
         self.admin = app
 
+        # configuracion de la db
         db = DBConfig()
         self.conn = db.get_db_config()
+
+        # Correr las rutas de la app
         self.setup_routes()
     
     def allowed_file(self, filename):
@@ -63,37 +65,44 @@ class AdminApp:
             Redenriza la plantilla 'admin/reportes.html'.
             """
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return render_template('admin/reportes.html')
-            return render_template('admin/admin.html', section="reports")
+                data = obtener_reportes_generales()
+                print("data", data)
+                return jsonify(data)
+            
+            data = obtener_reportes_generales()
+            return render_template('admin/admin.html', section="reports", data=data)
+        
+        @self.admin.route('/admin/reports/pdf')
+        @authentication_required
+        def descargar_reporte_pdf():
+            rendered = render_template("admin/reportes_pdf.html", data=obtener_reportes_generales())
+
+            try:
+                path_wkhtmltopdf = r'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+                config = pdfkit.configuration(wkhtmltopdf=path_wkhtmltopdf)   
+            except OSError as e:
+                return f"Error generando PDF: {e}", 500         
+
+            pdf = pdfkit.from_string(rendered, False, configuration=config)
+            return send_file(BytesIO(pdf), as_attachment=True, download_name="reporte_ventas.pdf")
         
         @self.admin.route('/admin/pedidos')
+        @authentication_required
         def admin_pedidos():
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return render_template('admin/pedidos.html')
-            return render_template('admin/admin.html', section="pedidos")
-
-        @self.admin.route('/admin/mesas')
-        def mesas_app():
             try:
-                with self.conn.cursor(dictionary=True) as cursor:
-                    query = """
-                    SELECT * FROM mesas
-                    """
-                    cursor.execute(query)
-                    mesas = cursor.fetchall()
-                    print("Mesas: ", mesas)
-            
-            except Error as e:
-                print(f"Error al obtener las mesas: {str(e)}")
-                flash(f"Error al obtener las mesas: {str(e)}", "error")
-                return redirect(url_for("admin_dashboard"))
+                response = requests.get(f"{request.host_url}api/pedidos")
+                pedidos = response.json() if response.status_code == 200 else []
+            except Exception as e:
+                print(f"Error al obtener pedidos: {str(e)}")
+                pedidos = []
 
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return render_template('admin/mesas.html', mesas=mesas)
-            return render_template('admin/admin.html', section="mesas", mesas=mesas)
+                return render_template('admin/pedidos.html', pedidos=pedidos)
+            return render_template('admin/admin.html', section="pedidos", pedidos=pedidos)
 
         # CRUD de FoodTrucks
         @self.admin.route('/admin/foodtrucks')
+        @authentication_required
         def foodtrucks():
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
@@ -118,22 +127,25 @@ class AdminApp:
             return render_template('admin/admin.html', section="foodtrucks", trucks=trucks, disabled_foodtrucks=disabled_foodtrucks)
         
         @self.admin.route('/admin/foodtrucks/create_trucks', methods=['GET', 'POST'])
+        @authentication_required
         def create_trucks():
             if request.method == "POST":
+
                 nombre_truck = request.form.get('nombreTrucks')
-                imagen_trucks = request.form.get('imagenTrucks')
+                imagen_trucks = request.files.get('imagenTrucks')
                 info_truck = request.form.get('informacionTrucks')
                 especialidad_truck = request.form.get('especialidadTrucks')
 
                 if imagen_trucks and self.allowed_file(imagen_trucks.filename):
                     filename = secure_filename(imagen_trucks.filename)
+                    os.makedirs(self.UPLOAD_FOLDER, exist_ok=True)
                     filepath = os.path.join(self.UPLOAD_FOLDER, filename)
                     imagen_trucks.save(filepath)
 
                     try:
                         with self.conn.cursor() as cursor:
                             query = """ 
-                            INSERT INTO trucks (nombre_truck, imagen_foodtrucks, info_foodtrucks, especialidad)
+                            INSERT INTO trucks (nombre_truck, imagen_foodtruck, info_foodtruck, especialidad)
                             VALUES (%s, %s, %s, %s)
                             """
                             cursor.execute(query, (nombre_truck, filepath, info_truck, especialidad_truck))
@@ -149,6 +161,7 @@ class AdminApp:
             return render_template('/admin/admin.html', section="create_trucks")
         
         @self.admin.route('/admin/foodtrucks/update_trucks/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
         def update_trucks(id):
             with self.conn.cursor(dictionary=True) as cursor:
                 query = """
@@ -164,6 +177,7 @@ class AdminApp:
                     return redirect(url_for('foodtrucks'))
 
                 if request.method == "POST":
+
                     nombre_truck = request.form.get('nombreTrucks')
                     imagen_trucks = request.form.get('imagenTrucks')
                     info_truck = request.form.get('informacionTrucks')
@@ -194,6 +208,7 @@ class AdminApp:
             return render_template('/admin/admin.html', section="update_trucks", trucks=trucks)
 
         @self.admin.route('/admin/foodtrucks/desabilitar_trucks/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
         def deshabilitar_trucks(id):
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
@@ -229,9 +244,10 @@ class AdminApp:
             return redirect(url_for('foodtrucks'))
 
         @self.admin.route('/admin/foodtrucks/habilitar_trucks/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
         def habilitar_trucks(id):
             try:
-                with self.conn.cursor() as cursor:
+                with self.conn.cursor(dictionary=True) as cursor:
                     select_query = """
                     SELECT id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad
                     FROM trucks_desabilitados
@@ -254,21 +270,116 @@ class AdminApp:
                     DELETE FROM trucks_desabilitados WHERE id = %s
                     """
                     cursor.execute(delete_query, (id,))
-                    
                     self.conn.commit()
-                
                 flash("Truck habilitado exitosamente!", "success")
+
             except Error as e:
                 print(f"Error al habilitar el truck!: {str(e)}")
                 flash(f"Error al habilitar el truck!: {str(e)}", "error")
             
             return redirect(url_for('foodtrucks'))
+        
+        # CRUD de productos
+        @self.admin.route('/admin/products/<int:truck_id>')
+        @authentication_required
+        def products(truck_id):
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query_truck = """
+                    SELECT * FROM trucks
+                    """
+                    cursor.execute(query_truck)
+                    trucks = cursor.fetchall()
+
+                    if truck_id:
+                        query = """
+                        SELECT * FROM productos WHERE truck_id = %s
+                        """
+                        cursor.execute(query, (truck_id,))
+                        productos = cursor.fetchall()
+
+                        query_truck = """
+                        SELECT * FROM trucks WHERE id = %s
+                        """
+                        cursor.execute(query_truck, (truck_id,))
+                        trucks = cursor.fetchall()
+                    else:
+                        query_truck = """
+                        SELECT * FROM trucks
+                        """
+                        cursor.execute(query_truck)
+                        trucks = cursor.fetchall()
+
+                        query = """
+                        SELECT * FROM productos
+                        """
+                        cursor.execute(query)
+                        productos = cursor.fetchall()
+
+            except Error as e:
+                print(f"Error al obtener los productos: {str(e)}")
+                flash(f"Error al obtener los productos: {str(e)}", "error")
+                return redirect(url_for('products'))
+
+            return render_template(
+                'admin/admin.html', 
+                section="products", 
+                productos=productos,
+                trucks=trucks,
+                truck_id_selected=truck_id
+            )
+
+        @self.admin.route('/admin/products/create_product/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
+        def create_products(id):
+            if request.method == "POST":
+                nombre_products = request.form.get("productName")
+                imagen_products = request.form.get('imagenProducts')
+                descripcion_products = request.form.get("descriptionProducts")
+                products_price = request.form.get("PrecioProducts")
+                truck_id = id
+
+                if imagen_products and self.allowed_file(imagen_products.filename):
+                    filename = secure_filename(imagen_products.filename)
+                    filepath = os.path.join(self.UPLOAD_FOLDER, filename)
+                    imagen_products.save(filepath)
+
+                    with self.conn.cursor(dictionary=True) as cursor:
+                        query = """
+                        INSERT INTO (nombre_producto, descripcion, precio, imagen_producto, truck_id)
+                        VALUES (%s, %s, %s, %s, %s)
+                        """
+                        cursor.execute(query, (nombre_products, descripcion_products, products_price, filepath, truck_id))
+                        self.conn.commit()
+                    
+                    flash("Productos creado exitosamente!", "success")
+                    return redirect(url_for("products"))
+
+            return render_template(
+                'admin/admin.html',
+                section='create_products'
+            )
+        
+        @self.admin.route('/admin/products/update_product/<int:id>', methods=['GET', 'POST'])
+        def update_products(id):
+            pass
+
+        @self.admin.route('/admin/products/disabled_products/<int:id>', methods=['GET', 'POST'])
+        def disabled_products(id):
+            pass
+
+        @self.admin.route('/admin/products/allowed_products/<int:id>', methods=['GET', 'POST'])
+        def allowed_products(id):
+            pass
+
+        @self.admin.route('/admin/products/descuentos_products/<int:id>', methods=['GET', 'POST'])
+        def descuestos_products(id):
+            pass
 
         # CRUD de Empleados
         @self.admin.route('/admin/employees')
         @authentication_required
         def employee():
-
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
                     query = """ 
@@ -288,12 +399,16 @@ class AdminApp:
                 flash(f"Error al obtener a los empleados: {e}", "error")
                 return redirect(url_for('employee'))
 
-            return render_template('admin/admin.html', section="employees", employees=employees, employees_disabled=employees_disabled)
+            return render_template(
+                'admin/admin.html', 
+                section="employees", 
+                employees=employees, 
+                employees_disabled=employees_disabled
+            )
         
         @self.admin.route('/admin/employees/create_employee', methods=['GET', 'POST'])
         @authentication_required
         def create_employee():
-
             if request.method == "POST":
 
                 name = request.form.get('nombre')
@@ -317,7 +432,10 @@ class AdminApp:
                 except Error as e:
                     flash(f"Error creando el empleado: {str(e)}", "error")
 
-            return render_template('admin/admin.html', section="create_employee")
+            return render_template(
+                'admin/admin.html', 
+                section="create_employee"
+            )
 
         @self.admin.route('/admin/employees/update_employee/<int:id>', methods=['GET', 'POST'])
         @authentication_required
@@ -337,6 +455,7 @@ class AdminApp:
                         return redirect(url_for('employee'))
 
                     if request.method == "POST":
+
                         name = request.form.get('nombre')
                         password = request.form.get('password')
                         email = request.form.get('email')
@@ -368,7 +487,11 @@ class AdminApp:
                             print(f"Error al actualizar el usuario: {e}")
                             flash(f"Error al actualizar el usuario: {e}", "error")
                     
-                    return render_template('admin/admin.html', section="edit_employee", employee=employee)
+                    return render_template(
+                        'admin/admin.html', 
+                        section="edit_employee", 
+                        employee=employee
+                    )
             
             except Error as e:
                 print(f"Error al obtener datos del empleado: {e}")
@@ -396,13 +519,7 @@ class AdminApp:
                     INSERT INTO user_desabilitados (id, name, password, email, rol, disabled_at)
                     VALUES (%s, %s, %s, %s, %s, NOW())
                     """
-                    cursor.execute(insert_disabled, (
-                        employee['id'],
-                        employee['name'],
-                        employee['password'],
-                        employee['email'],
-                        employee['rol']
-                    ))
+                    cursor.execute(insert_disabled, (employee['id'],employee['name'],employee['password'],employee['email'],employee['rol']))
 
                     update_user_status = """
                     UPDATE users
@@ -424,7 +541,6 @@ class AdminApp:
         @authentication_required
         def habilitar_employee(id):
             try:
-
                 with self.conn.cursor(dictionary=True) as cursor:
                     query_disabled = """ 
                     SELECT id, name, password, email, rol

@@ -21,6 +21,9 @@
     </header>
 
     <section class="container__pago">
+        <div class="container__img">
+            <img src="{{ url_for('static', filename='assets/pago.svg') }}" alt="icono de pago">
+        </div>
 
         <form method="POST" aria-label="Formulario de procesar metodo de pago">
             <p class="payment-message">
@@ -40,10 +43,6 @@
                 <label for="tabEfectivo" class="tab"><i class="fas fa-money-bill-wave"></i> Efectivo</label>
             </div>
         </form>
-
-        <div class="container__img">
-            <img src="{{ url_for('static', filename='assets/pago.svg') }}" alt="icono de pago">
-        </div>
     </section>
 
 

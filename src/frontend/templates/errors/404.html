@@ -18,17 +18,16 @@
         </p>
         <p><strong>URL:</strong> {{ request.url }}</p>
         <p>
-    
-            {% if user_id %}
-                <a href="{{ url_for('admin_dashboard') }}" aria-label="Volver al dashboard">
-                    Vuelve al dashboard administrativo
-                </a>
-            {% elif session['mesa_asignada'] %}
+            {% if mesa_asignada %}
                 <a href="{{ url_for('menu_user', mesa_id=session['mesa_asignada']) }}" aria-label="Volver a mi mesa">
                     Volver a mi mesa
                 </a>
+            {% elif user_id %}
+                <a href="{{ url_for('admin_dashboard') }}" aria-label="Volver al dashboard">
+                    Vuelve al dashboard administrativo
+                </a>
             {% else %}
-                <a href="/" aria-label="Volver a la página de inicio">
+                <a href="/user/splash" aria-label="Volver a la página de inicio">
                     Volver a la página de inicio
                 </a>
             {% endif %}

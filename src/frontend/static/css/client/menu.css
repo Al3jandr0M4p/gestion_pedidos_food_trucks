@@ -89,15 +89,10 @@ body {
     transform: translateX(-100%);
 }
 
-/* 
-/* @keyframes shine {
-    0% { transform: translateX(-100%); }
-    20%, 100% { transform: translateX(100%); }
-} */
-*/ .header p {
+.header p {
     font-size: 1.25rem;
-    color: #666;
-    max-width: 700px;
+    color: #494646;
+    max-width: 1200px;
     margin: 0 auto;
     line-height: 1.6;
 }

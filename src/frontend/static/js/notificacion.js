@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("JS de notificacion cargado");
     const messages = document.querySelectorAll('#flash-messages li');
     const notificationContainer = document.createElement('div');
     notificationContainer.className = "notification-container";
