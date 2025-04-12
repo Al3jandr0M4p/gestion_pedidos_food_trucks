@@ -34,7 +34,7 @@ La empresa o personas que tengan la aplicacion y la quieran tener para el public
 funcionamiento de la aplicacion y su buen manejo u poder mantener una buena experiencia de usuario y mejorar la interfaz del usuario
 a su conveniencia.
 
-> Tendra que tener python instalado en su servidor local donde podra mostrar su web o trabajar con ella. En la pagina oficial de python https://www.python.org/ podras instalar python despues que tenga python podra instalar flask el framewrok usado para desarrollar la aplicacion.
+> Tendra que tener python instalado en su servidor local donde podra mostrar su web o trabajar con ella. En la pagina oficial de python <a href="https://www.python.org/" target="_blank" rel="noopener noreferrer">https://www.python.org/</a> podras instalar python despues que tenga python podra instalar flask el framewrok usado para desarrollar la aplicacion.
 
 Instalar flask:
 
@@ -102,6 +102,6 @@ Esta aplicacion fue desarrollada usando las siguientes tecnologias:
 Este proyecto esta bajo la licencia MIT lo podras ver en el archivo LICENSE
 
 ## Contacto <a name = "Contact"></a>
-- Email empresarial 20230542@ipopsa.edu.do
-- Email propio molle0711@gmail.com
-- GitHub https://github.com/Al3jandr0M4p
+- Email empresarial <a href="mailto:20230542@ipopsa.edu.do" target="_blank" rel="noopener noreferrer">20230542@ipopsa.edu.do</a>
+- Email propio <a href="mailto:molle0711@gmail.com" target="_blank" rel="noopener noreferrer">molle0711@gmail.com</a>
+- GitHub <a href="https://github.com/Al3jandr0M4p" target="_blank" rel="noopener noreferrer">https://github.com/Al3jandr0M4p</a>
