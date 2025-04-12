@@ -74,7 +74,6 @@ y si las quieres actualizar solo tienes que poner el siguiente comando
 pip install --upgrade -r requirements.txt
 ```
 
-
 ## Usos <a name = "usage"></a>
 
 Despues que ya tenga todas dependencias necesarias de la aplicacion podra correrla y probarla o usarla con el siguiente comando
@@ -98,3 +97,11 @@ Esta aplicacion fue desarrollada usando las siguientes tecnologias:
 - ***dotenv*** – Manejo seguro de variables de entorno.
 - ***Chart.js*** – Para la visualización de gráficos estadísticos en el panel de admin.
 - ***QR Code*** – Sistema de acceso por escaneo a la app para usuarios.
+
+## Licencia <a name = "license"></a>
+Este proyecto esta bajo la licencia lo podras ver en el archivo LICENSE
+
+## Contacto <a name = "Contact"></a>
+- Email empresarial 20230542@ipopsa.edu.do
+- Email propio molle0711@gmail.com
+- GitHub https://github.com/Al3jandr0M4p
