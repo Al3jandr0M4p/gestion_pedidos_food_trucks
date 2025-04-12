@@ -99,7 +99,7 @@ Esta aplicacion fue desarrollada usando las siguientes tecnologias:
 - ***QR Code*** – Sistema de acceso por escaneo a la app para usuarios.
 
 ## Licencia <a name = "license"></a>
-Este proyecto esta bajo la licencia lo podras ver en el archivo LICENSE
+Este proyecto esta bajo la licencia MIT lo podras ver en el archivo LICENSE
 
 ## Contacto <a name = "Contact"></a>
 - Email empresarial 20230542@ipopsa.edu.do
