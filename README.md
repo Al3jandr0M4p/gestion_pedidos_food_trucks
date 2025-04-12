@@ -28,15 +28,13 @@ conveniencia y el que mas le apetesca la ruta donde los usuarios entraran a la a
 en esta ruta se le estara entregando una mesa al usuario donde el podra navegar en la aplicacion comprar, pagar y 
 disfrutar de la aplicacion, etc.
 
-### Pre-Requisistos que se necesita para poder usar la app
+## Pre-Requisistos que se necesita para poder usar la app
 
 La empresa o personas que tengan la aplicacion y la quieran tener para el publico tendran que tener cierta cosas para tener el buen
 funcionamiento de la aplicacion y su buen manejo u poder mantener una buena experiencia de usuario y mejorar la interfaz del usuario
 a su conveniencia.
 
-tendra que tener python instalado en su servidor local donde podra mostrar su web o trabajar con ella
-
-> En la pagina oficial de python https://www.python.org/ podras instalar python despues que tenga python podra instalar flask el framewrok usado para desarrollar la aplicacion.
+> Tendra que tener python instalado en su servidor local donde podra mostrar su web o trabajar con ella. En la pagina oficial de python https://www.python.org/ podras instalar python despues que tenga python podra instalar flask el framewrok usado para desarrollar la aplicacion.
 
 Instalar flask:
 
