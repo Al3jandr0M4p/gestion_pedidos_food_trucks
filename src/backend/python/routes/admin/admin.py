@@ -5,7 +5,7 @@ Este modulo define la clase `AdminApp`, que configura y gestiona
 las rutas de administracion dentro de la aplicacion Flask.
 """
 
-from flask import render_template, flash, redirect, url_for, send_file, jsonify, session, request
+from flask import render_template, flash, redirect, url_for, send_file, jsonify, send_from_directory, session, request
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from io import BytesIO
@@ -19,8 +19,8 @@ from ....db.database import DBConfig, Error
 from ...utils.report_utils import obtener_reportes_generales
 
 class AdminApp:
-    # carpeta donde se guardaran las imagenes y las extenciones permitidas
-    UPLOAD_FOLDER = r'static\uploads'
+
+    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'media')
     ALLOWED_EXTENSIONS = { 'png', 'jpg', 'jpeg' }
 
     def __init__(self, app):
@@ -30,6 +30,7 @@ class AdminApp:
         :param app: Flask app instancia.
         """
         self.admin = app
+        self.admin.config['UPLOAD_FOLDER'] = self.UPLOAD_FOLDER
 
         # configuracion de la db
         db = DBConfig()
@@ -46,6 +47,10 @@ class AdminApp:
         Confifura las rutas del panel de administracion.
         Incluye rutas para el dashboard, reportes, gestion y CRUD de empleados.
         """
+        @self.admin.route('/admin/<path:filename>')
+        def media(filename):
+            return send_from_directory(self.admin.config['UPLOAD_FOLDER'], filename)
+
         @self.admin.route('/admin')
         @authentication_required
         def admin_dashboard():
@@ -71,6 +76,12 @@ class AdminApp:
             
             data = obtener_reportes_generales()
             return render_template('admin/admin.html', section="reports", data=data)
+        
+        @self.admin.route('/admin/reports/ia')
+        def admin_ia_reports():
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return render_template('/admin/reports/ia.html')
+            return render_template('admin/admin.html', section='ia')
         
         @self.admin.route('/admin/reports/pdf')
         @authentication_required
@@ -107,24 +118,32 @@ class AdminApp:
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
                     query = """
-                    SELECT * FROM trucks
+                    SELECT * 
+                    FROM trucks
+                    WHERE estado_truck = 'activo'
                     """
                     cursor.execute(query)
                     trucks = cursor.fetchall()
 
-                    disabled_trucks = """
+                    query_disabled = """
                     SELECT *
-                    FROM trucks_desabilitados
+                    FROM trucks
+                    WHERE estado_truck = 'inactivo'
                     """
-                    cursor.execute(disabled_trucks)
-                    disabled_foodtrucks = cursor.fetchall()
+                    cursor.execute(query_disabled)
+                    disabled_trucks = cursor.fetchall()
             
             except Error as e:
                 print(f"Error al obtener los foodtrucks: {e}")
                 flash(f"Error al obtener a los empleados: {e}", "error")
                 return redirect(url_for('foodtrucks'))
             
-            return render_template('admin/admin.html', section="foodtrucks", trucks=trucks, disabled_foodtrucks=disabled_foodtrucks)
+            return render_template(
+                'admin/admin.html', 
+                section="foodtrucks", 
+                trucks=trucks,
+                disabled_trucks=disabled_trucks
+            )
         
         @self.admin.route('/admin/foodtrucks/create_trucks', methods=['GET', 'POST'])
         @authentication_required
@@ -148,7 +167,7 @@ class AdminApp:
                             INSERT INTO trucks (nombre_truck, imagen_foodtruck, info_foodtruck, especialidad)
                             VALUES (%s, %s, %s, %s)
                             """
-                            cursor.execute(query, (nombre_truck, filepath, info_truck, especialidad_truck))
+                            cursor.execute(query, (nombre_truck, filename, info_truck, especialidad_truck))
                             self.conn.commit()
                         
                         flash("Food trucks creado exitosamente!", "success")
@@ -158,7 +177,7 @@ class AdminApp:
                         print("No se pudo crear el food trucks")
                         flash(f"No se pudo crear el food trucks {str(e)}", "error")
             
-            return render_template('/admin/admin.html', section="create_trucks")
+            return render_template("/admin/trucks/crear_trucks.html")
         
         @self.admin.route('/admin/foodtrucks/update_trucks/<int:id>', methods=['GET', 'POST'])
         @authentication_required
@@ -195,7 +214,7 @@ class AdminApp:
                                 SET nombre_truck = %s, imagen_foodtrucks = %s, info_foodtruck = %s, especialidad = %s
                                 WHERE id = %s
                                 """
-                                update_cursor.execute(query, (nombre_truck, filepath, info_truck, especialidad_truck))
+                                update_cursor.execute(query, (nombre_truck, filename, info_truck, especialidad_truck))
                                 self.conn.commit()
                             
                             flash("Truck actualizado exitosamente!", "success")
@@ -205,38 +224,23 @@ class AdminApp:
                             print(f"Error al actualizar el truck!: {str(e)}")
                             flash(f"Error al actualizar el truck!: {str(e)}", "error")
 
-            return render_template('/admin/admin.html', section="update_trucks", trucks=trucks)
+            return render_template("/admin/trucks/update_trucks.html")
 
         @self.admin.route('/admin/foodtrucks/desabilitar_trucks/<int:id>', methods=['GET', 'POST'])
         @authentication_required
         def deshabilitar_trucks(id):
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
-                    select_query = """
-                    SELECT id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad
-                    FROM trucks
+                    update_query = """
+                    UPDATE trucks
+                    SET estado_truck = 'inactivo'
                     WHERE id = %s
                     """
-                    cursor.execute(select_query, (id,))
-                    truck = cursor.fetchone()
+                    cursor.execute(update_query, (id,))
+                    
+                    self.conn.commit()
+                    flash("Truck deshabilitado exitosamente!", "success")
 
-                    if not truck:
-                        flash("Truck no encontrado", "error")
-                        return redirect(url_for('foodtrucks'))
-                    
-                    insert_query = """
-                    INSERT INTO trucks_desabilitados (id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad)
-                    VALUES (%s, %s, %s, %s, %s)
-                    """
-                    cursor.execute(insert_query, (truck["id"], truck["nombre_truck"], truck["imagen_foodtruck"], truck["info_foodtruck"], truck["especialidad"]))
-                    
-                    delete_query = """
-                    DELETE FROM trucks WHERE id = %s
-                    """
-                    cursor.execute(delete_query, (id,))
-                    
-                self.conn.commit()
-                flash("Truck deshabilitado exitosamente!", "success")
             except Error as e:
                 print(f"Error al habilitar el truck!: {str(e)}")
                 flash(f"Error al habilitar el truck!: {str(e)}", "error")
@@ -248,30 +252,14 @@ class AdminApp:
         def habilitar_trucks(id):
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
-                    select_query = """
-                    SELECT id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad
-                    FROM trucks_desabilitados
+                    update_query = """
+                    UPDATE trucks
+                    SET estado_truck = 'activo'
                     WHERE id = %s
                     """
-                    cursor.execute(select_query, (id,))
-                    truck = cursor.fetchone()
-                    
-                    if not truck:
-                        flash("Truck no encontrado en la lista de deshabilitados", "error")
-                        return redirect(url_for('foodtrucks'))
-                    
-                    insert_query = """
-                    INSERT INTO trucks (id, nombre_truck, imagen_foodtruck, info_foodtruck, especialidad, estado_truck)
-                    VALUES (%s, %s, %s, %s, %s, 'activo')
-                    """
-                    cursor.execute(insert_query, (truck["id"], truck["nombre_truck"], truck["imagen_foodtruck"], truck["info_foodtruck"], truck["especialidad"]))
-                    
-                    delete_query = """
-                    DELETE FROM trucks_desabilitados WHERE id = %s
-                    """
-                    cursor.execute(delete_query, (id,))
+                    cursor.execute(update_query, (id,))
                     self.conn.commit()
-                flash("Truck habilitado exitosamente!", "success")
+                    flash("Truck habilitado exitosamente!", "success")
 
             except Error as e:
                 print(f"Error al habilitar el truck!: {str(e)}")
@@ -372,10 +360,6 @@ class AdminApp:
         def allowed_products(id):
             pass
 
-        @self.admin.route('/admin/products/descuentos_products/<int:id>', methods=['GET', 'POST'])
-        def descuestos_products(id):
-            pass
-
         # CRUD de Empleados
         @self.admin.route('/admin/employees')
         @authentication_required
@@ -433,8 +417,7 @@ class AdminApp:
                     flash(f"Error creando el empleado: {str(e)}", "error")
 
             return render_template(
-                'admin/admin.html', 
-                section="create_employee"
+                'admin/custom/crear_employees.html'
             )
 
         @self.admin.route('/admin/employees/update_employee/<int:id>', methods=['GET', 'POST'])
@@ -488,8 +471,7 @@ class AdminApp:
                             flash(f"Error al actualizar el usuario: {e}", "error")
                     
                     return render_template(
-                        'admin/admin.html', 
-                        section="edit_employee", 
+                        'admin/custom/edit_employee.html', 
                         employee=employee
                     )
             

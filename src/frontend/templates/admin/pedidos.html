@@ -30,25 +30,25 @@
                     </thead>
                     <tbody>
                         {% for pedido in pedidos %}
-                        <tr class="pagination-row">
-                            <td>{{ pedido.id }}</td>
-                            <td>{{ pedido.mesa_id }}</td>
-                            <td>{{ pedido.metodo_pago }}</td>
-                            <td>{{ pedido.monto }}</td>
-                            <td>
-                                {% if pedido.estado == 'completado' %}
-                                <span class="estado-completado">{{ pedido.estado }}</span>
-                                {% else %}
-                                <span class="estado-pendiente">{{ pedido.estado }}</span>
-                                {% endif %}
-                            </td>
-                            <td>{{ pedido.fecha }}</td>
-                            <td>
-                                {% for detalle in pedido.detalles %}
-                                <span>{{ detalle.nombre_producto }} x{{ detalle.cantidad }}</span>
-                                {% endfor %}
-                            </td>
-                        </tr>
+                            <tr class="pagination-row">
+                                <td>{{ pedido.id }}</td>
+                                <td>{{ pedido.mesa_id }}</td>
+                                <td>{{ pedido.metodo_pago }}</td>
+                                <td>{{ pedido.monto }}</td>
+                                <td>
+                                    {% if pedido.estado == 'completado' %}
+                                        <span class="estado-completado">{{ pedido.estado }}</span>
+                                    {% else %}
+                                        <span class="estado-pendiente">{{ pedido.estado }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ pedido.fecha }}</td>
+                                <td>
+                                    {% for detalle in pedido.detalles %}
+                                        <span>{{ detalle.nombre_producto }} x{{ detalle.cantidad }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
                         {% endfor %}
                     </tbody>
                 </table>

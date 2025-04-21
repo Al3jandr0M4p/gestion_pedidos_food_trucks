@@ -78,9 +78,12 @@ class UserApp:
             print("mesa_id:", mesa_id)
             foodtrucks = self.get_food_trucks()
             print("Foodtrucks:", foodtrucks)
-            session['foodtrucks'] = foodtrucks
 
-            return render_template('client/menu.html', mesa_id=int(mesa_id), foodtrucks=foodtrucks)
+            return render_template(
+                'client/menu.html',
+                mesa_id=int(mesa_id),
+                foodtrucks=foodtrucks
+            )
         
         @self.user.route('/user/menu/foodtruck/<int:foodtruck_id>')
         def menu_foodtruck(foodtruck_id):
@@ -99,7 +102,7 @@ class UserApp:
                 
                 except Error as e:
                     print(f"Error al obtener productos: {e}")
-                    return render_template('errors/500.html'), 500
+                    flash(f"Error al obtener productos: {e}", "error")
         
         @self.user.route('/user/splash')
         def splash_screen():
@@ -255,7 +258,6 @@ class UserApp:
                         datos = json.loads(transaccion['datos_adicionales'])
                         if 'stripe_payment_intent_id' in datos:
                             stripe.api_key = os.getenv('PRIVATE_KEY')
-                            payment_intent_id = datos['stripe_payment_intent_id']
                     
                     if 'datos_adicionales' in transaccion and transaccion['datos_adicionales']:
                         datos = json.loads(transaccion['datos_adicionales'])

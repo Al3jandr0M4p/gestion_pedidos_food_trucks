@@ -1,41 +1,36 @@
-<div class="container">
+<form action="/admin/foodtrucks/create_trucks" method="post" enctype="multipart/form-data">
+    <h1>Creacion de food trucks</h1>
 
-    <form action="/admin/foodtrucks/create_trucks" method="post" enctype="multipart/form-data">
-        <h1>Creacion de food trucks</h1>
+    <div class="container__input">
+        <label for="nombreTrucks">
+            Nombre:
+        </label>
+        <input type="text" name="nombreTrucks" id="nombreTrucks" required>
+    </div>
 
-        <div class="container__input">
-            <label for="nombreTrucks">
-                Nombre:
-            </label>
-            <input type="text" name="nombreTrucks" id="nombreTrucks" required>
-        </div>
+    <div class="container__input">
+        <label for="imagenTrucks">
+            Imagen:
+        </label>
+        <input type="file" name="imagenTrucks" id="imagenTrucks" accept="imagen/*" required>
+    </div>
 
-        <div class="container__input">
-            <label for="imagenTrucks">
-                Imagen:
-            </label>
-            <input type="file" name="imagenTrucks" id="imagenTrucks" accept="imagen/*" required>
-        </div>
+    <div class="container__input">
+        <label for="informacionTrucks">
+            Informacion:
+        </label>
+        <textarea name="informacionTrucks" id="informacionTrucks" required></textarea>
+    </div>
 
-        <div class="container__input">
-            <label for="informacionTrucks">
-                Informacion:
-            </label>
-            <textarea name="informacionTrucks" id="informacionTrucks" required></textarea>
-        </div>
+    <div class="container__input">
+        <label for="especialidadTrucks">
+            Especialidad:
+        </label>
+        <textarea name="especialidadTrucks" id="especialidadTrucks" required></textarea>
+    </div>
 
-        <div class="container__input">
-            <label for="especialidadTrucks">
-                Especialidad:
-            </label>
-            <textarea name="especialidadTrucks" id="especialidadTrucks" required></textarea>
-        </div>
+    <div class="form__actions">
+        <button type="submit">Crear</button>
+    </div>
 
-        <div class="form__actions">
-            <a href="{{ url_for('foodtrucks') }}" class="btn btn-secondary">Cancelar</a>
-            <button type="submit">Crear</button>
-        </div>
-
-    </form>
-
-</div>
+</form>

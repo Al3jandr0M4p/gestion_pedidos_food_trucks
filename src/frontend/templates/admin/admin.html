@@ -7,23 +7,89 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin.css') }}">
+
+    <style>
+        .admin-chatbot {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .chatbox {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: #f9f9f9;
+        }
+
+        .chat-messages p {
+            margin: 0.3rem 0;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .chat-input button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
 
     <button class="menu-toggle" id="menuToggle">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
     </button>
+
+    <div class="admin-chatbot">
+        <h2>🤖 Chatbot Admin</h2>
+        <div class="chatbox">
+            <div id="chatMessages" class="chat-messages"></div>
+            <div class="chat-input">
+                <input type="text" id="preguntaInput" placeholder="Escribí tu pregunta..." />
+                <button onclick="enviarPregunta()">Enviar</button>
+            </div>
+        </div>
+    </div>
 
     <section class="container__admin__dashboard">
         <aside class="container__admin__configuration">
             <div class="logo">
                 <div class="logo-container">
                     <div class="logo-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-                            <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32"
+                            fill="currentColor">
+                            <path
+                                d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z" />
                         </svg>
                     </div>
                     <h1>FoodOrder</h1>
@@ -38,6 +104,7 @@
                     <li><a href="/admin/employees" data-section="employees">Empleados</a></li>
                     <li><a href="/admin/foodtrucks" data-section="foodtrucks">Foodtrucks</a></li>
                     <li><a href="/admin/reports" data-section="reports">Reportes</a></li>
+                    <li><a href="/admin/reports/ia" data-section="ia">IA Reportes</a></li>
                     <li><a href="/logout">Cerrar session</a></li>
                 </ul>
             </nav>
@@ -46,36 +113,69 @@
 
         <main class="container__admin__content">
             {% if section == "dashboard" %}
-                {% include 'admin/dashboard.html'   %}
+            {% include 'admin/dashboard.html' %}
+
             {% elif section == "pedidos" %}
-                {% include 'admin/pedidos.html'   %}
+            {% include 'admin/pedidos.html' %}
+
             {% elif section == "reports" %}
-                {% include 'admin/reportes.html'   %}
-            
+            {% include 'admin/reportes.html' %}
+
+            {% elif section == "ia" %}
+            {% include 'admin/reports/ia.html' %}
+
+
             {% elif section == "foodtrucks" %}
-                {% include 'admin/trucks/trucks.html'   %}
-            {% elif section == "create_trucks" %}
-                {% include 'admin/trucks/crear_trucks.html'   %}
-            {% elif section == "update_trucks" %}
-                {% include 'admin/trucks/update_trucks.html'   %}
+            {% include 'admin/trucks/trucks.html' %}
 
             {% elif section == "products" %}
-                {% include 'admin/trucks/products/products.html'  %}
+            {% include 'admin/trucks/products/products.html' %}
             {% elif section == "create_products" %}
-                {% include 'admin/trucks/products/crear_products.html'   %}
-            
+            {% include 'admin/trucks/products/crear_products.html' %}
+
             {% elif section == "employees" %}
-                {% include "admin/custom/employees.html" %}
-            {% elif section == "create_employee" %}
-                {% include "admin/custom/crear_employees.html" %}
-            {% elif section == "edit_employee" %}
-                {% include "admin/custom/edit_employee.html" %}
+            {% include "admin/custom/employees.html" %}
             {% endif %}
         </main>
 
     </section>
-    
+
     <script type="text/javascript" src="{{ url_for('static', filename='js/admin/admin.js') }}"></script>
+    <script>
+        function agregarMensaje(mensaje, esBot = false) {
+            const chat = document.getElementById("chatMessages");
+            const p = document.createElement('p');
+            p.innerText = (esBot ? "🤖 " : "👤 ") + mensaje;
+            chat.appendChild(p);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function enviarPregunta() {
+            const input = document.getElementById("preguntaInput");
+            console.log("Valor de input.value:", input.value);
+            const pregunta = input.value.trim();
+            if (!pregunta) return;
+
+            agregarMensaje(pregunta, false);
+            input.value = "";
+
+            try {
+                const res = await fetch("/admin/chatbot", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ pregunta })
+                });
+
+                const data = await res.json();
+                agregarMensaje(data.respuesta, true);
+
+            } catch (err) {
+                agregarMensaje("Hubo un error al contactar al chatbot.", true);
+            }
+        }
+    </script>
 
 </body>
 

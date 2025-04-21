@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="current-location" content="{{ request.path }}">
+    <title>Food Trucks</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/truck/trucks.css') }}">
-    <title>Food Trucks</title>
 </head>
 
 <body>
@@ -18,12 +20,19 @@
     <div class="foodtruck-container">
         <h1>Gestion de Food trucks</h1>
 
+        <div id="foodtrucksModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeFoodTruckModal()">&times;</span>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+
         <div class="container__notificacion">
             {% with messages = get_flashed_messages(with_categories=True) %}
                 {% if messages %}
                     <ul id="flash-messages" style="display: none;">
                         {% for category, message in messages %}
-                            <li data-category="{{ category }}">{{ message }}</li>
+                            <li data-category="{{ category }}" data-location="{{ request.path }}">{{ message }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -31,9 +40,9 @@
         </div>
 
         <div class="actions-bar">
-            <a href="{{ url_for('create_trucks') }}" class="btn btn-primary">
+            <button onclick="openCreateFoodTruckModal()" class="btn btn-primary">
                 <i class="icon-plus"></i> Crear Trucks
-            </a>
+            </button>
         </div>
 
         <div class="card">
@@ -58,20 +67,21 @@
                             {% if trucks %}
                                 {% for truck in trucks %}
                                     <tr>
-                                        <td>{{ truck['id'] }}</td>
-                                        <td>{{ truck['nombre_truck'] }}</td>
+                                        <td>{{ truck.id }}</td>
+                                        <td>{{ truck.nombre_truck }}</td>
                                         <td>
-                                            <img src="{{ truck['imagen_foodtruck']  }}" alt="imagen del food truck {{ truck['id']  }}" class="img-circular">
+                                            <img src="{{ url_for('media', filename=truck.imagen_foodtruck) }}" alt="imagen del food truck {{ truck.id  }}" class="img-circular">
+                                            <!-- <img src="{{ truck.imagen_foodtruck  }}" alt="imagen del food truck {{ truck.id  }}" class="img-circular"> -->
                                         </td>
-                                        <td>{{ truck['estado_truck'] }}</td>
-                                        <td>
-                                            <a class="btn btn-sm btn-edit" href="/admin/foodtrucks/update_trucks/{{ truck['id']  }}">
-                                                <i class="icon-edit"></i> editar
-                                            </a>
-                                            <a class="btn btn-sm btn-danger" href="/admin/foodtrucks/desabilitar_trucks/{{ truck['id']  }}">
+                                        <td>{{ truck.estado_truck }}</td>
+                                        <td class="actions">
+                                            <button class="btn btn-sm btn-edit" onclick="openFoodTruckModal('{{ truck.id }}')">
+                                                <i class="icon-edit"></i> Editar
+                                            </button>
+                                            <a class="btn btn-sm btn-danger" href="/admin/foodtrucks/desabilitar_trucks/{{ truck.id  }}">
                                                 <i class="fas fa-user-slash"></i> deshabilitar
                                             </a>
-                                            <a class="btn btn-sm btn-show" href="{{ url_for('products', truck_id=truck['id']) }}">
+                                            <a class="btn btn-sm btn-show" href="{{ url_for('products', truck_id=truck.id) }}">
                                                 <i class="fas fa-plus"></i> productos
                                             </a>
                                         </td>
@@ -108,25 +118,25 @@
                         </thead>
 
                         <tbody>
-                            {% if disabled_foodtrucks %}
-                                {% for disabled_trucks in disabled_foodtrucks %}
-                                    <tr>
-                                        <td>{{ disabled_trucks['id'] }}</td>
-                                        <td>{{ disabled_trucks['nombre_truck'] }}</td>
+                            {% if disabled_trucks %}
+                                <tr>
+                                    {% for disabled_truck in disabled_trucks%}
+                                        <td>{{ disabled_truck.id }}</td>
+                                        <td>{{ disabled_truck.nombre_truck }}</td>
                                         <td>
-                                            <img src="{{ disabled_trucks['imagen_foodtruck'] }}" alt="imagen truck {{ disabled_trucks['id'] }}" class="img-circular">
+                                            <img src="{{ url_for('media', filename=disabled_truck.imagen_foodtruck) }}" alt="imagen del food truck {{ disabled_truck.id  }}" class="img-circular">
                                         </td>
-                                        <td>{{ disabled_trucks['estado_truck'] }}</td>
-                                        <td>
-                                            <a class="btn btn-sm btn-success" href="/admin/foodtrucks/habilitar_trucks/{{ disabled_trucks['id']  }}">
-                                                <i class="fas fa-user-check"></i> habilitar
+                                        <td>{{ disabled_truck.estado_truck }}</td>
+                                        <td class="actions">
+                                            <a href="/admin/foodtrucks/habilitar_trucks/{{ disabled_truck.id }}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-user-check"></i> Habilitar
                                             </a>
                                         </td>
-                                    </tr>
-                                {% endfor %}
+                                    {% endfor %}
+                                </tr>
                             {% else %}
                                 <tr>
-                                    <td colspan="6" class="text-center">No hay Food Trucks deshabilitados</td>
+                                    <td colspan="5" style="text-align: center;">No hay Food Trucks deshabilitados</td>
                                 </tr>
                             {% endif %}
                         </tbody>
@@ -138,6 +148,7 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/notificacion.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/trucks.js') }}"></script>
 
 </body>
 

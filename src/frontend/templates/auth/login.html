@@ -5,8 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="current-location" content="{{ request.path }}">
+
     <title>Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+
 </head>
 
 <body>
@@ -17,7 +20,7 @@
             {% if messages %}
                 <ul id="flash-messages" style="display: none;">
                     {% for category, message in messages %}
-                        <li data-category="{{ category }}">{{ message }}</li>
+                        <li data-category="{{ category }}" data-location="{{ request.path }}">{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -61,8 +64,8 @@
 
     </div>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/auth/login.js') }}" defer></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/notificacion.js') }}" defer></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/auth/login.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/notificacion.js') }}"></script>
 
 </body>
 

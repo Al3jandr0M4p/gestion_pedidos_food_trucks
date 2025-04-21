@@ -1,0 +1,36 @@
+{
+    "responses": {
+        "vegetariano": [
+            "¡Tenemos excelentes opciones vegetarianas! 'Green Wheels' y 'Veggie Delight' se especializan en esto. ¿Te gustaría conocer sus platos?",
+            "Para comida vegetariana, te recomiendo 'Green Wheels'. Sus ensaladas y wraps son muy populares."
+        ],
+        "vegano": [
+            "Contamos con 'Vegan Vibes' que ofrece deliciosos platos veganos. ¡Sus bowls de proteína son los más pedidos!",
+            "Si buscas opciones veganas, 'Vegan Vibes' y 'Green Wheels' tienen menús completos sin productos animales."
+        ],
+        "sin gluten": [
+            "Varios de nuestros food trucks ofrecen opciones sin gluten. 'Healthy Bites' se especializa en esto. ¿Te gustaría ver sus opciones?",
+            "Para comida sin gluten, te recomiendo revisar el menú de 'Healthy Bites'. Tienen platos deliciosos y seguros."
+        ],
+        "saludable": [
+            "Si buscas opciones saludables, 'Fit Food' y 'Green Wheels' ofrecen platos nutritivos y deliciosos. ¿Te interesa algo en particular?",
+            "Para comida saludable, te recomiendo los bowls de 'Fit Food'. Son balanceados y muy sabrosos."
+        ],
+        "postres": [
+            "¡Tenemos deliciosos postres! 'Sweet Wheels' se especializa en repostería. Sus brownies y cheesecakes son los más vendidos.",
+            "Para satisfacer tu antojo dulce, visita 'Sweet Wheels'. ¡Sus postres son irresistibles!"
+        ],
+        "bebidas": [
+            "Ofrecemos una variedad de bebidas refrescantes. 'Juice Bar' tiene los mejores smoothies y jugos naturales.",
+            "Para bebidas, te recomiendo 'Juice Bar' y 'Coffee Wheels'. Tienen opciones para todos los gustos."
+        ],
+        "asiático": [
+            "Para comida asiática, 'Asian Fusion Wheels' y 'Sushi Roll' son excelentes opciones. ¿Te gusta más la comida japonesa, china o tailandesa?",
+            "Te recomiendo probar los platos de 'Asian Fusion Wheels'. Sus dumplings y fideos son muy populares."
+        ],
+        "sushi": [
+            "Si te gusta el sushi, 'Sushi Roll' ofrece opciones frescas y deliciosas. Sus rolls especiales son los más pedidos.",
+            "Para sushi, definitivamente prueba 'Sushi Roll'. ¡Tienen las mejores combinaciones!"
+        ]
+    }
+}

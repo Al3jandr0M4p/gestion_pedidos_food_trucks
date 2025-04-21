@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA - Reportes</title>
+</head>
+<body>
+
+
+    <section class="ia-reports">
+        <h1>🔍 Reportes Inteligentes</h1>
+        <p>Esta sección muestra análisis y alertas generadas por la IA.</p>
+
+        <div id="reportes-anomalias">
+            <button onclick="obtenerAnomalias()">🔔 Revisar Anomalías</button>
+            <div id="anomalias"></div>
+        </div>
+
+        <hr>
+
+        <h2>📩 Ver en Gmail</h2>
+        <p>Los reportes también fueron enviados al correo de los administradores.</p>
+    </section>
+
+    <script>
+        function obtenerAnomalias() {
+            fetch('/reportes/ia/anormalias')
+                .then(res => res.json())
+                .then(data => {
+                    const contenedor = document.getElementById("anomalias");
+                    if (data.length === 0) {
+                        contenedor.innerHTML = "<p>No se detectaron anomalías recientes.</p>";
+                    } else {
+                        contenedor.innerHTML = "<ul>" + data.map(d => `
+                            <li>🛒 Producto ID ${d.producto_id} con ${d.ventas_diarias} ventas</li>
+                        `).join("") + "</ul>";
+                    }
+                })
+        }
+    </script>
+    
+</body>
+</html>

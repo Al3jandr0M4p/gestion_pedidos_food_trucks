@@ -202,6 +202,36 @@ body {
     box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
 }
 
+.descuentos-seccion {
+    margin-top: 20px;
+    border-top: 1px dashed #ccc;
+    padding-top: 15px;
+}
+
+.descuento-item {
+    color: #e44d26;
+    font-weight: 600;
+}
+
+.resumen-compra {
+    margin-top: 20px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+.linea-resumen {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.total-linea {
+    font-weight: bold;
+    font-size: 1.2em;
+    border-top: 2px solid #333;
+    padding-top: 10px;
+}
+
 @media (max-width: 768px) {
     body {
         padding: 1.5rem 1rem;

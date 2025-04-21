@@ -449,6 +449,47 @@ button:hover {
     background-color: #45a049;
 }
 
+.no-foodtrucks-message {
+    text-align: center;
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.no-foodtrucks-message p {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.no-foodtrucks-message small {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #323232;
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.notification.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.notification.show {
+    opacity: 1;
+}
+
 @media (max-width: 1024px) {
     .cards-grid {
         grid-template-columns: repeat(2, 1fr);

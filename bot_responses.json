@@ -1,0 +1,41 @@
+{
+    "bot_responses": {
+        "r'hola|saludar|buenos dias|buenas tardes|hey'": [
+            "¡Hola! ¿En qué puedo ayudarte hoy?",
+            "¡Bienvenido! ¿Qué te gustaría comer?",
+            "¡Hola! ¿Buscas algún food truck en particular?"
+        ],
+        "r'menu|carta|que hay|que ofrecen'": [
+            "¡Tenemos muchas opciones! ¿Buscas algo en específico: hamburguesas, tacos, pizza...?",
+            "Puedes ver todos nuestros trucks y sus menús en la sección principal. ¿Te interesa alguna comida en particular?"
+        ],
+        "r'hamburguesa|hamburguesas|burger|burgers'": [
+            "¡Tenemos excelentes hamburguesas! Te recomiendo probar las de 'Burger Master' y 'Grill on Wheels'. ¿Prefieres algún estilo en particular?",
+            "Nuestras hamburguesas son famosas. 'Burger Master' tiene la hamburguesa clásica más pedida y 'Grill on Wheels' ofrece opciones gourmet. ¿Te gustaría ver el menú completo?"
+        ],
+        "r'tacos|taco|mexicana|mexicano'": [
+            "¡Los tacos son nuestra especialidad! 'Taquería Rodante' y 'Mexican Flavors' tienen los mejores. ¿Te interesan tacos de carne, pollo o vegetarianos?",
+            "Para tacos, no puedes perderte los de 'Taquería Rodante'. ¡Son los más auténticos de la ciudad! ¿Quieres ver sus opciones?"
+        ],
+        "r'pizza|pizzas|italiana|italiano'": [
+            "Para pizza, te recomiendo 'Pizza Express' y 'Italian Wheels'. Tienen desde opciones clásicas hasta creaciones gourmet. ¿Qué tipo de pizza prefieres?",
+            "Nuestras pizzas de 'Italian Wheels' son horneadas en horno de leña. ¡Son irresistibles! ¿Te gustaría conocer sus especialidades?"
+        ],
+        "r'recomendacion|recomendar|que me recomiendas|sugerir|que productos me recomiendas'": [
+            "¡Claro! Nuestros productos más populares son {top_product} de {top_truck}. ¡Te encantará!",
+            "Te recomiendo probar {top_product} de {top_truck}, ¡es un éxito entre nuestros clientes!"
+        ],
+        "r'gracias|thanks|thank you'": [
+            "¡De nada! Estoy aquí para ayudarte.",
+            "¡Un placer! Si necesitas algo más, solo pregunta."
+        ],
+        "r'precio|costo|cuanto cuesta|valor'": [
+            "Los precios varían según el food truck. ¿Hay algún producto específico que te interese?",
+            "Puedes ver los precios en el menú de cada food truck. ¿Buscas algo en particular?"
+        ],
+        "r'pedido|ordenar|pedir|comprar'": [
+            "Para hacer un pedido, selecciona el food truck, añade los productos al carrito y confirma tu orden.",
+            "¡Ordenar es fácil! Elige tus productos favoritos, agrégalos al carrito y sigue las instrucciones para completar tu pedido."
+        ]
+    }
+}

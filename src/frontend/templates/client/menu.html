@@ -9,9 +9,129 @@
 
     <link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='css/client/menu.css') }}">
 
+    <style>
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background-color: #ff5722;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .chat-body {
+            height: 300px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            display: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+        }
+
+        .chat-body.active {
+            display: flex;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background-color: #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #ff5722;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+
+        .chat-input.active {
+            display: flex;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            padding: 8px;
+            border-radius: 20px;
+            margin-right: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .chat-input button {
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background-color: #e64a19;
+        }
+    </style>
+
 </head>
 
 <body>
+
+    <div id="notification" class="notification hidden">
+        <p id="notification-message"></p>
+    </div>
+
+    <div class="chat-container">
+        <div class="chat-header" id="chat-header">
+            <h3>Asistente Virtual</h3>
+            <span id="chat-toggle">👇</span>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="message bot-message">
+                ¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?
+            </div>
+        </div>
+        <div class="chat-input" id="chat-input">
+            <input type="text" id="user-message" placeholder="Escribe tu mensaje..." autocomplete="off">
+            <button id="send-message">Enviar</button>
+        </div>
+    </div>
 
     <section class="container__principal__section__menu">
         <div class="container">
@@ -63,11 +183,12 @@
             </div>
 
             <div class="cards-grid">
-                {% for foodtruck in session.get('foodtrucks') %}
+                {% if foodtrucks %}
+                {% for foodtruck in foodtrucks %}
                 <article class="food-card">
                     <div class="card-image">
-                        <img src="{{ foodtruck['imagen_foodtruck'] }}" alt="{{ foodtruck['nombre_truck'] }}"
-                            loading="lazy">
+                        <img src="{{ url_for('media', filename=foodtruck['imagen_foodtruck']) }}"
+                            alt="{{ foodtruck['nombre_truck'] }}">
                     </div>
                     <div class="card-content">
                         <h3>{{ foodtruck['nombre_truck'] }}</h3>
@@ -87,12 +208,173 @@
                     </div>
                 </article>
                 {% endfor %}
+                {% else %}
+                <div class="no-foodtrucks-message">
+                    <p>No hay food trucks disponibles en este momento.</p>
+                    <small>
+                        Revisa tu conexión a internet o avísale a un empleado si el problema persiste.
+                    </small>
+                </div>
+                {% endif %}
             </div>
 
         </div>
     </section>
 
     <script src="{{ url_for('static', filename='js/client/menu.js') }}"></script>
+
+    <script>
+        // Notification bot functionality
+        function showNotificationBot(message, duration = 10000) {
+            const notification = document.getElementById('notification');
+            const msg = document.getElementById('notification-message');
+
+            msg.textContent = message;
+            notification.classList.remove('hidden');
+            notification.classList.add('show');
+
+            console.log('Notificación mostrada: ', message);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                notification.classList.add('hidden');
+            }, duration);
+        }
+
+        let isNotifying = false;
+
+        function showBotNotification(mensajes, delay = 2000) {
+            if (isNotifying || mensajes.length === 0) return;
+
+            isNotifying = true;
+            let i = 0;
+
+            const mostrarSiguiente = () => {
+                if (i < mensajes.length) {
+                    showNotificationBot(mensajes[i]);
+                    console.log('Notificación enviada: ', mensajes[i]);
+                    i++;
+                    setTimeout(mostrarSiguiente, delay);
+                } else {
+                    isNotifying = false;
+                }
+            };
+            mostrarSiguiente();
+        }
+
+        let notificacionesRecientes = [];
+
+        function obtenerYMostrarNotificaciones() {
+            fetch('/notificaciones')
+                .then(res => res.json())
+                .then(mensajes => {
+                    const nuevos = mensajes.filter(msg => !notificacionesRecientes.includes(msg));
+
+                    if (nuevos.length > 0) {
+                        showBotNotification(mensajes, 10000);
+                        notificacionesRecientes = [...notificacionesRecientes, ...nuevos];
+                    }
+                })
+                .catch(err => console.log("Error al obtener notificaciones del bot:", err));
+        }
+
+        setInterval(obtenerYMostrarNotificaciones, 25000);
+
+        // Chat bot functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            obtenerYMostrarNotificaciones();
+
+            const chatHeader = document.getElementById('chat-header');
+            const chatBody = document.getElementById('chat-body');
+            const chatInput = document.getElementById('chat-input');
+            const chatToggle = document.getElementById('chat-toggle');
+            const userMessageInput = document.getElementById('user-message');
+            const sendMessageButton = document.getElementById('send-message');
+
+            // Toggle chat open/close
+            chatHeader.addEventListener('click', () => {
+                chatBody.classList.toggle('active');
+                chatInput.classList.toggle('active');
+
+                // Update toggle icon
+                if (chatBody.classList.contains('active')) {
+                    chatToggle.textContent = '👆';
+                } else {
+                    chatToggle.textContent = '👇';
+                }
+            });
+
+            // Function to add messages to chat
+            function addMessage(message, isUser = false) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+                messageElement.classList.add(isUser ? 'user-message' : 'bot-message');
+                messageElement.textContent = message;
+
+                chatBody.appendChild(messageElement);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+
+            // Send message on button click
+            sendMessageButton.addEventListener('click', sendMessage);
+
+            // Send message on Enter key
+            userMessageInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Send message function
+            function sendMessage() {
+                const message = userMessageInput.value.trim();
+                if (!message) return;
+
+                // Display user message
+                addMessage(message, true);
+                userMessageInput.value = '';
+
+                // Send to chatbot API
+                fetch('/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        mensaje: message
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display bot response
+                        addMessage(data.respuesta);
+                    })
+                    .catch(error => {
+                        console.error('Error comunicándose con el chatbot:', error);
+                        addMessage('Lo siento, tuve un problema al procesar tu mensaje. Por favor intenta de nuevo.');
+                    });
+            }
+
+            // Automatically show sample response on first load
+            setTimeout(() => {
+                fetch('/chatbot', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        mensaje: "¿Qué me recomiendas hoy?"
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Save this for future display if user opens chat
+                        window.recommendationResponse = data.respuesta;
+                    })
+                    .catch(err => console.log("Error al obtener recomendación inicial:", err));
+            }, 3000);
+        });
+    </script>
 
 </body>
 

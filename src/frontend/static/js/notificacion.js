@@ -1,26 +1,30 @@
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("JS de notificacion cargado");
+const notificationContainer = document.createElement('div');
+notificationContainer.className = "notification-container";
+document.body.appendChild(notificationContainer);
+
+function showNotification(icon, message, className) {
+    const notification = document.createElement('div');
+    notification.className = className;
+    notification.innerHTML = `<span class="icon">${icon}</span> <span>${message}</span>`;
+
+    notificationContainer.appendChild(notification);
+
+    setTimeout(() => {
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 550);
+    }, 3000);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
     const messages = document.querySelectorAll('#flash-messages li');
-    const notificationContainer = document.createElement('div');
-    notificationContainer.className = "notification-container";
-    document.body.appendChild(notificationContainer);
-
-    let showNotification = (icon, message, className) => {
-        const notification = document.createElement('div');
-        notification.className = className;
-        notification.innerHTML = `<span class="icon">${icon}</span> <span>${message}</span>`;
-
-        notificationContainer.appendChild(notification);
-
-        setTimeout(() => {
-            notification.style.opacity = "0";
-            setTimeout(() => notification.remove(), 500);
-        }, 3000);
-    }
+    const currentLocation = document.querySelector('meta[name="current-location"]').getAttribute('content');
 
     messages.forEach((msg) => {
         const messageText = msg.innerText;
         const category = msg.dataset.category;
+        const messageLocation = msg.dataset.location;
+
+        if (messageLocation !== currentLocation) return;
 
         let icon = "";
         let className = "notification";
@@ -35,4 +39,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
         showNotification(icon, messageText, className);
     });
-});
+})

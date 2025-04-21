@@ -1,14 +1,20 @@
 document.addEventListener("DOMContentLoaded", () => {
     const slider = document.querySelector(".slider__wrapper");
     let isDown = false;
-    let startX;
-    let scrollLeft;
-    let autoScroll;
+    let startX = 0;
+    let scrollLeft = 0;
+    let autoScroll = null;
     let isMobile = window.innerWidth <= 768;
 
-    // resto del codigo para el slider
-    let startAutoScroll = () => {
-        if (!isMobile) {
+    const updateIsMobile = () => {
+        isMobile = window.innerWidth <= 768;
+        if (isMobile) stopAutoScroll();
+        else startAutoScroll();
+    }
+
+    const startAutoScroll = () => {
+        stopAutoScroll(); // por si ya hay uno corriendo
+        if (!isMobile && slider) {
             autoScroll = setInterval(() => {
                 if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth) {
                     slider.scrollLeft = 0;
@@ -19,12 +25,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    let stopAutoScroll = () => {
-        clearInterval(autoScroll);
+    const stopAutoScroll = () => {
+        if (autoScroll) {
+            clearInterval(autoScroll);
+            autoScroll = null;
+        }
     }
 
     if (slider) {
         slider.addEventListener("touchstart", (e) => {
+            stopAutoScroll();
             isDown = true;
             startX = e.touches[0].pageX - slider.offsetLeft;
             scrollLeft = slider.scrollLeft;
@@ -40,18 +50,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
         slider.addEventListener("touchend", () => {
             isDown = false;
+            if (!isMobile) setTimeout(startAutoScroll, 5000);
         });
-    
+
         slider.addEventListener("mousedown", (e) => {
             stopAutoScroll();
             isDown = true;
             startX = e.pageX - slider.offsetLeft;
             scrollLeft = slider.scrollLeft;
         });
-    
+
         slider.addEventListener("mouseup", () => {
             isDown = false;
             if (!isMobile) setTimeout(startAutoScroll, 5000);
+        });
+
+        slider.addEventListener("mouseleave", () => {
+            isDown = false;
         });
 
         slider.addEventListener("mousemove", (e) => {
@@ -61,7 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const walk = (x - startX) * 1.1;
             slider.scrollLeft = scrollLeft - walk;
         });
-    
+
         startAutoScroll();
     }
+
+    window.addEventListener("resize", updateIsMobile);
 });

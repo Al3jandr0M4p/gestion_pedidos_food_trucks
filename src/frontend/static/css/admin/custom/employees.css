@@ -213,6 +213,82 @@ body {
     margin-right: 0.3rem;
 }
 
+.modal {
+    position: absolute;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, .5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 50%;
+    max-width: 600px;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.form-container {
+    padding: 1rem 0;
+}
+
+.form-container h1 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--white);
+    font-family: var(--font);
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(255, 125, 32, 0.2);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.btn {
+    font-family: 'Poppins', sans-serif;
+}
+
 @media (min-width: 1400px) {
     .employees-container {
         max-width: 1400px;
@@ -241,6 +317,21 @@ body {
     .actions-bar {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 1rem;
+        margin: 15% auto;
+    }
+
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-actions .btn {
+        width: 100%;
     }
 
     .btn {
@@ -287,5 +378,30 @@ body {
     .table th:nth-child(4),
     .table td:nth-child(4) {
         display: none;
+    }
+
+    .modal-content {
+        width: 98%;
+        margin: 25% auto;
+        padding: .8rem;
+    }
+
+    .close-btn {
+        top: 5px;
+        right: 10px;
+        font-size: 1.25rem;
+    }
+
+    .form-group label {
+        font-size: .9rem;
+    }
+
+    .form-control {
+        font-size: .85rem;
+        padding: .6rem .8rem;
+    }
+
+    .btn {
+        font-size: .85rem;
     }
 }

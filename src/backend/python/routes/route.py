@@ -15,9 +15,11 @@ from .auth.logout import Logout
 
 # administration
 from .admin.admin import AdminApp
+from ..bot.adminBot import AdminBots
 
 # Users
 from .client.user import UserApp
+from ..bot.userBot import NotificationBot
 
 class ConfigurationRoutesApp:
     """
@@ -50,3 +52,4 @@ class ConfigurationRoutesApp:
 
         # User
         UserApp(self.routes)
+        NotificationBot(self.routes)
