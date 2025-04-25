@@ -11,14 +11,13 @@ function openModalById (modalId, url=null) {
                 return response.text();
             })
             .then(html => {
-                console.log("HTML recibido: ", html);
-                const modalBody = modal.querySelector('#modal-body');
+                const modalBody = modal.querySelector('.modal-body') || modal.querySelector('#modal-body');
 
                 if (modalBody) modalBody.innerHTML = html;
                 modal.style.display = 'block';
             })
             .catch(err => {
-                showNotification("Error al cargar el modal", "error")
+                showNotification("Error al cargar el contenido del modal de trucks", "error")
                 console.error(err);
             });
     } else {

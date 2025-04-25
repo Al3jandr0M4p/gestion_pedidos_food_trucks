@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/reports.css') }}">
 </head>
 
 <body>
@@ -14,7 +15,9 @@
         <h1>📊 Reportes Administrativos</h1>
 
         <div class="actions-bar">
-            <a href="/admin/reports/pdf" class="btn btn-success">Descargar PDF</a>
+            <p>
+                Reportes de ventas <a href="/admin/reports/pdf" class="btn btn-success">descargar PDF</a>.
+            </p>
         </div>
 
         <article class="card mt-4">

@@ -5,7 +5,7 @@
             "¡Bienvenido! ¿Qué te gustaría comer?",
             "¡Hola! ¿Buscas algún food truck en particular?"
         ],
-        "r'menu|carta|que hay|que ofrecen'": [
+        "r'menu|carta|que hay|que ofrecen|que me recomiendan|que me recomiendas'": [
             "¡Tenemos muchas opciones! ¿Buscas algo en específico: hamburguesas, tacos, pizza...?",
             "Puedes ver todos nuestros trucks y sus menús en la sección principal. ¿Te interesa alguna comida en particular?"
         ],

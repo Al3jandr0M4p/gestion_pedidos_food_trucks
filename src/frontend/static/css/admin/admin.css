@@ -5,7 +5,7 @@
     
     --primary: #ff7d20;
     --primary-dark: #ea580c;
-    --background: #fff5eb;
+    --background: #fff;
     --sidebar-bg: #1a1a1a;
     --sidebar-hover: #333333;
     --sidebar-active: #f98c3e;
@@ -33,7 +33,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     color: var(--text-primary);
-    background-color: var(--background);
+    background: var(--background);
 }
 
 .container__admin__dashboard {

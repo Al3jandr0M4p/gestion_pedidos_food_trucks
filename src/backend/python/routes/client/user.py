@@ -93,7 +93,9 @@ class UserApp:
             with self.conn.cursor(dictionary=True) as cursor:
                 try:
                     query = """
-                    SELECT * FROM productos WHERE truck_id = %s
+                    SELECT * 
+                    FROM productos 
+                    WHERE truck_id = %s
                     """
                     cursor.execute(query, (foodtruck_id,))
                     productos = cursor.fetchall()

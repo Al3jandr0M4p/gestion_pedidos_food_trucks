@@ -15,7 +15,7 @@ function openModalById (modalId, url=null) {
                 modal.style.display = 'block';
             })
             .catch(err => {
-                showNotification("Error al cargar el contenido del modal", "error");
+                showNotification("Error al cargar el contenido del modal de empleados", "error");
                 console.log(err);
             });
     } else {

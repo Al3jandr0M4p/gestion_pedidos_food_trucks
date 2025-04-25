@@ -9,55 +9,102 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin.css') }}">
 
     <style>
-        .admin-chatbot {
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+        .chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
         }
 
-        .chatbox {
+        .chat-header {
+            background-color: #ff5722;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .chat-body {
+            height: 300px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
+            display: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
         }
 
-        .chat-messages {
-            height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
-            background-color: #f9f9f9;
+        .chat-body.active {
+            display: flex;
         }
 
-        .chat-messages p {
-            margin: 0.3rem 0;
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background-color: #e0e0e0;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background-color: #ff5722;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
         }
 
         .chat-input {
             display: flex;
-            gap: 0.5rem;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 0 0 10px 10px;
+            border: 1px solid #ddd;
+            display: none;
+        }
+
+        .chat-input.active {
+            display: flex;
         }
 
         .chat-input input {
-            flex: 1;
-            padding: 0.5rem;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            padding: 8px;
+            border-radius: 20px;
+            margin-right: 10px;
+            background-color: #f0f0f0;
         }
 
         .chat-input button {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            background-color: #4CAF50;
+            background-color: #ff5722;
             color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
             cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .chat-input button:hover {
+            background-color: #e64a19;
         }
     </style>
 </head>
@@ -70,16 +117,24 @@
         </svg>
     </button>
 
-    <div class="admin-chatbot">
-        <h2>🤖 Chatbot Admin</h2>
-        <div class="chatbox">
-            <div id="chatMessages" class="chat-messages"></div>
-            <div class="chat-input">
-                <input type="text" id="preguntaInput" placeholder="Escribí tu pregunta..." />
-                <button onclick="enviarPregunta()">Enviar</button>
+    <!-- <div class="chat-container">
+        <div class="chat-header" id="chat-header">
+            <h2>🤖 Chatbot Admin</h2>
+            <div id="chat-toggle">👇</div>
+        </div>
+
+        <div class="chat-body" id="chat-body">
+            <div class="message bot-message">
+                ¡Hola! Soy tu asistente. En que puedo ayudarte hoy?
             </div>
         </div>
-    </div>
+        <div class="chat-input" id="chat-input">
+            <div class="chat-input">
+                <input type="text" id="preguntaInput" placeholder="Escribí tu pregunta..." autocomplete="off" />
+                <button id="send-message" onclick="enviarPregunta()">Enviar</button>
+            </div>
+        </div>
+    </div> -->
 
     <section class="container__admin__dashboard">
         <aside class="container__admin__configuration">
@@ -175,6 +230,27 @@
                 agregarMensaje("Hubo un error al contactar al chatbot.", true);
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatHeader = document.getElementById('chat-header');
+            const chatBody = document.getElementById('chat-body');
+            const chatInput = document.getElementById('chat-input');
+            const chatToggle = document.getElementById('chat-toggle');
+
+            chatHeader.addEventListener('click', function () {
+                chatBody.classList.toggle('active');
+                chatInput.classList.toggle('active');
+
+                // Update toggle icon
+                if (chatBody.classList.contains('active')) {
+                    chatToggle.textContent = '👆';
+                } else {
+                    chatToggle.textContent = '👇';
+                }
+            })
+        })
+
+
     </script>
 
 </body>

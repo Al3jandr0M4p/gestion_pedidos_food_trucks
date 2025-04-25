@@ -198,7 +198,7 @@ class AdminApp:
                 if request.method == "POST":
 
                     nombre_truck = request.form.get('nombreTrucks')
-                    imagen_trucks = request.form.get('imagenTrucks')
+                    imagen_trucks = request.files.get('imagenTrucks')
                     info_truck = request.form.get('informacionTrucks')
                     especialidad_truck = request.form.get('especialidadTrucks')
                     
@@ -211,10 +211,10 @@ class AdminApp:
                             with self.conn.cursor() as update_cursor:
                                 query = """
                                 UPDATE trucks 
-                                SET nombre_truck = %s, imagen_foodtrucks = %s, info_foodtruck = %s, especialidad = %s
+                                SET nombre_truck = %s, imagen_foodtruck = %s, info_foodtruck = %s, especialidad = %s
                                 WHERE id = %s
                                 """
-                                update_cursor.execute(query, (nombre_truck, filename, info_truck, especialidad_truck))
+                                update_cursor.execute(query, (nombre_truck, filename, info_truck, especialidad_truck, id))
                                 self.conn.commit()
                             
                             flash("Truck actualizado exitosamente!", "success")
@@ -224,7 +224,7 @@ class AdminApp:
                             print(f"Error al actualizar el truck!: {str(e)}")
                             flash(f"Error al actualizar el truck!: {str(e)}", "error")
 
-            return render_template("/admin/trucks/update_trucks.html")
+            return render_template("/admin/trucks/update_trucks.html", trucks=trucks)
 
         @self.admin.route('/admin/foodtrucks/desabilitar_trucks/<int:id>', methods=['GET', 'POST'])
         @authentication_required
