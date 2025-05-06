@@ -4,14 +4,108 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DashBoard</title>
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/dash.css') }}">
 </head>
+
 <body>
 
     <section class="container-dashboard">
-        <h1>Dashboard del admin {{ name }}</h1>
-
+        <div class="dashboard-header">
+            <div>
+                <h1 class="welcome-message">Bienvenido, {{ name }}</h1>
+                <p class="date-display">
+                    <script>
+                        document.write(new Date().toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        }));
+                    </script>
+                </p>
+            </div>
+        </div>
+        
+        <div class="stats-container">
+            <div class="stat-card">
+                <h3>Ingresos Totales</h3>
+                <div class="stat-value">$<span id="totalRevenue">23,568</span></div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>Pedidos</h3>
+                <div class="stat-value"><span id="totalOrders">142</span></div>
+            </div>
+            
+            <div class="stat-card">
+                <h3>FoodTrucks Activos</h3>
+                <div class="stat-value"><span id="activeFoodtrucks">{{ active_trucks | length }}</span></div>
+            </div>
+        </div>
+        
+        <div class="dashboard-row">
+            <div class="recent-orders">
+                <h2 class="section-title">Pagos Recientes</h2>
+                {% for pedido in pedidos[:3] %}
+                    <div id="recentOrdersList">
+                        <div class="order-item">
+                            <div class="order-info">
+                                <span class="order-id">Mesa: {{ pedido.mesa_id }}</span>
+                                <span class="order-customer">{{ pedido.metodo_pago }}</span>
+                            </div>
+                            {% if pedido.estado == "completado" %}
+                                <span class="order-status status-completed">
+                                    {{ pedido.estado }}
+                                </span>
+                            {% else %}
+                                <span class="order-status status-pending">
+                                    {{ pedido.estado }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                <a href="/admin/pedidos" class="view-all">Ver todos los pedidos</a>
+            </div>
+            
+            <div class="quick-actions">
+                <h2 class="section-title">Acciones Rapidas</h2>
+                <div class="action-buttons">
+                    <a href="/admin/pedidos" class="action-button">
+                        <div class="action-icon">📋</div>
+                        <span class="action-label">Ver Pedidos</span>
+                    </a>
+                    <a href="/admin/reports" class="action-button">
+                        <div class="action-icon">📊</div>
+                        <span class="action-label">Reportes</span>
+                    </a>
+                    <a href="/admin/employees" class="action-button">
+                        <div class="action-icon">👤</div>
+                        <span class="action-label">Añadir Empleado</span>
+                    </a>
+                    <a href="/admin/foodtrucks" class="action-button">
+                        <div class="action-icon">🚚</div>
+                        <span class="action-label">Foodtrucks</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="foodtruck-performance">
+            <h2 class="section-title">Food Trucks Activos</h2>
+            <div class="foodtruck-cards">
+                {% for truck in active_trucks %}
+                    <div class="foodtruck-card">
+                        <img src="{{ url_for('media', filename=truck['imagen_foodtruck']) }}" alt="{{ truck.id }}" class="foodtruck-img">
+                        <h6 class="foodtruck-name">{{ truck['nombre_truck'] }}</h6>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </section>
     
+    <script src="{{ url_for('static', filename='js/admin/dash.js') }}"></script>
 </body>
 </html>

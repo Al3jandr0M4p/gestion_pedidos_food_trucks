@@ -3,61 +3,119 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Productos</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/products/products.css') }}">
 </head>
 
 <body>
 
-    <div class="container">
+    <div class="product-container">
         <h1>Gestion de productos!</h1>
 
-        {% for truck in trucks %}
-        <h2>{{ truck.nombre_truck }}</h2>
-        <p><strong>Especialidad:</strong> {{ truck.especialidad }}</p>
-        <p><strong>Estado:</strong> {{ truck.estado_truck }}</p>
-        <p>
-            <a class="add-button" href="{{ url_for('create_products', id=truck.id) }}">
-                ➕ Agregar producto
-            </a>
-        </p>
-        <p>
-            <a href="{{ url_for('foodtrucks') }}" class="btn btn-secondary">
-                Cancelar
-            </a>
-        </p>
+        <header class="dashboard-header">
+            <div class="header-actions">
+                <a href="{{ url_for('foodtrucks') }}" class="btn-back">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </header>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Descripcion</th>
-                    <th>Precio</th>
-                    <th>Imagen</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% set productos_truck = productos | selectattr('truck_id', 'equalto', truck.id) | list %}
-                {% if productos_truck %}
-                {% for producto in productos_truck %}
-                <tr>
-                    <td>{{ producto.nombre_producto }}</td>
-                    <td>{{ producto.descripcion }}</td>
-                    <td>{{ producto.precio }}</td>
-                    <td>
-                        <img src="{{ producto.imagen_producto }}" alt="img" width="80">
-                    </td>
-                </tr>
-                {% endfor %}
-                {% else %}
-                <tr>
-                    <td colspan="4" style="text-align: center;">No hay productos para este truck.</td>
-                </tr>
-                {% endif %}
-            </tbody>
-        </table>
+        <div id="productModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeProductModal()">
+                    &times;
+                </span>
+                <div class="modal-body"></div>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul id="flash-messages" style="display: none;">
+                    {% for category, message in messages %}
+                        <li data-category="{{ category }}" data-location="{{ request.path }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        {% for truck in trucks %}
+            <div class="actions-bar">
+                <h2>{{ truck.nombre_truck }}</h2>
+                <button class="btn btn-primary" onclick="openCreateProductModal('{{ truck.id }}')">
+                    <i class="icon-plus"></i> Crear Producto
+                </button>
+            </div>
+
+            <div class="card">
+                <header class="card-header">
+                    <h2>Productos del Trucks</h2>
+                </header>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Descripcion</th>
+                                    <th>Precio</th>
+                                    <th>Imagen</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% set productos_truck = productos | selectattr('truck_id', 'equalto', truck.id) | list %}
+                                {% if productos_truck %}
+                                    {% for producto in productos_truck %}
+                                        <tr>
+                                            <td>{{ producto.nombre_producto }}</td>
+                                            <td>{{ producto.descripcion }}</td>
+                                            <td>$ {{ producto.precio }}</td>
+                                            <td>
+                                                <img src="{{ url_for('media_product', filename=producto.imagen_producto) }}" alt="{{ producto.nombre_producto }}">
+                                            </td>
+                                            <td class="actions">
+                                                <button class="btn btn-sm btn-edit" onclick="openProductModal('{{ producto.id }}')">
+                                                    <i class="icon-edir"></i> Editar
+                                                </button>
+            
+                                                <a href="#" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-user-sls"></i> Desabilitar
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr class="empty-row">
+                                        <td colspan="5">
+                                            <div class="no-products">
+                                                <i class="fa-solid fa-utensils"></i>
+                                                <p>No hay productos para este truck</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         {% endfor %}
+
     </div>
+
+    <script src="{{ url_for('static', filename='js/notificacion.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/admin/product.js') }}"></script>
 
 </body>
 

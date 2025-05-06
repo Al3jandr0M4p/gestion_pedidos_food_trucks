@@ -45,14 +45,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // vaciar el carrito
     btnVaciar.addEventListener("click", () => {
-        carrito = [];
-        localStorage.setItem("carrito", JSON.stringify(carrito));
-        actualizarCarrito();
+        Swal.fire({
+            title: "Estas seguro?",
+            text: "Se eliminaran todos los productos del carrito",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "si, vaciar",
+            cancelButtonText: "no, cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                carrito = [];
+                localStorage.setItem("carrito", JSON.stringify(carrito));
+                actualizarCarrito();
+                Swal.fire(
+                    'Carrito vaciado!',
+                    '',
+                    'success'
+                )
+            }
+        })
     });
 
     btnFinalizar.addEventListener("click", () => {
         if (carrito.length === 0) {
-            alert("El carrito está vacío.");
+            Swal.fire({
+                icon: "warning",
+                title: "Carrito vacio",
+                text: "Agrega productos antes de finalizar la compra.",
+                confirmButtonColor: "#3085d6"
+            })
             return;
         }
 
@@ -70,7 +93,15 @@ document.addEventListener("DOMContentLoaded", () => {
         sessionStorage.carrito = JSON.stringify(carrito);
 
         // redirijir a los metodos de pagos
-        window.location.href = "/seleccionar-pago";
+        Swal.fire({
+            title: "Procesando compra...",
+            text: "Redirigiendo a metodos de pagos",
+            icon: "success",
+            timer: 2000,
+            showConformButton: false
+        }).then(() => {
+            window.location.href = "/seleccionar-pago";
+        });
     });
 
     // Actualizar el carrito

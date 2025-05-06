@@ -58,7 +58,6 @@ class UserApp:
             )
             qr.add_data(target_url)
             qr.make(fit=True)
-
             img = qr.make_image(fill='black', back_color='white')
             buffer = BytesIO()
             img.save(buffer, format="PNG")
@@ -219,11 +218,20 @@ class UserApp:
                         if mesa_id:
                             session['mesa_asignada'] = mesa_id
 
-                    return render_template('client/confirmacion_pago.html', transaccion=transaccion, detalles=detalles, instrucciones=instrucciones,datos=datos_adiccionales, metodo_pago=metodo_pago,mesa_id=mesa_id)
+                    return render_template(
+                        'client/confirmacion_pago.html',
+                        transaccion=transaccion, 
+                        detalles=detalles, 
+                        instrucciones=instrucciones,
+                        datos=datos_adiccionales, 
+                        metodo_pago=metodo_pago,
+                        mesa_id=mesa_id
+                    )
                 
             except Exception as e:
                 print(f'Error al mostrar la confirmación: {str(e)}')
-                flash(f'Error al mostrar la confirmación: {str(e)}')    
+                flash(f'Error al mostrar la confirmación: {str(e)}') 
+                mesa_id = session.get('mesa_asignada')   
                 return redirect(url_for('menu_user', mesa_id=mesa_id))
         
         @self.user.route('/user/confirmar-pago/<transaccion_id>/<token>')
@@ -382,75 +390,91 @@ class UserApp:
     
     def procesar_pago_tarjeta(self, mesa_id, carrito, total, transaccion_id, fecha):
         """
-        Procesa un pago con tarjeta de credito utilizando
-        la api `Stripe`.
+        Procesa un pago con tarjeta de credito utilizando la api `Stripe`.
         """
         try:
             stripe.api_key = os.getenv('PRIVATE_KEY')
 
             if not stripe.api_key:
                 print("ERROR: PRIVATE_KEY no esta configurada")
+                flash("Error: No se ha configurado la clave de Stripe. Contacta a un empleado.", "error")
                 return redirect(url_for('select_payment'))
             
-            print(f"Todos los datos del formulario:", dict(request.form))
+            # Obtener y validar todos los datos del formulario
+            print(f"Datos recibidos del formulario:", dict(request.form))
 
             token = request.form.get('stripeToken')
             nombre = request.form.get('nombreUsuario')
             correo = request.form.get('correo')
             monto = request.form.get('monto')
 
-            print(f"Datos recibidos - Token: {token}, Nombre: {nombre}, Correo: {correo}, Monto: {monto}, Total: {total}")
+            print(f"Procesando - Token: {token}, Nombre: {nombre}, Correo: {correo}, Monto: {monto}, Total: {total}")
+
 
             if not token:
-                print('Error: No se recibio el token de pago')
-                print("Datos del formulario: ", request.form)
-                flash('Error: No se recibio el token de pago')
+                print('Error: No se recibió el token de pago')
+                flash('Error: No se pudo procesar el pago con la tarjeta. Por favor, inténtalo de nuevo.', 'error')
                 return redirect(url_for('select_payment'))
             
-            print(f"Intentando crear cargo por {total} USD")
-
-            charge = stripe.Charge.create(
-                amount=int(float(total) * 100),
-                currency="usd",
-                source=token,
-                description=f"Pago de mesa {mesa_id} - Cliente {nombre}"
-            )
-            print(f"Cargo creado exitosamente: {charge.id}")
-
-            with self.conn.cursor() as cursor:
-                query = """ 
-                INSERT INTO transacciones (id, mesa_id, metodo_pago, monto, estado, fecha)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                """
-                cursor.execute(query, (transaccion_id, mesa_id, 'tarjeta', total, 'completado', fecha))
-
-                for item in carrito:
-                    query_detalle = """
-                    INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
-                    VALUES (%s, %s, %s, %s)
-                    """
-                    cursor.execute(query_detalle, (transaccion_id, item.get('id'), item.get('cantidad'), item.get('precio')))
-                self.conn.commit()
+            if not carrito or len(carrito) == 0:
+                print('Error: El carrito está vacío')
+                flash('Error: El carrito está vacío. No se puede procesar el pago.', 'error')
+                return redirect(url_for('select_payment'))
             
-            if correo:
-                print(f"Enviando factura a {correo}...")
-                self.enviar_factura_por_correo(correo, nombre, mesa_id, carrito, total, transaccion_id, fecha)
-            session.pop('carrito', None)
+            try:
+                print(f"Intentando crear cargo por {total} USD")
 
-            print('Pago con tarjeta procesado exitosamente')
-            flash('Pago con tarjeta procesado exitosamente. El carrito ha sido vaciado.')
-            return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+                charge = stripe.Charge.create(
+                    amount=int(float(total) * 100),
+                    currency="usd",
+                    source=token,
+                    description=f"Pago de mesa {mesa_id} - Cliente {nombre}"
+                )
+                print(f"Cargo creado exitosamente: {charge.id}")
+
+                with self.conn.cursor() as cursor:
+                    query = """ 
+                    INSERT INTO transacciones (id, mesa_id, metodo_pago, monto, estado, fecha)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """
+                    cursor.execute(query, (transaccion_id, mesa_id, 'tarjeta', total, 'completado', fecha))
+
+                    for item in carrito:
+                        query_detalle = """
+                        INSERT INTO transaccion_detalles (transaccion_id, producto_id, cantidad, precio_unitario)
+                        VALUES (%s, %s, %s, %s)
+                        """
+                        cursor.execute(query_detalle, (transaccion_id, item.get('id'), item.get('cantidad'), item.get('precio')))
+
+                    self.conn.commit()
+                    print("Transacción guardada en la base de datos correctamente")
+            
+                if correo:
+                    print(f"Enviando factura a {correo}...")
+                    self.enviar_factura_por_correo(correo, nombre, mesa_id, carrito, total, transaccion_id, fecha)
+
+                session.pop('carrito', None)
+                print('Pago con tarjeta procesado exitosamente')
+                flash('Pago con tarjeta procesado exitosamente. El carrito ha sido vaciado.')
+                return redirect(url_for('confirmacion_pago', transaccion_id=transaccion_id))
+            
+            except stripe.error.CardError as e:
+                self.conn.rollback()
+                error = e.json_body.get('error', {})
+                print(f'Error en la tarjeta: {error.get("message")}')
+                flash(f'Error en la tarjeta: {error.get("message")}', 'error')
+                return redirect(url_for('select_payment'))
         
-        except stripe.error.StripeError as e:
-            self.conn.rollback()
-            print(f'Error en el pago con tarjeta: {str(e)}')
-            flash(f'Error en el pago con tarjeta: {str(e)}')
-            return redirect(url_for('select_payment'))
+            except stripe.error.StripeError as e:
+                self.conn.rollback()
+                print(f'Error en el pago con tarjeta: {str(e)}')
+                flash(f'Error en el pago con tarjeta: {str(e)}')
+                return redirect(url_for('select_payment'))
 
         except Exception as e:
             self.conn.rollback()
-            print(f'Error al procesar el pago: {str(e)}')
-            flash(f'Error al procesar el pago: {str(e)}')
+            print(f'Error inesperado al procesar el pago: {str(e)}')
+            flash(f'Error inesperado: {str(e)}', 'error')
             return redirect(url_for('select_payment'))
     
     def procesar_pago_transferencia(self, mesa_id, carrito, total, transaccion_id, fecha):

@@ -1,5 +1,4 @@
 from flask import request, jsonify
-from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 from flask_mail import Message
 
@@ -8,8 +7,10 @@ import pandas as pd
 from scipy import stats
 
 # modulos propios
-from ...db.database import DBConfig, Error
+from ...db.database import DBConfig
 from ...security.autentication import authentication_required
+from ..utils.factura_utils import generar_factura_pdf
+import os
 
 class AdminBots:
     hoy = datetime.now()
@@ -60,42 +61,48 @@ class AdminBots:
             
             with self.conn.cursor() as cursor:
                 query = """
-                SELECT p.id AS producto_id, SUM(td.cantidad) AS ventas_diarias
+                SELECT 
+                    p.id AS producto_id, 
+                    p.nombre_producto,
+                    t.nombre_truck,
+                    SUM(td.cantidad) AS ventas_diarias
                 FROM productos p
+                LEFT JOIN trucks t ON p.truck_id = t.id
                 LEFT JOIN transaccion_detalles td ON p.id = td.producto_id
-                LEFT JOIN transacciones t ON td.transaccion_id = t.id
-                WHERE t.fecha >= NOW() - INTERVAL 7 DAY
-                GROUP BY p.id
+                LEFT JOIN transacciones tx ON td.transaccion_id = tx.id
+                WHERE tx.fecha >= NOW() - INTERVAL 7 DAY
+                GROUP BY p.id, p.nombre_producto, t.nombre_truck
                 """
                 cursor.execute(query)
                 result = cursor.fetchall()
-                data = pd.DataFrame(result, columns=['producto_id', 'ventas_diarias'])
+                data = pd.DataFrame(result, columns=['producto_id', 'nombre_producto', 'nombre_truck', 'ventas_diarias'])
 
                 data['ventas_diarias'] = pd.to_numeric(data['ventas_diarias'], errors='coerce')
 
                 data = data.dropna(subset=['ventas_diarias'])
 
                 z_score = stats.zscore(data['ventas_diarias'])
-                umbral = 2
-                data['anomalias'] = np.abs(z_score) > umbral
+                umbral = 1
+                data['anomalias'] = np.abs(z_score) >= umbral
 
                 anomalias = data[data['anomalias'] == True]
 
                 if not anomalias.empty:
-                    mensaje = "🔔 *Anomalías detectadas en ventas:*\n"
-                    for _, row in anomalias.iterrows():
-                        mensaje += f"🛒 Producto ID {row['producto_id']} con {int(row['ventas_diarias'])} ventas.\n"
-                    
-                    self.enviar_alarma_email(mensaje)
+                    pdf_name = "factura_anomalias.pdf"
+
+                    generar_factura_pdf(pdf_name, anomalias)
+
+                    mensaje = "🔔 *Se detectaron anomalías en ventas. Se adjunta la factura.*"
+                    self.enviar_alarma_email(mensaje, archivo_pdf=os.path.join(os.getcwd(), 'facturas', pdf_name))
                 
                 return jsonify(anomalias.to_dict(orient="records"))
     
-    def enviar_alarma_email(self, mensaje):
+    def enviar_alarma_email(self, mensaje, archivo_pdf=None):
         with self.conn.cursor() as cursor:
             query = """
             SELECT email 
             FROM users 
-            WHERE rol = 'admin' AND estado = 'activo';
+            WHERE rol = 'admin' AND estado = 'activo'
             """
             cursor.execute(query)
             result = cursor.fetchall()
@@ -107,6 +114,14 @@ class AdminBots:
             recipients=correos,
             html=mensaje
         )
+
+        if archivo_pdf:
+            with open(archivo_pdf, 'rb') as f:
+                msg.attach(
+                    filename="factura_anomalias.pdf",
+                    content_type="application/pdf",
+                    data=f.read()
+                ) 
 
         if self.mail:
             self.mail.send(msg)
@@ -173,21 +188,3 @@ class AdminBots:
                 return f"🔥 Promocioná el combo: {productos[0][0]} + {productos[1][0]}"
             
             return "No hay suficientes productos para sugerir un combo"
-    
-    def ejecutar_ajuste_precios(self):
-
-        try:
-
-            with self.conn.cursor() as cursor:
-                cursor.execute("CALL ajustar_precios()")
-                self.conn.commit()
-        
-        except Error as e:
-            print("Error al ejecutar el ejuste de precios: {e}")
-        except Exception as e:
-            print("Error al ejecutar el ejuste de precios: {e}")
-    
-    def iniciar_scheduler(self):
-        scheduler = BackgroundScheduler()
-        scheduler.add_job(self.ejecutar_ajuste_precios, 'interval', days=1, start_date=datetime.now())
-        scheduler.start()

@@ -21,6 +21,7 @@ from ...utils.report_utils import obtener_reportes_generales
 class AdminApp:
 
     UPLOAD_FOLDER = os.path.join(os.getcwd(), 'media')
+    UPLOAD_FOLDER_PRODUCT = os.path.join(os.getcwd(), 'media', 'products')
     ALLOWED_EXTENSIONS = { 'png', 'jpg', 'jpeg' }
 
     def __init__(self, app):
@@ -31,6 +32,7 @@ class AdminApp:
         """
         self.admin = app
         self.admin.config['UPLOAD_FOLDER'] = self.UPLOAD_FOLDER
+        self.admin.config['UPLOAD_FOLDER_PRODUCT'] = self.UPLOAD_FOLDER_PRODUCT
 
         # configuracion de la db
         db = DBConfig()
@@ -50,6 +52,10 @@ class AdminApp:
         @self.admin.route('/admin/<path:filename>')
         def media(filename):
             return send_from_directory(self.admin.config['UPLOAD_FOLDER'], filename)
+        
+        @self.admin.route('/admin/data/<path:filename>')
+        def media_product(filename):
+            return send_from_directory(self.admin.config['UPLOAD_FOLDER_PRODUCT'], filename)
 
         @self.admin.route('/admin')
         @authentication_required
@@ -58,9 +64,29 @@ class AdminApp:
             Muestra el dashboard de administracion.
             Renderiza la plantilla 'admin/admin.html'.
             """
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return render_template('admin/dashboard.html')
-            return render_template('admin/admin.html', name=session.get('user_name'), section="dashboard")
+            with self.conn.cursor(dictionary=True) as cursor:
+                query = """
+                SELECT * 
+                FROM trucks
+                WHERE estado_truck = 'activo'
+                """
+                cursor.execute(query)
+                active_trucks = cursor.fetchall()
+            
+            try:
+                response = requests.get(f"{request.host_url}api/pedidos")
+                pedidos = response.json() if response.status_code == 200 else []
+            except Exception as e:
+                print(f"Error al obtener pedidos: {str(e)}")
+                pedidos = []
+
+            return render_template(
+                'admin/admin.html', 
+                name=session.get('user_name'), 
+                section="dashboard", 
+                active_trucks=active_trucks,
+                pedidos=pedidos
+            )
         
         @self.admin.route('/admin/reports')
         @authentication_required
@@ -175,7 +201,7 @@ class AdminApp:
                     
                     except Error as e:
                         print("No se pudo crear el food trucks")
-                        flash(f"No se pudo crear el food trucks {str(e)}", "error")
+                        flash(f"No se pudo crear el food trucks", "error")
             
             return render_template("/admin/trucks/crear_trucks.html")
         
@@ -222,7 +248,7 @@ class AdminApp:
                         
                         except Error as e:
                             print(f"Error al actualizar el truck!: {str(e)}")
-                            flash(f"Error al actualizar el truck!: {str(e)}", "error")
+                            flash(f"Error al actualizar el truck!", "error")
 
             return render_template("/admin/trucks/update_trucks.html", trucks=trucks)
 
@@ -317,40 +343,94 @@ class AdminApp:
                 truck_id_selected=truck_id
             )
 
-        @self.admin.route('/admin/products/create_product/<int:id>', methods=['GET', 'POST'])
+        @self.admin.route('/admin/products/create_product/<int:truck_id>', methods=['GET', 'POST'])
         @authentication_required
-        def create_products(id):
+        def create_products(truck_id):
             if request.method == "POST":
-                nombre_products = request.form.get("productName")
-                imagen_products = request.form.get('imagenProducts')
-                descripcion_products = request.form.get("descriptionProducts")
-                products_price = request.form.get("PrecioProducts")
-                truck_id = id
+
+                nombre_products = request.form.get("nombre")
+                imagen_products = request.files.get('imgInput')
+                descripcion_products = request.form.get("descripcion")
+                products_price = request.form.get("precio")
 
                 if imagen_products and self.allowed_file(imagen_products.filename):
                     filename = secure_filename(imagen_products.filename)
-                    filepath = os.path.join(self.UPLOAD_FOLDER, filename)
+                    os.makedirs(self.UPLOAD_FOLDER_PRODUCT, exist_ok=True)
+                    filepath = os.path.join(self.UPLOAD_FOLDER_PRODUCT, filename)
                     imagen_products.save(filepath)
 
-                    with self.conn.cursor(dictionary=True) as cursor:
-                        query = """
-                        INSERT INTO (nombre_producto, descripcion, precio, imagen_producto, truck_id)
-                        VALUES (%s, %s, %s, %s, %s)
-                        """
-                        cursor.execute(query, (nombre_products, descripcion_products, products_price, filepath, truck_id))
-                        self.conn.commit()
-                    
-                    flash("Productos creado exitosamente!", "success")
-                    return redirect(url_for("products"))
+                    try:
+                        with self.conn.cursor(dictionary=True) as cursor:
+                            query = """
+                            INSERT INTO productos (nombre_producto, descripcion, precio, imagen_producto, truck_id)
+                            VALUES (%s, %s, %s, %s, %s)
+                            """
+                            cursor.execute(query, (nombre_products, descripcion_products, products_price, filename, truck_id))
+                            self.conn.commit()
+                        
+                        flash("Productos creado exitosamente!", "success")
+                        return redirect(url_for("products", truck_id=truck_id))
+
+                    except Error as e:
+                        print(f"Error al crear el producto: {str(e)}")
+                        flash(f"Error al crear el producto", "error")
+                        return redirect(url_for('products'))
 
             return render_template(
-                'admin/admin.html',
-                section='create_products'
+                'admin/trucks/products/crear_products.html',
+                truck_id=truck_id
             )
         
         @self.admin.route('/admin/products/update_product/<int:id>', methods=['GET', 'POST'])
         def update_products(id):
-            pass
+
+            with self.conn.cursor(dictionary=True) as cursor:
+                query = """
+                SELECT *
+                FROM productos
+                WHERE id = %s
+                """
+                cursor.execute(query, (id,))
+                pedido = cursor.fetchone()
+
+                if not pedido:
+                    flash("Pedido no encontrado", "error")
+                    return redirect(url_for("products", truck_id=pedido['truck_id']))
+
+                if request.method == "POST":
+                    nombre_products = request.form.get("nombre")
+                    imagen_products = request.files.get('imgInput')
+                    descripcion_products = request.form.get("descripcion")
+                    products_price = request.form.get("precio")
+                    truck_id = pedido['truck_id']
+
+                    if imagen_products and self.allowed_file(imagen_products.filename):
+                        filename = secure_filename(imagen_products.filename)
+                        os.makedirs(self.UPLOAD_FOLDER_PRODUCT, exist_ok=True)
+                        filepath = os.path.join(self.UPLOAD_FOLDER_PRODUCT, filename)
+                        imagen_products.save(filepath)
+
+                        try :
+                            with self.conn.cursor() as update_cursor:
+                                query = """
+                                UPDATE productos
+                                SET nombre_producto = %s, descripcion = %s, precio = %s, imagen_producto = %s, truck_id = %s
+                                WHERE id = %s
+                                """
+                                update_cursor.execute(query, (nombre_products, descripcion_products, products_price, filename, truck_id, id))
+                                self.conn.commit()
+                            
+                            flash("Pedido actualizado exitosamente", "success")
+                            return redirect(url_for("products", truck_id=pedido['truck_id']))
+                        
+                        except Error as e:
+                            print(f"Error al actualizar el producto: {str(e)}")
+                            flash("Error al actualizar el producto", "error")
+            
+            return render_template(
+                'admin/trucks/products/update_products.html',
+                pedido=pedido
+            )
 
         @self.admin.route('/admin/products/disabled_products/<int:id>', methods=['GET', 'POST'])
         def disabled_products(id):

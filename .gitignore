@@ -20,3 +20,7 @@ ia.txt
 
 # Ignorar la carpeta logs propia
 logs/
+
+# Ignorar los archivos logs del repo
+logout.log
+login.log

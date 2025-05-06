@@ -36,28 +36,14 @@ body {
     flex-wrap: wrap;
 }
 
-.container__logo__img {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    max-width: 400px;
-}
-
-.container__logo__img img {
-    width: 100%;
-    max-width: 350px;
-}
-
 form {
     flex: 1;
-    display: flex;
-    flex-direction: column;
     gap: 20px;
+    padding: 30px;
+    flex-direction: column;
     background: var(--white);
     color: var(--black);
     box-sizing: border-box;
-    padding: 30px;
     max-width: 400px;
     height: auto;
 }
@@ -66,9 +52,17 @@ form {
     text-align: center;
 }
 
-h1 {
+.container__logo > img {
+    max-width: 250px;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.container__logo > h1 {
     font-size: 24px;
     font-weight: 600;
+    margin-bottom: 20px;
 }
 
 .container__input__name,
@@ -90,6 +84,7 @@ input {
     padding: 10px;
     box-sizing: border-box;
     border-radius: 8px;
+    margin-bottom: 20px;
 }
 
 input:focus {
@@ -120,6 +115,8 @@ input:focus {
 .btn__primary {
     padding: 12px;
     border: none;
+    text-align: center;
+    width: 100%;
     background: var(--principal);
     color: var(--white);
     border-radius: 8px;
@@ -154,19 +151,18 @@ input:focus {
 }
 
 .notification.success {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: #d0f5d9;
+    color: #156327;
 }
 
 .notification.error {
-    background-color: #f8d7da;
-    color: #721c24;
+    background-color: #f5c7cb;
+    color: #7b1a24;
 }
 
 @media (max-width: 768px) {
     .container__form {
         flex-direction: column;
-        text-align: center;
         height: auto;
         padding: 40px 20px;
     }
@@ -176,7 +172,7 @@ input:focus {
     }
 
     .container__logo__img img {
-        max-width: 250px;
+        max-width: 200px;
     }
 
     form {

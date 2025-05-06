@@ -5,9 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.addEventListener("click", (e) => {
             const id = e.target.getAttribute("data-id");
             const nombre = e.target.getAttribute("data-nombre");
+            const img = e.target.getAttribute("data-img");
             const precio = parseFloat(e.target.getAttribute("data-precio"));
 
-            const producto = { id, nombre, precio, cantidad: 1 };
+            const producto = { id, nombre, precio, img, cantidad: 1 };
 
             const index = carrito.findIndex(p => p.id === id);
             if (index !== -1) {

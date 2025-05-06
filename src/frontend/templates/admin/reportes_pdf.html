@@ -2,12 +2,27 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Reporte de Ventas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 30px;
             background-color: #f4f4f4;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo {
+            margin-bottom: 10px;
+        }
+        .empresa-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-top: 0;
         }
         h1, h2 {
             color: #333;
@@ -51,10 +66,19 @@
     </style>
 </head>
 <body>
-    <h1>Reporte de Ventas</h1>
+
+    <header class="header">
+        <svg class="logo" xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="#3498db">
+            <path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z" />
+        </svg>
+
+        <h1 class="empresa-title">FoodOrder S.A.</h1>
+    </header>
+
+    <h2>Reporte de Ventas</h2>
 
     <div class="summary-section">
-        <h2>Resumen General</h2>
+        <h3>Resumen General</h3>
         <table class="summary-table">
             <thead>
                 <tr>
@@ -73,7 +97,7 @@
         </table>
     </div>
 
-    <h2>Ventas por Método de Pago</h2>
+    <h3>Ventas por Metodo de Pago</h3>
     <table>
         <thead>
             <tr>
@@ -93,7 +117,7 @@
         </tbody>
     </table>
 
-    <h2>Ingresos por Food Truck</h2>
+    <h3>Ingresos por Food Truck</h3>
     <table>
         <thead>
             <tr>
@@ -113,7 +137,7 @@
         </tbody>
     </table>
 
-    <h2>Ventas por Producto</h2>
+    <h3>Ventas por Producto</h3>
     <table>
         <thead>
             <tr>
@@ -133,7 +157,7 @@
         </tbody>
     </table>
 
-    <h2>Transacciones por Food Truck</h2>
+    <h3>Transacciones por Food Truck</h3>
     <table>
         <thead>
             <tr>
@@ -153,7 +177,7 @@
         </tbody>
     </table>
 
-    <h2>Estado de las Mesas</h2>
+    <h3>Estado de las Mesas</h3>
     <table>
         <thead>
             <tr>

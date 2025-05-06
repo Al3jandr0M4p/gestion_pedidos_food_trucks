@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carrito</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/client/carrito.css') }}">
 </head>
 
@@ -14,23 +18,30 @@
 
     <header class="container__head">
         <h1>Carrito de Compras</h1>
-        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
+        <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}" class="btn-volver">
             <i class="fa-solid fa-arrow-left"></i> Volver al menu
         </a>
     </header>
 
-    <section class="container__carrito">
-        <div id="lista-carrito"></div>
+    <section class="container-carrito">
+        <div id="lista-carrito" class="lista-carrito"></div>
 
-        <div class="carrito__total">
+        <div class="carrito-total">
             <h3>Total: <span id="total-precio">$0.00</span></h3>
-            <button id="vaciar-carrito">Vaciar Carrito</button>
-            <button id="finalizar-compra">Finalizar Compra</button>
+
+            <div class="carrito-botones">
+                <button id="vaciar-carrito" aria-label="Vaciar el carrito">
+                    <i class="fa-solid fa-trash"></i> Vaciar Carrito
+                </button>
+                <button id="finalizar-compra" aria-label="Finalizar la compra">
+                    <i class="fa-solid fa-shopping-cart"></i> Finalizar Compra
+                </button>
+            </div>
         </div>
     </section>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/client/carrito.js') }}"></script>
-
 
 </body>
 

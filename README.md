@@ -1,6 +1,5 @@
 # Gestion de pedidos de Food Trucks (FoodOrder)
 
-
 ## Sobre La app <a name = "about"></a>
 
 La esto es una aplicacion hecha para solucionar la forma de pedidos  en los food trucks

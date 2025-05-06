@@ -15,7 +15,6 @@ from .auth.logout import Logout
 
 # administration
 from .admin.admin import AdminApp
-from ..bot.adminBot import AdminBots
 
 # Users
 from .client.user import UserApp

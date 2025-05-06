@@ -15,71 +15,65 @@
         <h1>📊 Reportes Administrativos</h1>
 
         <div class="actions-bar">
-            <p>
-                Reportes de ventas <a href="/admin/reports/pdf" class="btn btn-success">descargar PDF</a>.
-            </p>
+            <a href="/admin/reports/pdf" class="btn btn-success">descargar PDF</a>
         </div>
 
-        <article class="card mt-4">
-            <header class="card-header">
-                <h2>Ventas por Metodo de Pago</h2>
-            </header>
+        <div class="reports-container">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Ventas por Metodo de Pago</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoMetodosPago"></canvas>
+                </div>
+            </div>
 
-            <div class="card-body">
-                <canvas id="graficoMetodosPago"></canvas>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Ingresos por Food Truck</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoTrucks"></canvas>
+                </div>                
             </div>
-        </article>
 
-        <article class="card mt-4">
-            <header class="card-header">
-                <h2>Ingresos por Food Truck</h2>
-            </header>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Ventas por Producto</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoVentasProducto"></canvas>
+                </div>
+            </div>
 
-            <div class="card-body">
-                <canvas id="graficoTrucks"></canvas>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Número de Transacciones por Food Truck</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoTransaccionesTruck"></canvas>
+                </div>
             </div>
-        </article>
 
-        <article class="card mt-4">
-            <header class="card-header">
-                <h2>Ventas por Producto</h2>
-            </header>
-        
-            <div class="card-body">
-                <canvas id="graficoVentasProducto"></canvas>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Ventas por Hora</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoVentasHora"></canvas>
+                </div>
             </div>
-        </article>
-        
-        <article class="card mt-4">
-            <header class="card-header">
-                <h2>Número de Transacciones por Food Truck</h2>
-            </header>
-        
-            <div class="card-body">
-                <canvas id="graficoTransaccionesTruck"></canvas>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Estado de las Mesas (Ocupadas y Libres)</h2>
+                </div>
+                <div class="card-body">
+                    <canvas id="graficoEstadoMesas"></canvas>
+                </div>
             </div>
-        </article>
-        
-        <article class="card mt-4">
-            <header class="card-header">
-                <h2>Ventas por Hora</h2>
-            </header>
-        
-            <div class="card-body">
-                <canvas id="graficoVentasHora"></canvas>
-            </div>
-        </article>
-        
-        <article class="card mt-4">
-            <header class="card-header">
-                <h2>Estado de las Mesas (Ocupadas y Libres)</h2>
-            </header>
-        
-            <div class="card-body">
-                <canvas id="graficoEstadoMesas"></canvas>
-            </div>
-        </article>
-        
+
+        </div>        
         
     </section>
 

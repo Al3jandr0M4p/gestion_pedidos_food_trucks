@@ -1,5 +1,5 @@
-<form action="{{ url_for('create_products', truck_id=truck_id) }}" method="post" class="form-container" enctype="multipart/form-data">
-    <h1>Crear Producto</h1>
+<form action="{{ url_for('update_products', id=pedido.id) }}" method="post" class="form-container" enctype="multipart/form-data">
+    <h1>Editar {{ pedido.nombre_producto }}</h1>
 
     <div class="form-group">
         <label for="imgInput">Imagen:</label>

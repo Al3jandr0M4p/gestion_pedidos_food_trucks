@@ -17,7 +17,6 @@ import logging
 # Importaciones propias
 from ..config.config import Config
 from .routes.route import ConfigurationRoutesApp
-from .bot.adminBot import AdminBots
 
 class FoodTrucks:
     '''
@@ -29,7 +28,8 @@ class FoodTrucks:
 
     def __init__(self):
         '''
-        Inicializa la aplicación Flask con su configuración, rutas y sistema de logging.
+        Inicializa la aplicación Flask con su configuración, 
+        rutas y sistema de logging.
         '''
         
         try:
@@ -58,9 +58,6 @@ class FoodTrucks:
             
             # Configuración de las rutas
             ConfigurationRoutesApp(self.food)
-
-            self.admin_bot = AdminBots(self.food, self.mail)
-            self.admin_bot.iniciar_scheduler()
 
         except Exception as e:
             print(f"Error al inicializar la aplicacion FoodTrucks: {str(e)}")

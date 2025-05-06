@@ -117,25 +117,6 @@
         </svg>
     </button>
 
-    <!-- <div class="chat-container">
-        <div class="chat-header" id="chat-header">
-            <h2>🤖 Chatbot Admin</h2>
-            <div id="chat-toggle">👇</div>
-        </div>
-
-        <div class="chat-body" id="chat-body">
-            <div class="message bot-message">
-                ¡Hola! Soy tu asistente. En que puedo ayudarte hoy?
-            </div>
-        </div>
-        <div class="chat-input" id="chat-input">
-            <div class="chat-input">
-                <input type="text" id="preguntaInput" placeholder="Escribí tu pregunta..." autocomplete="off" />
-                <button id="send-message" onclick="enviarPregunta()">Enviar</button>
-            </div>
-        </div>
-    </div> -->
-
     <section class="container__admin__dashboard">
         <aside class="container__admin__configuration">
             <div class="logo">
@@ -168,28 +149,26 @@
 
         <main class="container__admin__content">
             {% if section == "dashboard" %}
-            {% include 'admin/dashboard.html' %}
+                {% include 'admin/dashboard.html' %}
 
             {% elif section == "pedidos" %}
-            {% include 'admin/pedidos.html' %}
+                {% include 'admin/pedidos.html' %}
 
             {% elif section == "reports" %}
-            {% include 'admin/reportes.html' %}
+                {% include 'admin/reportes.html' %}
 
             {% elif section == "ia" %}
-            {% include 'admin/reports/ia.html' %}
-
+                {% include 'admin/reports/ia.html' %}
 
             {% elif section == "foodtrucks" %}
-            {% include 'admin/trucks/trucks.html' %}
+                {% include 'admin/trucks/trucks.html' %}
 
             {% elif section == "products" %}
-            {% include 'admin/trucks/products/products.html' %}
-            {% elif section == "create_products" %}
-            {% include 'admin/trucks/products/crear_products.html' %}
+                {% include 'admin/trucks/products/products.html' %}
 
             {% elif section == "employees" %}
-            {% include "admin/custom/employees.html" %}
+                {% include "admin/custom/employees.html" %}
+
             {% endif %}
         </main>
 

@@ -14,7 +14,6 @@
 
 <body>
 
-
     <div class="container__notificacion">
         {% with messages = get_flashed_messages(with_categories=True) %}
             {% if messages %}
@@ -29,25 +28,22 @@
     
     <div class="container__form">
 
-        <div class="container__logo__img">
-            <img src="{{ url_for('static', filename='assets/logo-login.svg') }}" alt="Logo login">
-        </div>
-
         <form action="/login" method="post">
 
             <div class="container__logo">
-                <h1>Inicia sesión en tu cuenta</h1>
+                <img src="{{ url_for('static', filename='assets/FoodOrder.png') }}" alt="">
+                <h1 style="color: #ab0224;">Inicia sesión en tu cuenta</h1>
             </div>
 
             <div class="container__input__name">
-                <label for="name">
+                <label for="name" style="color: #ab0224;">
                     Username:
                 </label>
                 <input type="text" name="name" id="name" autocomplete="off" required>
             </div>
 
             <div class="container__input__password">
-                <label for="passwd">
+                <label for="passwd" style="color: #ab0224;">
                     Password:
                 </label>
                 <div class="password-wrapper">

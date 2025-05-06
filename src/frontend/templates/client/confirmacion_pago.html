@@ -13,7 +13,6 @@
 
 <body>
 
-
     <header class="container__head">
         <h1>Confirmación de Pago</h1>
         <a href="{{ url_for('menu_user', mesa_id=session.get('mesa_asignada', 1)) }}">
@@ -34,8 +33,6 @@
 
                 {% if transaccion.metodo_pago == 'tarjeta' %}
                 <p class="estado-completado">¡Pago completado con éxito!</p>
-                {% elif transaccion.metodo_pago == 'efectivo' %}
-                <p class="estado-pendiente">Por favor realiza el pago en la caja.</p>
                 {% else %}
                 <p class="estado-pendiente">El pago está pendiente de verificación.</p>
                 {% endif %}
@@ -51,6 +48,8 @@
                 </div>
                 {% endfor %}
             </div>
+
+            <p>La confirmacion de esta factura fue enviada a tu gmail 👌 gracias</p>
         </div>
     </section>
 
