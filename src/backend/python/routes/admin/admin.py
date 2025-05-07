@@ -264,12 +264,12 @@ class AdminApp:
                     """
                     cursor.execute(update_query, (id,))
                     
-                    self.conn.commit()
-                    flash("Truck deshabilitado exitosamente!", "success")
+                self.conn.commit()
+                flash("Truck deshabilitado exitosamente!", "success")
 
             except Error as e:
-                print(f"Error al habilitar el truck!: {str(e)}")
-                flash(f"Error al habilitar el truck!: {str(e)}", "error")
+                print(f"Error al deshabilitar el truck!: {str(e)}")
+                flash(f"Error al deshabilitar el truck!: {str(e)}", "error")
 
             return redirect(url_for('foodtrucks'))
 
@@ -284,8 +284,9 @@ class AdminApp:
                     WHERE id = %s
                     """
                     cursor.execute(update_query, (id,))
-                    self.conn.commit()
-                    flash("Truck habilitado exitosamente!", "success")
+
+                self.conn.commit()
+                flash("Truck habilitado exitosamente!", "success")
 
             except Error as e:
                 print(f"Error al habilitar el truck!: {str(e)}")
@@ -434,11 +435,59 @@ class AdminApp:
 
         @self.admin.route('/admin/products/disabled_products/<int:id>', methods=['GET', 'POST'])
         def disabled_products(id):
-            pass
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query_disabled = """ 
+                    SELECT *
+                    FROM productos
+                    WHERE id = %s
+                    """
+                    cursor.execute(query_disabled, (id,))
+                    pedido = cursor.fetchone()
+
+                    update_query_disabled = """ 
+                    UPDATE productos
+                    SET estado = 'inactivo'
+                    WHERE id = %s
+                    """
+                    cursor.execute(update_query_disabled, (id,))
+
+                self.conn.commit()
+                flash("Truck deshabilitado exitosamente!", "success")
+            
+            except Error as e:
+                print(f"Error al deshabilitar el truck!: {str(e)}")
+                flash(f"Error al deshabilitar el truck!", "error")
+            
+            return redirect(url_for("products", truck_id=pedido['truck_id']))
 
         @self.admin.route('/admin/products/allowed_products/<int:id>', methods=['GET', 'POST'])
         def allowed_products(id):
-            pass
+            try:
+                with self.conn.cursor(dictionary=True) as cursor:
+                    query_id = """
+                    SELECT *
+                    FROM productos
+                    WHERE id = %s
+                    """
+                    cursor.execute(query_id, (id,))
+                    pedido = cursor.fetchone()
+
+                    update_products_query = """ 
+                    UPDATE products
+                    SET estado = 'activo'
+                    WHERE id = %s
+                    """
+                    cursor.execute(update_products_query, (id,))
+
+                self.conn.commit()
+                flash("producto actualizado exitosamente!", "success")
+            
+            except Error as e:
+                print(f"Error al actualizar el producto: {str(e)}")
+                flash("Error al actualizar el producto")
+            
+            return redirect(url_for("products", truck_id=pedido['truck_id']))
 
         # CRUD de Empleados
         @self.admin.route('/admin/employees')
