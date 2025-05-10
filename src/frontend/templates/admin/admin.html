@@ -6,107 +6,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin.css') }}">
-
-    <style>
-        .chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 300px;
-            z-index: 1000;
-        }
-
-        .chat-header {
-            background-color: #ff5722;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px 10px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .chat-header h3 {
-            margin: 0;
-            font-size: 16px;
-        }
-
-        .chat-body {
-            height: 300px;
-            background-color: #f5f5f5;
-            padding: 10px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            display: none;
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-        }
-
-        .chat-body.active {
-            display: flex;
-        }
-
-        .message {
-            margin-bottom: 10px;
-            max-width: 80%;
-            padding: 8px 12px;
-            border-radius: 15px;
-            word-wrap: break-word;
-        }
-
-        .bot-message {
-            background-color: #e0e0e0;
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-        }
-
-        .user-message {
-            background-color: #ff5722;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-
-        .chat-input {
-            display: flex;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 0 0 10px 10px;
-            border: 1px solid #ddd;
-            display: none;
-        }
-
-        .chat-input.active {
-            display: flex;
-        }
-
-        .chat-input input {
-            flex-grow: 1;
-            border: none;
-            outline: none;
-            padding: 8px;
-            border-radius: 20px;
-            margin-right: 10px;
-            background-color: #f0f0f0;
-        }
-
-        .chat-input button {
-            background-color: #ff5722;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .chat-input button:hover {
-            background-color: #e64a19;
-        }
-    </style>
 </head>
 
 <body>
@@ -141,6 +42,7 @@
                     <li><a href="/admin/foodtrucks" data-section="foodtrucks">Foodtrucks</a></li>
                     <li><a href="/admin/reports" data-section="reports">Reportes</a></li>
                     <li><a href="/admin/reports/ia" data-section="ia">IA Reportes</a></li>
+                    <li><a href="/">Obtener QR</a></li>
                     <li><a href="/logout">Cerrar session</a></li>
                 </ul>
             </nav>
@@ -175,62 +77,6 @@
     </section>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/admin/admin.js') }}"></script>
-    <script>
-        function agregarMensaje(mensaje, esBot = false) {
-            const chat = document.getElementById("chatMessages");
-            const p = document.createElement('p');
-            p.innerText = (esBot ? "🤖 " : "👤 ") + mensaje;
-            chat.appendChild(p);
-            chat.scrollTop = chat.scrollHeight;
-        }
-
-        async function enviarPregunta() {
-            const input = document.getElementById("preguntaInput");
-            console.log("Valor de input.value:", input.value);
-            const pregunta = input.value.trim();
-            if (!pregunta) return;
-
-            agregarMensaje(pregunta, false);
-            input.value = "";
-
-            try {
-                const res = await fetch("/admin/chatbot", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ pregunta })
-                });
-
-                const data = await res.json();
-                agregarMensaje(data.respuesta, true);
-
-            } catch (err) {
-                agregarMensaje("Hubo un error al contactar al chatbot.", true);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatHeader = document.getElementById('chat-header');
-            const chatBody = document.getElementById('chat-body');
-            const chatInput = document.getElementById('chat-input');
-            const chatToggle = document.getElementById('chat-toggle');
-
-            chatHeader.addEventListener('click', function () {
-                chatBody.classList.toggle('active');
-                chatInput.classList.toggle('active');
-
-                // Update toggle icon
-                if (chatBody.classList.contains('active')) {
-                    chatToggle.textContent = '👆';
-                } else {
-                    chatToggle.textContent = '👇';
-                }
-            })
-        })
-
-
-    </script>
 
 </body>
 

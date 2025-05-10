@@ -5,13 +5,14 @@ Este modulo define la clase `AdminApp`, que configura y gestiona
 las rutas de administracion dentro de la aplicacion Flask.
 """
 
-from flask import render_template, flash, redirect, url_for, send_file, jsonify, send_from_directory, session, request
+from flask import render_template, flash, redirect, url_for, send_file, jsonify, send_from_directory, send_file, session, request
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 from io import BytesIO
 import requests
 import os
 import pdfkit
+import qrcode
 
 # importaciones propias
 from ....security.autentication import authentication_required
@@ -49,11 +50,35 @@ class AdminApp:
         Confifura las rutas del panel de administracion.
         Incluye rutas para el dashboard, reportes, gestion y CRUD de empleados.
         """
+        @self.admin.route('/')
+        @authentication_required
+        def qrcode_route():
+            """
+            Genera un codigo QR para la asignacion de mesas.
+            """
+            target_url = "https://74zb1whg-5000.use2.devtunnels.ms/user/splash"
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(target_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill='black', back_color='white')
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            buffer.seek(0)
+
+            return send_file(buffer, mimetype="image/png", as_attachment=True, download_name="qr.png")
+
         @self.admin.route('/admin/<path:filename>')
+        @authentication_required
         def media(filename):
             return send_from_directory(self.admin.config['UPLOAD_FOLDER'], filename)
         
         @self.admin.route('/admin/data/<path:filename>')
+        @authentication_required
         def media_product(filename):
             return send_from_directory(self.admin.config['UPLOAD_FOLDER_PRODUCT'], filename)
 
@@ -104,6 +129,7 @@ class AdminApp:
             return render_template('admin/admin.html', section="reports", data=data)
         
         @self.admin.route('/admin/reports/ia')
+        @authentication_required
         def admin_ia_reports():
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return render_template('/admin/reports/ia.html')
@@ -300,12 +326,6 @@ class AdminApp:
         def products(truck_id):
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
-                    query_truck = """
-                    SELECT * FROM trucks
-                    """
-                    cursor.execute(query_truck)
-                    trucks = cursor.fetchall()
-
                     if truck_id:
                         query = """
                         SELECT * FROM productos WHERE truck_id = %s
@@ -318,6 +338,15 @@ class AdminApp:
                         """
                         cursor.execute(query_truck, (truck_id,))
                         trucks = cursor.fetchall()
+
+                        query_disabled_products = """
+                        SELECT *
+                        FROM productos
+                        WHERE estado = 'inactivo'
+                        """
+                        cursor.execute(query_disabled_products)
+                        product_disabled = cursor.fetchall()
+
                     else:
                         query_truck = """
                         SELECT * FROM trucks
@@ -325,7 +354,7 @@ class AdminApp:
                         cursor.execute(query_truck)
                         trucks = cursor.fetchall()
 
-                        query = """
+                        query = """ 
                         SELECT * FROM productos
                         """
                         cursor.execute(query)
@@ -334,14 +363,13 @@ class AdminApp:
             except Error as e:
                 print(f"Error al obtener los productos: {str(e)}")
                 flash(f"Error al obtener los productos: {str(e)}", "error")
-                return redirect(url_for('products'))
 
             return render_template(
                 'admin/admin.html', 
                 section="products", 
                 productos=productos,
                 trucks=trucks,
-                truck_id_selected=truck_id
+                product_disabled=product_disabled
             )
 
         @self.admin.route('/admin/products/create_product/<int:truck_id>', methods=['GET', 'POST'])
@@ -383,6 +411,7 @@ class AdminApp:
             )
         
         @self.admin.route('/admin/products/update_product/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
         def update_products(id):
 
             with self.conn.cursor(dictionary=True) as cursor:
@@ -434,6 +463,7 @@ class AdminApp:
             )
 
         @self.admin.route('/admin/products/disabled_products/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
         def disabled_products(id):
             try:
                 with self.conn.cursor(dictionary=True) as cursor:
@@ -462,6 +492,7 @@ class AdminApp:
             return redirect(url_for("products", truck_id=pedido['truck_id']))
 
         @self.admin.route('/admin/products/allowed_products/<int:id>', methods=['GET', 'POST'])
+        @authentication_required
         def allowed_products(id):
             try:
                 with self.conn.cursor(dictionary=True) as cursor:

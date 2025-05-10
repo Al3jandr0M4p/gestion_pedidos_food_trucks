@@ -4,13 +4,14 @@ Modulo de gestion de usuarios de la aplicacion
 Este modulo define la clase `UserApp` que configura y gestiona 
 las rutas relacionadas con los usuarios en la aplicacion Flask
 """
-from flask import render_template, url_for, redirect, send_file, jsonify, flash, session, request
+from flask import render_template, url_for, redirect, jsonify, flash, session, request
 from io import BytesIO
 from datetime import datetime
 
 import os
-import json, uuid
-import qrcode, stripe
+import json
+import uuid
+import stripe
 import concurrent.futures
 
 # Importaciones propias
@@ -43,28 +44,6 @@ class UserApp:
         Incluye la logica para generar codigos QR, asignar mesas 
         y mostrar el menu de foodtrucks
         """
-        @self.user.route('/')
-        def qrcode_route():
-            """
-            Genera un codigo QR para la asignacion de mesas.
-            """
-            # target_url = "https://74zb1whg-5000.use2.devtunnels.ms/user/assign_mesa"
-            target_url = "https://74zb1whg-5000.use2.devtunnels.ms/user/splash"
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(target_url)
-            qr.make(fit=True)
-            img = qr.make_image(fill='black', back_color='white')
-            buffer = BytesIO()
-            img.save(buffer, format="PNG")
-            buffer.seek(0)
-
-            # return send_file(buffer, mimetype="image/png", as_attachment=True, download_name="qr.png")
-            return "<b style='text-align: center;'>Ya el qrcode ya fue entregado.<b>"
         
         @self.user.route('/user/menu/<mesa_id>')
         def menu_user(mesa_id):

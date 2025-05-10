@@ -1,20 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
 :root {
-    --white: #fff;
-    --primary: #f97316;
-    --primary-dark: #ea580c;
-    --primary-light: #ffedd5;
-    --text-primary: #333333;
-    --dark: #1e293b;
-    --light: #f8fafc;
-    --gray: #94a3b8;
-    --gray-light: #e2e8f0;
-    --danger: #ef4444;
-    --success: #10b981;
-    --border-radius: 8px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --font: 'Poppins', sans-serif;
+    --dark-color: #1a1a1a;
+    --accent-color: #ff7d20;
+    --gradient-accent: linear-gradient(135deg, #fb781b 0%, #fe9641 100%);
+    --shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --white: #ffffff;
+    --primary: #ff7d20;
+    --primary-dark: #e86500;
+    --danger: #e74c3c;
+    --success: #2ecc71;
+    --info: #3498db;
+    --border-color: #e0e0e0;
+    --text-primary: #333333;
+    --background-light: #fff8f0;
 }
 
 * {
@@ -147,7 +149,7 @@ body {
 }
 
 .card-body {
-    padding: 1.4rem;
+    padding: clamp(1rem, 3vw, 2rem);
 }
 
 .modal {
@@ -451,6 +453,20 @@ body {
 
 .empty-row td {
     padding: 3rem 1rem;
+}
+
+.img-circular {
+    width: clamp(40px, 8vw, 60px);
+    height: clamp(40px, 8vw, 60px);
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-color);
+    transition: transform .3s ease;
+}
+
+.img-circular:hover {
+    transform: scale(1.1);
+    border-color: var(--primary);
 }
 
 .no-products {

@@ -69,6 +69,7 @@
                                     <th>Descripcion</th>
                                     <th>Precio</th>
                                     <th>Imagen</th>
+                                    <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -82,14 +83,15 @@
                                             <td>{{ producto.descripcion }}</td>
                                             <td>$ {{ producto.precio }}</td>
                                             <td>
-                                                <img src="{{ url_for('media_product', filename=producto.imagen_producto) }}" alt="{{ producto.nombre_producto }}">
+                                                <img src="{{ url_for('media_product', filename=producto.imagen_producto) }}" alt="{{ producto.nombre_producto }}" class="img-circular">
                                             </td>
+                                            <td>{{ producto.estado }}</td>
                                             <td class="actions">
                                                 <button class="btn btn-sm btn-edit" onclick="openProductModal('{{ producto.id }}')">
-                                                    <i class="icon-edir"></i> Editar
+                                                    <i class="icon-edit"></i> Editar
                                                 </button>
             
-                                                <a href="#" class="btn btn-sm btn-danger">
+                                                <a href="{{ url_for('disabled_products', id=producto.id) }}" class="btn btn-sm btn-danger">
                                                     <i class="fas fa-user-sls"></i> Desabilitar
                                                 </a>
                                             </td>
@@ -109,8 +111,62 @@
                         </table>
                     </div>
                 </div>
+
             </div>
         {% endfor %}
+
+        <div class="card mt-4">
+            <header class="card-header">
+                <h2>Pedidos Deshabilitados</h2>
+            </header>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Descripcion</th>
+                                <th>Precio</th>
+                                <th>Imagen</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                {% if product_disabled %}
+                                    {% for disabled in product_disabled %}
+                                        <td>{{ disabled.nombre_producto }}</td>
+                                        <td>{{ disabled.descripcion }}</td>
+                                        <td>{{ disabled.precio }}</td>
+                                        <td>
+                                            <img src="{{ url_for('media_product', filename=disabled.imagen_producto) }}" alt="{{ disabled.nombre_producto }}" class="img-circular">
+                                        </td>
+                                        <td>{{ disabled.estado }}</td>
+                                        <td>
+                                            <button aria-label="Habilitar productos">
+                                                Habilitar
+                                            </button>
+                                        </td>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr class="empty-row">
+                                        <td colspan="5">
+                                            <div class="no-products">
+                                                <i class="fa-solid fa-utensils"></i>
+                                                <p>No hay productos deshabilitados para este truck</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
     </div>
 
